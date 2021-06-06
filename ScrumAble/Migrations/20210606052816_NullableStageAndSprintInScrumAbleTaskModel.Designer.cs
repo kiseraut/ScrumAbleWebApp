@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ScrumAble.Data;
 
 namespace ScrumAble.Migrations
 {
     [DbContext(typeof(ScrumAbleContext))]
-    partial class ScrumAbleContextModelSnapshot : ModelSnapshot
+    [Migration("20210606052816_NullableStageAndSprintInScrumAbleTaskModel")]
+    partial class NullableStageAndSprintInScrumAbleTaskModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -239,10 +241,10 @@ namespace ScrumAble.Migrations
                     b.Property<int>("ReleaseId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("SprintId")
+                    b.Property<int>("SprintId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("StageId")
+                    b.Property<int>("StageId")
                         .HasColumnType("int");
 
                     b.Property<string>("TaskName")

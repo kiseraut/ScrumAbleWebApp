@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
@@ -11,6 +12,7 @@ using ScrumAble.Data;
 [assembly: HostingStartup(typeof(ScrumAble.Areas.Identity.IdentityHostingStartup))]
 namespace ScrumAble.Areas.Identity
 {
+    [ExcludeFromCodeCoverage]
     public class IdentityHostingStartup : IHostingStartup
     {
         public void Configure(IWebHostBuilder builder)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -12,6 +13,7 @@ using ScrumAble.Areas.Identity.Data;
 namespace ScrumAble.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
+    [ExcludeFromCodeCoverage]
     public class LogoutModel : PageModel
     {
         private readonly SignInManager<ScrumAbleUser> _signInManager;

@@ -4,11 +4,13 @@ using ScrumAble.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace ScrumAble.Controllers
 {
+    [ExcludeFromCodeCoverage]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;

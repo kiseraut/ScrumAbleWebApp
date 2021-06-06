@@ -1,7 +1,9 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ScrumAble.Models
 {
+    [ExcludeFromCodeCoverage]
     public class ErrorViewModel
     {
         public string RequestId { get; set; }

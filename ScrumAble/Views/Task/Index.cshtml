@@ -1,0 +1,63 @@
+﻿@model ScrumAble.Models.ScrumAbleTask
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "New Task";
+
+}
+
+<h2>Add A New Task</h2>
+
+<div style="width: 500px;">
+    @using (Html.BeginForm("AddToSprint", "Task"))
+    {
+    <div class="form-group">
+        @Html.LabelFor(t => t.TaskName)
+        @Html.TextBoxFor(t => t.TaskName, new { @class = "form-control" })
+        @Html.ValidationMessageFor(t => t.TaskName)
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(t => t.Points)
+        @Html.TextBoxFor(t => t.Points, new { @class = "form-control" })
+        @Html.ValidationMessageFor(t => t.Points)
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(t => t.DueDate)
+        <input class="form-control" asp-for="DueDate" />
+        @Html.ValidationMessageFor(t => t.DueDate)
+    </div>
+        <div class="form-group">
+            @Html.LabelFor(t => t.Description)
+            @Html.TextAreaFor(t => t.Description, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @{
+                List<SelectListItem> listItems = new List<SelectListItem>();
+                listItems.Add(new SelectListItem
+                {
+                    Text = "Sprint",
+                    Value = "Sprint",
+                    Selected = true
+                });
+                listItems.Add(new SelectListItem
+                {
+                    Text = "Backlog",
+                    Value = "Backlog"
+                });
+            }
+            @Html.LabelFor(t => t.Destination)
+            @Html.DropDownListFor(t => t.Description, listItems, new { @class = "form-control" })
+        </div>
+
+        @Html.AntiForgeryToken()
+
+        <button type="submit" class="btn btn-primary">Add Task</button>
+
+    }
+</div>
+
+<!--javascript libraries for unobtrusive client-side validation-->
+@section scripts {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+}

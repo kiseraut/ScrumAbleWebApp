@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -18,6 +19,7 @@ using ScrumAble.Areas.Identity.Data;
 namespace ScrumAble.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
+    [ExcludeFromCodeCoverage]
     public class RegisterModel : PageModel
     {
         private readonly SignInManager<ScrumAbleUser> _signInManager;

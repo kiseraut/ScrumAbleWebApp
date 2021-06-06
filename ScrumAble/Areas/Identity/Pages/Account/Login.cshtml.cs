@@ -12,10 +12,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using ScrumAble.Areas.Identity.Data;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ScrumAble.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
+    [ExcludeFromCodeCoverage]
     public class LoginModel : PageModel
     {
         private readonly UserManager<ScrumAbleUser> _userManager;

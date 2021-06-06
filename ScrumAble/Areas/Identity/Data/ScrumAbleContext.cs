@@ -16,6 +16,8 @@ namespace ScrumAble.Data
         {
         }
 
+        public DbSet<ScrumAble.Models.ScrumAbleTask> Tasks { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
