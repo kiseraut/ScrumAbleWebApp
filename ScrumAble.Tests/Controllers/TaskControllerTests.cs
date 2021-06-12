@@ -47,9 +47,9 @@ namespace ScrumAble.Tests.Controllers
             var testTask = new ScrumAbleTask();
 
             testTask.TaskName = "Test Task";
-            testTask.Points = 5;
-            testTask.DueDate = new DateTime(2021, 6, 5);
-            testTask.Description = "This is a tesk Task";
+            testTask.TaskPoints = 5;
+            testTask.TaskDueDate = new DateTime(2021, 6, 5);
+            testTask.TaskDescription = "This is a tesk Task";
             testTask.Destination = "Sprint";           
 
             // Act
@@ -74,17 +74,17 @@ namespace ScrumAble.Tests.Controllers
             var testTask = new ScrumAbleTask();
 
             testTask.TaskName = "Test Task";
-            testTask.Points = 5;
-            testTask.DueDate = new DateTime(2021, 6, 5);
-            testTask.Description = "This is a tesk Task";
-            testTask.Destination = "Sprint";
+            testTask.TaskPoints = 5;
+            testTask.TaskDueDate = new DateTime(2021, 6, 5);
+            testTask.TaskDescription = "This is a tesk Task";
+            testTask.Destination = "Sprint";  
 
             // Act
             IActionResult result = taskController.AddToSprint(testTask) as IActionResult;            
 
             // Assert
             Assert.NotNull(testTask.SprintId);
-            Assert.NotNull(testTask.StageId);
+            Assert.NotNull(testTask.WorkflowStageID);
             context.Database.EnsureDeleted();
         }
 
@@ -101,9 +101,9 @@ namespace ScrumAble.Tests.Controllers
             var testTask = new ScrumAbleTask();
 
             testTask.TaskName = "Test Task";
-            testTask.Points = 5;
-            testTask.DueDate = new DateTime(2021, 6, 5);
-            testTask.Description = "This is a tesk Task";
+            testTask.TaskPoints = 5;
+            testTask.TaskDueDate = new DateTime(2021, 6, 5);
+            testTask.TaskDescription = "This is a tesk Task";
             testTask.Destination = "Backlog";
 
             // Act
@@ -111,7 +111,7 @@ namespace ScrumAble.Tests.Controllers
 
             // Assert
             Assert.Null(testTask.SprintId);
-            Assert.Null(testTask.StageId);
+            Assert.Null(testTask.WorkflowStageID);
             context.Database.EnsureDeleted();
         }
 
@@ -128,9 +128,9 @@ namespace ScrumAble.Tests.Controllers
             var testTask = new ScrumAbleTask();
 
             testTask.TaskName = null;
-            testTask.Points = 5;
-            testTask.DueDate = new DateTime(2021, 6, 5);
-            testTask.Description = "This is a tesk Task";
+            testTask.TaskPoints = 5;
+            testTask.TaskDueDate = new DateTime(2021, 6, 5);
+            testTask.TaskDescription = "This is a tesk Task";
             testTask.Destination = "Backlog";
 
             taskController.ModelState.AddModelError("TaskName", "The Task Name field is required.");

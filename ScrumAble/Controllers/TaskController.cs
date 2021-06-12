@@ -23,6 +23,11 @@ namespace ScrumAble.Controllers
             return View();
         }
 
+        public IActionResult AddTask()
+        {
+            return View();
+        }
+
         [HttpPost]
         public IActionResult AddToSprint(ScrumAbleTask formTask)
         {
@@ -31,17 +36,17 @@ namespace ScrumAble.Controllers
                 return View("Index", formTask);
             }
             
-            formTask.ReleaseId = 0;
+            //formTask.ReleaseId = 0;
 
             if(formTask.Destination == "Sprint")
             {
                 //TODO replace hardcoded data
-                formTask.StageId = 1;
+                formTask.WorkflowStageID = 1;
                 formTask.SprintId = 1;
             }
             else
             {
-                formTask.StageId = null;
+                formTask.WorkflowStageID = null;
                 formTask.SprintId = null;
             }
 

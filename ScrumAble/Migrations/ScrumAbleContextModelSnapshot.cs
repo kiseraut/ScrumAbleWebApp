@@ -202,6 +202,9 @@ namespace ScrumAble.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
+                    b.Property<string>("UserColor")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -219,6 +222,98 @@ namespace ScrumAble.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
+            modelBuilder.Entity("ScrumAble.Models.ScrumAbleRelease", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("ReleaseEndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReleaseName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ReleaseStartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TeamId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Releases");
+                });
+
+            modelBuilder.Entity("ScrumAble.Models.ScrumAbleSprint", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ReleaseId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("SprintEndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SprintName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("SprintStartDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Sprints");
+                });
+
+            modelBuilder.Entity("ScrumAble.Models.ScrumAbleStory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("SprintId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StoryCloseDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("StoryDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("StoryDueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("StoryName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StoryOwner")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StoryPoints")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StoryStartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("WorkflowStageID")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Stories");
+                });
+
             modelBuilder.Entity("ScrumAble.Models.ScrumAbleTask", b =>
                 {
                     b.Property<int>("Id")
@@ -226,32 +321,104 @@ namespace ScrumAble.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DueDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Points")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ReleaseId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("SprintId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("StageId")
+                    b.Property<int?>("StoryID")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("TaskCloseDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TaskDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("TaskDueDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("TaskName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("TaskOwner")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TaskPoints")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TaskStartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("WorkflowStageID")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("Tasks");
+                });
+
+            modelBuilder.Entity("ScrumAble.Models.ScrumAbleTeam", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("TeamName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Teams");
+                });
+
+            modelBuilder.Entity("ScrumAble.Models.ScrumAbleUserTeamMapping", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("TeamId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId1")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TeamId");
+
+                    b.HasIndex("UserId1");
+
+                    b.ToTable("UserTeamMapping");
+                });
+
+            modelBuilder.Entity("ScrumAble.Models.ScrumAbleWorkflowStage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ReleaseName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TeamId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("WorkflowStagePosition")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WorkflowStages");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -303,6 +470,23 @@ namespace ScrumAble.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("ScrumAble.Models.ScrumAbleUserTeamMapping", b =>
+                {
+                    b.HasOne("ScrumAble.Models.ScrumAbleTeam", "Team")
+                        .WithMany()
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ScrumAble.Areas.Identity.Data.ScrumAbleUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId1");
+
+                    b.Navigation("Team");
+
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

@@ -14,9 +14,14 @@ namespace ScrumAble.Data
         public ScrumAbleContext(DbContextOptions<ScrumAbleContext> options)
             : base(options)
         {
-        }
-
+        }        
+        public DbSet<ScrumAble.Models.ScrumAbleRelease> Releases { get; set; }
+        public DbSet<ScrumAble.Models.ScrumAbleSprint> Sprints { get; set; }
+        public DbSet<ScrumAble.Models.ScrumAbleStory> Stories { get; set; }
         public DbSet<ScrumAble.Models.ScrumAbleTask> Tasks { get; set; }
+        public DbSet<ScrumAble.Models.ScrumAbleTeam> Teams { get; set; }
+        public DbSet<ScrumAble.Models.ScrumAbleWorkflowStage> WorkflowStages { get; set; }
+        public DbSet<ScrumAble.Models.ScrumAbleUserTeamMapping> UserTeamMapping { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

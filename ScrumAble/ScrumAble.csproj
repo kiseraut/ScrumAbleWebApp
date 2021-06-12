@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="bootstrap" Version="5.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.6" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.6" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.6" />
@@ -14,6 +15,27 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\js\BS5\bootstrap-5.0.1\.github\CODEOWNERS" />
+    <None Include="wwwroot\js\BS5\bootstrap-5.0.1\.github\CONTRIBUTING.md" />
+    <None Include="wwwroot\js\BS5\bootstrap-5.0.1\.github\dependabot.yml" />
+    <None Include="wwwroot\js\BS5\bootstrap-5.0.1\.github\FUNDING.yml" />
+    <None Include="wwwroot\js\BS5\bootstrap-5.0.1\.github\ISSUE_TEMPLATE\bug_report.md" />
+    <None Include="wwwroot\js\BS5\bootstrap-5.0.1\.github\ISSUE_TEMPLATE\config.yml" />
+    <None Include="wwwroot\js\BS5\bootstrap-5.0.1\.github\ISSUE_TEMPLATE\feature_request.md" />
+    <None Include="wwwroot\js\BS5\bootstrap-5.0.1\.github\release-drafter.yml" />
+    <None Include="wwwroot\js\BS5\bootstrap-5.0.1\.github\SUPPORT.md" />
+    <None Include="wwwroot\js\BS5\bootstrap-5.0.1\.github\workflows\browserstack.yml" />
+    <None Include="wwwroot\js\BS5\bootstrap-5.0.1\.github\workflows\bundlewatch.yml" />
+    <None Include="wwwroot\js\BS5\bootstrap-5.0.1\.github\workflows\codeql.yml" />
+    <None Include="wwwroot\js\BS5\bootstrap-5.0.1\.github\workflows\css.yml" />
+    <None Include="wwwroot\js\BS5\bootstrap-5.0.1\.github\workflows\docs.yml" />
+    <None Include="wwwroot\js\BS5\bootstrap-5.0.1\.github\workflows\js.yml" />
+    <None Include="wwwroot\js\BS5\bootstrap-5.0.1\.github\workflows\lint.yml" />
+    <None Include="wwwroot\js\BS5\bootstrap-5.0.1\.github\workflows\node-sass.yml" />
+    <None Include="wwwroot\js\BS5\bootstrap-5.0.1\.github\workflows\release-notes.yml" />
   </ItemGroup>
 
 </Project>

@@ -11,43 +11,103 @@
 <div style="width: 500px;">
     @using (Html.BeginForm("AddToSprint", "Task"))
     {
-    <div class="form-group">
-        @Html.LabelFor(t => t.TaskName)
-        @Html.TextBoxFor(t => t.TaskName, new { @class = "form-control" })
-        @Html.ValidationMessageFor(t => t.TaskName)
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(t => t.Points)
-        @Html.TextBoxFor(t => t.Points, new { @class = "form-control" })
-        @Html.ValidationMessageFor(t => t.Points)
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(t => t.DueDate)
-        <input class="form-control" asp-for="DueDate" />
-        @Html.ValidationMessageFor(t => t.DueDate)
-    </div>
         <div class="form-group">
-            @Html.LabelFor(t => t.Description)
-            @Html.TextAreaFor(t => t.Description, new { @class = "form-control" })
+            @Html.LabelFor(t => t.TaskName)
+            @Html.TextBoxFor(t => t.TaskName, new { @class = "form-control" })
+            @Html.ValidationMessageFor(t => t.TaskName)
         </div>
+
         <div class="form-group">
             @{
-                List<SelectListItem> listItems = new List<SelectListItem>();
-                listItems.Add(new SelectListItem
+                List<SelectListItem> ownerListItems = new List<SelectListItem>();
+                //add all team members to this list
+                ownerListItems.Add(new SelectListItem
                 {
-                    Text = "Sprint",
-                    Value = "Sprint",
+                    Text = "None",
+                    Value = "-1",
                     Selected = true
                 });
-                listItems.Add(new SelectListItem
+                ownerListItems.Add(new SelectListItem
                 {
-                    Text = "Backlog",
-                    Value = "Backlog"
+                    Text = "John Doe",
+                    Value = "3"
+                });
+                ownerListItems.Add(new SelectListItem
+                {
+                    Text = "Jane Doe",
+                    Value = "4"
                 });
             }
-            @Html.LabelFor(t => t.Destination)
-            @Html.DropDownListFor(t => t.Description, listItems, new { @class = "form-control" })
+            @Html.LabelFor(t => t.TaskOwner)
+            @Html.DropDownListFor(t => t.TaskOwner, ownerListItems, new { @class = "form-control" })
         </div>
+
+        <div class="form-group">
+            @Html.LabelFor(t => t.TaskPoints)
+            @Html.TextBoxFor(t => t.TaskPoints, new { @class = "form-control" })
+            @Html.ValidationMessageFor(t => t.TaskPoints)
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(t => t.TaskDueDate)
+            <input class="form-control" asp-for="TaskDueDate" />
+            @Html.ValidationMessageFor(t => t.TaskDueDate)
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(t => t.TaskDescription)
+            @Html.TextAreaFor(t => t.TaskDescription, new { @class = "form-control" })
+        </div>
+
+        <div class="form-group">
+            @{
+                List<SelectListItem> SprintListItems = new List<SelectListItem>();
+                //add current and future sprints to this list
+                SprintListItems.Add(new SelectListItem
+                {
+                    Text = "Sprint 1",
+                    Value = "1"
+                }); SprintListItems.Add(new SelectListItem
+                {
+                    Text = "Sprint 2",
+                    Value = "2"
+                });
+                SprintListItems.Add(new SelectListItem
+                {
+                    Text = "Backlog",
+                    Value = "-1",
+                    Selected = true
+                });
+            }
+            @Html.LabelFor(t => t.SprintId)
+            @Html.DropDownListFor(t => t.SprintId, SprintListItems, new { @class = "form-control"})
+            
+        </div>
+
+        <div class="form-group">
+            @{
+                List<SelectListItem> StoryListItems = new List<SelectListItem>();
+                //add all stories from the selected sprint above
+                StoryListItems.Add(new SelectListItem
+                {
+                    Text = "Story 1",
+                    Value = "1"
+                }); StoryListItems.Add(new SelectListItem
+                {
+                    Text = "Story 2",
+                    Value = "2"
+                });
+                StoryListItems.Add(new SelectListItem
+                {
+                    Text = "None",
+                    Value = "-1",
+                    Selected = true
+                });
+            }
+            @Html.LabelFor(t => t.StoryID, new { id="StoryListLabel"})
+            @Html.DropDownListFor(t => t.StoryID, StoryListItems, new { @class = "form-control"})
+        </div>
+
 
         @Html.AntiForgeryToken()
 
