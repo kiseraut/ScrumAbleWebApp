@@ -13,6 +13,9 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using ScrumAble.Areas.Identity.Data;
 using System.Diagnostics.CodeAnalysis;
+using ScrumAble.Data;
+using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 
 namespace ScrumAble.Areas.Identity.Pages.Account
 {
@@ -22,15 +25,18 @@ namespace ScrumAble.Areas.Identity.Pages.Account
     {
         private readonly UserManager<ScrumAbleUser> _userManager;
         private readonly SignInManager<ScrumAbleUser> _signInManager;
+        private readonly ScrumAbleContext _context;
         private readonly ILogger<LoginModel> _logger;
 
         public LoginModel(SignInManager<ScrumAbleUser> signInManager, 
             ILogger<LoginModel> logger,
-            UserManager<ScrumAbleUser> userManager)
+            UserManager<ScrumAbleUser> userManager,
+            ScrumAbleContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
+            _context = context;
         }
 
         [BindProperty]
@@ -88,6 +94,24 @@ namespace ScrumAble.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
+
+
+
+                    // set initial user state
+                    
+
+                    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                    var user = _context.Users.Where(u => u.Id == userId)
+                        .Include(u => u.UserTeamMappings)
+                            .ThenInclude(utm => utm.Team)
+                        .SingleOrDefault();
+
+                    //user.currentWorkingTeam = user.UserTeamMappings.team;
+
+
+
+
+
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)

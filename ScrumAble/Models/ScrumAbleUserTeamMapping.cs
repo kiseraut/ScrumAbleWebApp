@@ -11,14 +11,10 @@ namespace ScrumAble.Models
     {
         public int Id { get; set; }
 
+        [Required]
         public ScrumAbleUser User { get; set; }
 
         [Required]
-        public int UserId { get; set; }
-
         public ScrumAbleTeam Team { get; set; }
-
-        [Required]
-        public int TeamId { get; set; }
     }
 }

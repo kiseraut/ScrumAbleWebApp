@@ -209,6 +209,15 @@ namespace ScrumAble.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<int?>("currentWorkingReleaseId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("currentWorkingSprintId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("currentWorkingTeamId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -218,6 +227,12 @@ namespace ScrumAble.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.HasIndex("currentWorkingReleaseId");
+
+                    b.HasIndex("currentWorkingSprintId");
+
+                    b.HasIndex("currentWorkingTeamId");
 
                     b.ToTable("AspNetUsers");
                 });
@@ -239,11 +254,12 @@ namespace ScrumAble.Migrations
                     b.Property<DateTime>("ReleaseStartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("TeamId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("TeamId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TeamId");
 
                     b.ToTable("Releases");
                 });
@@ -255,9 +271,8 @@ namespace ScrumAble.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ReleaseId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("ReleaseId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("SprintEndDate")
                         .HasColumnType("datetime2");
@@ -270,6 +285,8 @@ namespace ScrumAble.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ReleaseId");
 
                     b.ToTable("Sprints");
                 });
@@ -284,32 +301,38 @@ namespace ScrumAble.Migrations
                     b.Property<int?>("SprintId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("StoryCloseDate")
+                    b.Property<DateTime?>("StoryCloseDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("StoryDescription")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("StoryDueDate")
+                    b.Property<DateTime?>("StoryDueDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("StoryName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("StoryOwner")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("StoryOwnerId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("StoryPoints")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("StoryStartDate")
+                    b.Property<DateTime?>("StoryStartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("WorkflowStageID")
+                    b.Property<int?>("WorkflowStageId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SprintId");
+
+                    b.HasIndex("StoryOwnerId");
+
+                    b.HasIndex("WorkflowStageId");
 
                     b.ToTable("Stories");
                 });
@@ -324,35 +347,44 @@ namespace ScrumAble.Migrations
                     b.Property<int?>("SprintId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("StoryID")
+                    b.Property<int?>("StoryId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("TaskCloseDate")
+                    b.Property<DateTime?>("TaskCloseDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("TaskDescription")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("TaskDueDate")
+                    b.Property<DateTime?>("TaskDueDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("TaskName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("TaskOwner")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("TaskOwnerId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("TaskPoints")
+                    b.Property<int?>("TaskPoints")
+                        .IsRequired()
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("TaskStartDate")
+                    b.Property<DateTime?>("TaskStartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("WorkflowStageID")
+                    b.Property<int?>("WorkflowStageId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SprintId");
+
+                    b.HasIndex("StoryId");
+
+                    b.HasIndex("TaskOwnerId");
+
+                    b.HasIndex("WorkflowStageId");
 
                     b.ToTable("Tasks");
                 });
@@ -383,17 +415,15 @@ namespace ScrumAble.Migrations
                     b.Property<int>("TeamId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId1")
+                    b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("TeamId");
 
-                    b.HasIndex("UserId1");
+                    b.HasIndex("UserId");
 
                     b.ToTable("UserTeamMapping");
                 });
@@ -405,11 +435,10 @@ namespace ScrumAble.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ReleaseName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("TeamId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("TeamId")
+                    b.Property<string>("WorkflowStageName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -417,6 +446,8 @@ namespace ScrumAble.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TeamId");
 
                     b.ToTable("WorkflowStages");
                 });
@@ -472,21 +503,167 @@ namespace ScrumAble.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ScrumAble.Areas.Identity.Data.ScrumAbleUser", b =>
+                {
+                    b.HasOne("ScrumAble.Models.ScrumAbleRelease", "currentWorkingRelease")
+                        .WithMany()
+                        .HasForeignKey("currentWorkingReleaseId");
+
+                    b.HasOne("ScrumAble.Models.ScrumAbleSprint", "currentWorkingSprint")
+                        .WithMany()
+                        .HasForeignKey("currentWorkingSprintId");
+
+                    b.HasOne("ScrumAble.Models.ScrumAbleTeam", "currentWorkingTeam")
+                        .WithMany()
+                        .HasForeignKey("currentWorkingTeamId");
+
+                    b.Navigation("currentWorkingRelease");
+
+                    b.Navigation("currentWorkingSprint");
+
+                    b.Navigation("currentWorkingTeam");
+                });
+
+            modelBuilder.Entity("ScrumAble.Models.ScrumAbleRelease", b =>
+                {
+                    b.HasOne("ScrumAble.Models.ScrumAbleTeam", "Team")
+                        .WithMany("Releases")
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Team");
+                });
+
+            modelBuilder.Entity("ScrumAble.Models.ScrumAbleSprint", b =>
+                {
+                    b.HasOne("ScrumAble.Models.ScrumAbleRelease", "Release")
+                        .WithMany("Sprints")
+                        .HasForeignKey("ReleaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Release");
+                });
+
+            modelBuilder.Entity("ScrumAble.Models.ScrumAbleStory", b =>
+                {
+                    b.HasOne("ScrumAble.Models.ScrumAbleSprint", "Sprint")
+                        .WithMany("Stories")
+                        .HasForeignKey("SprintId");
+
+                    b.HasOne("ScrumAble.Areas.Identity.Data.ScrumAbleUser", "StoryOwner")
+                        .WithMany("Stories")
+                        .HasForeignKey("StoryOwnerId");
+
+                    b.HasOne("ScrumAble.Models.ScrumAbleWorkflowStage", "WorkflowStage")
+                        .WithMany("Stories")
+                        .HasForeignKey("WorkflowStageId");
+
+                    b.Navigation("Sprint");
+
+                    b.Navigation("StoryOwner");
+
+                    b.Navigation("WorkflowStage");
+                });
+
+            modelBuilder.Entity("ScrumAble.Models.ScrumAbleTask", b =>
+                {
+                    b.HasOne("ScrumAble.Models.ScrumAbleSprint", "Sprint")
+                        .WithMany("Tasks")
+                        .HasForeignKey("SprintId");
+
+                    b.HasOne("ScrumAble.Models.ScrumAbleStory", "Story")
+                        .WithMany("Tasks")
+                        .HasForeignKey("StoryId");
+
+                    b.HasOne("ScrumAble.Areas.Identity.Data.ScrumAbleUser", "TaskOwner")
+                        .WithMany("Tasks")
+                        .HasForeignKey("TaskOwnerId");
+
+                    b.HasOne("ScrumAble.Models.ScrumAbleWorkflowStage", "WorkflowStage")
+                        .WithMany("Tasks")
+                        .HasForeignKey("WorkflowStageId");
+
+                    b.Navigation("Sprint");
+
+                    b.Navigation("Story");
+
+                    b.Navigation("TaskOwner");
+
+                    b.Navigation("WorkflowStage");
+                });
+
             modelBuilder.Entity("ScrumAble.Models.ScrumAbleUserTeamMapping", b =>
                 {
                     b.HasOne("ScrumAble.Models.ScrumAbleTeam", "Team")
-                        .WithMany()
+                        .WithMany("UserTeamMappings")
                         .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("ScrumAble.Areas.Identity.Data.ScrumAbleUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId1");
+                        .WithMany("UserTeamMappings")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Team");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ScrumAble.Models.ScrumAbleWorkflowStage", b =>
+                {
+                    b.HasOne("ScrumAble.Models.ScrumAbleTeam", "Team")
+                        .WithMany("WorkFlowStages")
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Team");
+                });
+
+            modelBuilder.Entity("ScrumAble.Areas.Identity.Data.ScrumAbleUser", b =>
+                {
+                    b.Navigation("Stories");
+
+                    b.Navigation("Tasks");
+
+                    b.Navigation("UserTeamMappings");
+                });
+
+            modelBuilder.Entity("ScrumAble.Models.ScrumAbleRelease", b =>
+                {
+                    b.Navigation("Sprints");
+                });
+
+            modelBuilder.Entity("ScrumAble.Models.ScrumAbleSprint", b =>
+                {
+                    b.Navigation("Stories");
+
+                    b.Navigation("Tasks");
+                });
+
+            modelBuilder.Entity("ScrumAble.Models.ScrumAbleStory", b =>
+                {
+                    b.Navigation("Tasks");
+                });
+
+            modelBuilder.Entity("ScrumAble.Models.ScrumAbleTeam", b =>
+                {
+                    b.Navigation("Releases");
+
+                    b.Navigation("UserTeamMappings");
+
+                    b.Navigation("WorkFlowStages");
+                });
+
+            modelBuilder.Entity("ScrumAble.Models.ScrumAbleWorkflowStage", b =>
+                {
+                    b.Navigation("Stories");
+
+                    b.Navigation("Tasks");
                 });
 #pragma warning restore 612, 618
         }

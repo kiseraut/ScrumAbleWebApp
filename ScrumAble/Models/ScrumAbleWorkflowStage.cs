@@ -11,8 +11,8 @@ namespace ScrumAble.Models
         public int Id { get; set; }
 
         //The display name of the workflow stage
-        [Required(AllowEmptyStrings = false), Display(Name = "Release Name")]
-        public string ReleaseName { get; set; }
+        [Required(AllowEmptyStrings = false), Display(Name = "Workflow Stage Name")]
+        public string WorkflowStageName { get; set; }
 
         //The position of the workflow stage releative to other workflow stages for this team
         [Required(AllowEmptyStrings = false), Display(Name = "Workflow Stage Position")]
@@ -20,6 +20,10 @@ namespace ScrumAble.Models
 
         //The Team that will be using this workflow stage
         [Required(AllowEmptyStrings = false), Display(Name = "Team")]
-        public string TeamId { get; set; }
+        public ScrumAbleTeam Team { get; set; }
+
+        public ICollection<ScrumAbleStory> Stories { get; set; }
+
+        public ICollection<ScrumAbleTask> Tasks { get; set; }
     }
 }

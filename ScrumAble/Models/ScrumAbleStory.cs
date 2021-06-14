@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ScrumAble.Areas.Identity.Data;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ScrumAble.Models
 {
-    public class ScrumAbleStory
+    public class ScrumAbleStory 
     {
         public int Id { get; set; }
 
@@ -16,19 +17,19 @@ namespace ScrumAble.Models
 
         //The owner of the story
         [Display(Name = "Story Owner")]
-        public string StoryOwner { get; set; }
+        public ScrumAbleUser StoryOwner { get; set; }
 
         //The date that the story was started i.e. moved into progress
-        [Required(AllowEmptyStrings = false), Display(Name = "Story Start Date"), DataType(DataType.Date)]
-        public DateTime StoryStartDate { get; set; }
+        [Display(Name = "Story Start Date"), DataType(DataType.Date)]
+        public DateTime? StoryStartDate { get; set; }
 
         //The date the story is due to be completed
-        [Required(AllowEmptyStrings = false), Display(Name = "Story Due Date"), DataType(DataType.Date)]
-        public DateTime StoryDueDate { get; set; }
+        [Display(Name = "Story Due Date"), DataType(DataType.Date)]
+        public DateTime? StoryDueDate { get; set; }
 
         //The date the story was actually finished
         [DataType(DataType.Date)]
-        public DateTime StoryCloseDate { get; set; }
+        public DateTime? StoryCloseDate { get; set; }
 
         //The number of points assgned to this story
         [Required(AllowEmptyStrings = false), Display(Name = "Sprint Points For This Story")]
@@ -39,11 +40,17 @@ namespace ScrumAble.Models
         public String StoryDescription { get; set; }
 
         //The ID of the stage (swim lane) that the story is in
-        public int? WorkflowStageID { get; set; }
+        public ScrumAbleWorkflowStage WorkflowStage { get; set; }
 
         //The ID of the sprint this story is in
         [Display(Name = "Add Task To Sprint")]
-        public int? SprintId { get; set; }
+        public ScrumAbleSprint Sprint { get; set; }
+
+
+        public ICollection<ScrumAbleTask> Tasks { get; set; }
+
+
+
 
 
     }

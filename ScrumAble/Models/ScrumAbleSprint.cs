@@ -24,6 +24,10 @@ namespace ScrumAble.Models
 
         //The Releaes that this sprint it in
         [Required(AllowEmptyStrings = false), Display(Name = "Release")]
-        public string ReleaseId { get; set; }
+        public ScrumAbleRelease Release { get; set; }
+
+        public ICollection<ScrumAbleStory> Stories { get; set; }
+
+        public ICollection<ScrumAbleTask> Tasks { get; set; }
     }
 }

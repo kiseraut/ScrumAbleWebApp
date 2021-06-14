@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ScrumAble.Areas.Identity.Data;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -17,38 +18,56 @@ namespace ScrumAble.Models
 
         //The owner of the task
         [Display(Name = "Task Owner")]
-        public string TaskOwner { get; set; }
+        public ScrumAbleUser TaskOwner { get; set; }
 
         //The date that the task was started i.e. moved into progress
-        [Required(AllowEmptyStrings = false), Display(Name = "Task Start Date"), DataType(DataType.Date)]
-        public DateTime TaskStartDate { get; set; }
+        [Display(Name = "Task Start Date"), DataType(DataType.Date), DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
+        public DateTime? TaskStartDate { get; set; }
 
         //The date the task is due to be completed
-        [Required(AllowEmptyStrings = false), Display(Name = "Task Due Date"), DataType(DataType.Date)]
-        public DateTime TaskDueDate { get; set; }
+        [Display(Name = "Task Due Date"), DataType(DataType.Date), DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
+        public DateTime? TaskDueDate { get; set; }
 
         //The date the task was actually finished
-        [DataType(DataType.Date)]
-        public DateTime TaskCloseDate { get; set; }
+        [DataType(DataType.Date), DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
+        public DateTime? TaskCloseDate { get; set; }
 
         //The number of points assgned to this task
         [Required(AllowEmptyStrings = false), Display(Name = "Sprint Points For This Task")]
-        public int TaskPoints { get; set; }
+        public int? TaskPoints { get; set; }
 
         //The description of the task
         [Display(Name = "Description")]
         public String TaskDescription { get; set; }
 
         //The ID of the stage (swim lane) that the task is in
-        public int? WorkflowStageID { get; set; }
+        public ScrumAbleWorkflowStage WorkflowStage { get; set; }
 
         //The ID of the sprint this task is in
         [Display(Name = "Add Task To Sprint")]
-        public int? SprintId { get; set; }
+        public ScrumAbleSprint Sprint { get; set; }
 
         //The ID of the story this task is in
         [Display(Name = "Add Task To Story")]
-        public int? StoryID { get; set; }
+        public ScrumAbleStory Story { get; set; }
+
+        [NotMapped]
+        public ViewModelTaskAggregate viewModelTaskAggregate { get; set; }
+
+        //The owner of the task
+        [Display(Name = "Task Owner")]
+        [NotMapped]
+        public string? TaskOwnerId { get; set; }
+
+        //The ID of the sprint this task is in
+        [Display(Name = "Add Task To Sprint")]
+        [NotMapped]
+        public int? TaskSprintId { get; set; }
+
+        //The ID of the story this task is in
+        [Display(Name = "Add Task To Story")]
+        [NotMapped]
+        public int? TaskStoryId { get; set; }
 
         //Unused?
         [NotMapped, Display(Name = "Add Task To")]

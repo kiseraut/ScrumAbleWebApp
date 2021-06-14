@@ -24,6 +24,9 @@ namespace ScrumAble.Models
 
         //The Team that will be working on this release
         [Required(AllowEmptyStrings = false), Display(Name = "Team")]
-        public string TeamId { get; set; }
+        public ScrumAbleTeam Team { get; set; }
+
+        public ICollection<ScrumAbleSprint> Sprints { get; set; }
+
     }
 }
