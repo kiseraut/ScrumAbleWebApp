@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ScrumAble.Areas.Identity.Data;
+using ScrumAble.Migrations;
+using ScrumAble.Models;
 
 namespace ScrumAble.Data
 {
@@ -22,6 +24,7 @@ namespace ScrumAble.Data
         public DbSet<ScrumAble.Models.ScrumAbleTeam> Teams { get; set; }
         public DbSet<ScrumAble.Models.ScrumAbleWorkflowStage> WorkflowStages { get; set; }
         public DbSet<ScrumAble.Models.ScrumAbleUserTeamMapping> UserTeamMapping { get; set; }
+        public DbSet<Areas.Identity.Data.ScrumAbleUser> User { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -30,5 +33,7 @@ namespace ScrumAble.Data
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);
         }
+
+      
     }
 }

@@ -1,4 +1,6 @@
-﻿@inject SignInManager<ScrumAbleUser> SignInManager
+﻿@using System.Diagnostics.CodeAnalysis
+@attribute [ExcludeFromCodeCoverage]
+@inject SignInManager<ScrumAbleUser> SignInManager
 @{
     var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
 }

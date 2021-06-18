@@ -166,6 +166,15 @@ namespace ScrumAble.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("CurrentWorkingReleaseId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CurrentWorkingSprintId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CurrentWorkingTeamId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -209,16 +218,13 @@ namespace ScrumAble.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<int?>("currentWorkingReleaseId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("currentWorkingSprintId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("currentWorkingTeamId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("CurrentWorkingReleaseId");
+
+                    b.HasIndex("CurrentWorkingSprintId");
+
+                    b.HasIndex("CurrentWorkingTeamId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -227,12 +233,6 @@ namespace ScrumAble.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.HasIndex("currentWorkingReleaseId");
-
-                    b.HasIndex("currentWorkingSprintId");
-
-                    b.HasIndex("currentWorkingTeamId");
 
                     b.ToTable("AspNetUsers");
                 });
@@ -363,7 +363,7 @@ namespace ScrumAble.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("TaskOwnerId")
+                    b.Property<string>("TaskOwnerId1")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("TaskPoints")
@@ -382,7 +382,7 @@ namespace ScrumAble.Migrations
 
                     b.HasIndex("StoryId");
 
-                    b.HasIndex("TaskOwnerId");
+                    b.HasIndex("TaskOwnerId1");
 
                     b.HasIndex("WorkflowStageId");
 
@@ -505,23 +505,23 @@ namespace ScrumAble.Migrations
 
             modelBuilder.Entity("ScrumAble.Areas.Identity.Data.ScrumAbleUser", b =>
                 {
-                    b.HasOne("ScrumAble.Models.ScrumAbleRelease", "currentWorkingRelease")
+                    b.HasOne("ScrumAble.Models.ScrumAbleRelease", "CurrentWorkingRelease")
                         .WithMany()
-                        .HasForeignKey("currentWorkingReleaseId");
+                        .HasForeignKey("CurrentWorkingReleaseId");
 
-                    b.HasOne("ScrumAble.Models.ScrumAbleSprint", "currentWorkingSprint")
+                    b.HasOne("ScrumAble.Models.ScrumAbleSprint", "CurrentWorkingSprint")
                         .WithMany()
-                        .HasForeignKey("currentWorkingSprintId");
+                        .HasForeignKey("CurrentWorkingSprintId");
 
-                    b.HasOne("ScrumAble.Models.ScrumAbleTeam", "currentWorkingTeam")
+                    b.HasOne("ScrumAble.Models.ScrumAbleTeam", "CurrentWorkingTeam")
                         .WithMany()
-                        .HasForeignKey("currentWorkingTeamId");
+                        .HasForeignKey("CurrentWorkingTeamId");
 
-                    b.Navigation("currentWorkingRelease");
+                    b.Navigation("CurrentWorkingRelease");
 
-                    b.Navigation("currentWorkingSprint");
+                    b.Navigation("CurrentWorkingSprint");
 
-                    b.Navigation("currentWorkingTeam");
+                    b.Navigation("CurrentWorkingTeam");
                 });
 
             modelBuilder.Entity("ScrumAble.Models.ScrumAbleRelease", b =>
@@ -579,7 +579,7 @@ namespace ScrumAble.Migrations
 
                     b.HasOne("ScrumAble.Areas.Identity.Data.ScrumAbleUser", "TaskOwner")
                         .WithMany("Tasks")
-                        .HasForeignKey("TaskOwnerId");
+                        .HasForeignKey("TaskOwnerId1");
 
                     b.HasOne("ScrumAble.Models.ScrumAbleWorkflowStage", "WorkflowStage")
                         .WithMany("Tasks")

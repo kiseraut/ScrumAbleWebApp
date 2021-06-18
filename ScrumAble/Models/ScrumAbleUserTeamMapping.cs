@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ScrumAble.Models
 {
-    public class ScrumAbleUserTeamMapping
+    public class ScrumAbleUserTeamMapping : IScrumAbleUserTeamMapping
     {
         public int Id { get; set; }
 

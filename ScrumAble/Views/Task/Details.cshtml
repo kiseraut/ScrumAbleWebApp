@@ -1,4 +1,6 @@
-﻿@model ScrumAble.Models.ScrumAbleTask
+﻿@using System.Diagnostics.CodeAnalysis
+@attribute [ExcludeFromCodeCoverage]
+@model ScrumAble.Models.ScrumAbleTask
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
@@ -9,7 +11,6 @@
 <div>
     <ul class="navbar-nav" style="flex-direction: row;">
         <li class="nav-item" style="margin-right: 15px;">
-
             @Html.ActionLink("Edit", "EditTask", new { Id = Model.Id })
         </li>
         <li class="nav-item">
@@ -21,31 +22,66 @@
 </div>
 <h2>@Model.TaskName</h2>
 
-<b>Owner:</b> @Model.TaskOwner.Email
+<b>Owner:</b> @{
+    if (@Model.TaskOwner != null)
+    {
+        @Model.TaskOwner.Email
+    }
+}
 
 <br />
 
-<b>Due:</b> @Html.DisplayFor(d => Model.TaskDueDate)
+<b>Due:</b> @{
+    if (@Model.Sprint != null)
+    {
+        Html.DisplayFor(d => Model.TaskDueDate);
+    }
+}
 
 <br />
 
-<b>Sprint:</b> @Model.Sprint.SprintName
+<b>Sprint:</b> @{
+    if (@Model.Sprint != null)
+    {
+        @Model.Sprint.SprintName;
+    }
+}
 
 <br />
 
-<b>Story:</b> @Model.Story.StoryName
+<b>Story:</b> @{
+    if (@Model.Story != null)
+    {
+        @Model.Story.StoryName;
+    }
+}
 
 <br />
 
-<b>Worflow Stage:</b> @Model.WorkflowStage.WorkflowStageName
+<b>Workflow Stage:</b> @{
+    if (@Model.WorkflowStage != null)
+    {
+        @Model.WorkflowStage.WorkflowStageName;
+    }
+}
 
 <br />
 
-<b>Points:</b> @Model.TaskPoints
+<b>Points:</b> @{
+    if (@Model.TaskPoints != null)
+    {
+        @Model.TaskPoints;
+    }
+}
 
 <br />
 
-<b>Description:</b> @Model.TaskDescription
+<b>Description:</b> @{
+    if (@Model.TaskDescription != null)
+    {
+        @Model.TaskDescription;
+    }
+}
 
 
 

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ScrumAble.Models
 {
-    public class ViewModelTaskAggregate
+    public class ViewModelTaskAggregate : IViewModelTaskAggregate
     {
         [NotMapped]
         public ScrumAbleTask Task { get; set; }

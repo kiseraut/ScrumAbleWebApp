@@ -22,6 +22,7 @@ namespace ScrumAble.Controllers
 
         public IActionResult Index()
         {
+            ViewBag.TeamName = "Team will go here";
             return View();
         }
 

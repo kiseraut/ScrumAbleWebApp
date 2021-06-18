@@ -1,11 +1,16 @@
-﻿<div class="flex-shrink-0 p-3 bg-dark" style="width: 280px; height: 100%;">
+﻿@using Microsoft.AspNetCore.Identity
+@using ScrumAble.Areas.Identity.Data
+@using ScrumAble.Controllers
+
+@inject SignInManager<ScrumAbleUser> SignInManager
+@inject UserManager<ScrumAbleUser> UserManager
+    
+    <div class="flex-shrink-0 p-3 bg-dark" style="width: 280px; height: 100%;">
 
     <a href="/" class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom" style="color: white; font-size: 21px;">
         <svg class="bi me-2" width="30" height="24"><use xlink:href="#bootstrap" /></svg>
-        <span class="fs-4 fw-semibold">Team 1</span>
-    </a>
-
-
+        <span class="fs-4 fw-semibold"> </span>
+    </a>   
     <ul class="list-unstyled ps-0">
         <li class="mb-1">
             <button class="btn btn-toggle align-items-center rounded collapsed" style="color: white;" data-bs-toggle="collapse" data-bs-target="#home-collapse" aria-expanded="true">

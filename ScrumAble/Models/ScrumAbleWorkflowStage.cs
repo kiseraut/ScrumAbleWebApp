@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ScrumAble.Models
 {
-    public class ScrumAbleWorkflowStage
+    public class ScrumAbleWorkflowStage : IScrumAbleWorkflowStage
     {
         public int Id { get; set; }
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ScrumAble.Models
 {
-    public class ScrumAbleRelease
+    public class ScrumAbleRelease : IScrumAbleRelease
     {
         public int Id { get; set; }
 

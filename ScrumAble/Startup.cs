@@ -1,14 +1,19 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ScrumAble.Areas.Identity.Data;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using ScrumAble.Data;
+using ScrumAble.Models;
 
 namespace ScrumAble
 {
@@ -25,9 +30,13 @@ namespace ScrumAble
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<ScrumAbleContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("ScrumAbleContextConnection")));
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddHttpContextAccessor();
+            services.AddTransient<UserManager<ScrumAbleUser>>();
+            services.AddScoped<IScrumAbleRepo, ScrumAbleRepo>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

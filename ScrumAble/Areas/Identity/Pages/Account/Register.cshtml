@@ -1,4 +1,6 @@
 ﻿@page
+@using System.Diagnostics.CodeAnalysis
+@attribute [ExcludeFromCodeCoverage]
 @model RegisterModel
 @{
     ViewData["Title"] = "Register";
@@ -30,7 +32,7 @@
             <button type="submit" class="btn btn-primary">Register</button>
         </form>
     </div>
-    
+
 </div>
 
 @section Scripts {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ScrumAble.Models
 {
-    public class ScrumAbleSprint
+    public class ScrumAbleSprint : IScrumAbleSprint
     {
         public int Id { get; set; }
 
@@ -22,7 +22,7 @@ namespace ScrumAble.Models
         [Required(AllowEmptyStrings = false), Display(Name = "Sprint End Date"), DataType(DataType.Date)]
         public DateTime SprintEndDate { get; set; }
 
-        //The Releaes that this sprint it in
+        //The Releases that this sprint it in
         [Required(AllowEmptyStrings = false), Display(Name = "Release")]
         public ScrumAbleRelease Release { get; set; }
 

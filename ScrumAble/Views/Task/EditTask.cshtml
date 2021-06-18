@@ -1,0 +1,126 @@
+﻿
+@using System.Diagnostics.CodeAnalysis
+@attribute [ExcludeFromCodeCoverage]
+@model ScrumAble.Models.ScrumAbleTask
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Edit Task";
+
+}
+
+<h2>Add A New Task</h2>
+
+<div style="width: 500px;">
+    @using (Html.BeginForm("UpdateTask", "Task"))
+    {
+        <div class="form-group">
+            @Html.LabelFor(t => t.TaskName)
+            @Html.TextBoxFor(t => t.TaskName, new { @class = "form-control" })
+            @Html.ValidationMessageFor(t => t.TaskName)
+        </div>
+
+        <div class="form-group">
+            @{
+                List<SelectListItem> ownerListItems = new List<SelectListItem>();
+                //add all team members to this list
+
+                ownerListItems.Add(new SelectListItem
+                {
+                    Text = "None",
+                    Value = "-1",
+                    Selected = true
+                });
+
+                foreach (var teammate in Model.viewModelTaskAggregate.Users)
+                {
+                    ownerListItems.Add(new SelectListItem
+                    {
+                        Text = teammate.Email,
+                        Value = teammate.Email
+                    });
+                }
+            }
+            @Html.LabelFor(t => t.TaskOwnerId)
+            @Html.DropDownListFor(t => t.TaskOwnerId, ownerListItems, new { @class = "form-control" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(t => t.TaskPoints)
+            @Html.TextBoxFor(t => t.TaskPoints, new { @class = "form-control" })
+            @Html.ValidationMessageFor(t => t.TaskPoints)
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(t => t.TaskDueDate)
+            <input class="form-control" asp-for="TaskDueDate" />
+            @Html.ValidationMessageFor(t => t.TaskDueDate)
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(t => t.TaskDescription)
+            @Html.TextAreaFor(t => t.TaskDescription, new { @class = "form-control" })
+        </div>
+
+        <div class="form-group">
+            @{
+                List<SelectListItem> SprintListItems = new List<SelectListItem>();
+                //add current and future sprints to this list
+
+                SprintListItems.Add(new SelectListItem
+                {
+                    Text = "Backlog",
+                    Value = "-1",
+                    Selected = true
+                });
+
+                foreach (var sprint in Model.viewModelTaskAggregate.Sprints)
+                {
+                    SprintListItems.Add(new SelectListItem
+                    {
+                        Text = sprint.SprintName,
+                        Value = sprint.Id.ToString()
+                    });
+                }
+
+            }
+            @Html.LabelFor(t => t.TaskSprintId)
+            @Html.DropDownListFor(t => t.TaskSprintId, SprintListItems, new { @class = "form-control" })
+
+        </div>
+
+        <div class="form-group">
+            @{
+                List<SelectListItem> StoryListItems = new List<SelectListItem>();
+                //add all stories from the selected sprint above
+
+                StoryListItems.Add(new SelectListItem
+                {
+                    Text = "None",
+                    Value = "-1",
+                    Selected = true
+                });
+
+                foreach (var story in Model.viewModelTaskAggregate.Stories)
+                {
+                    StoryListItems.Add(new SelectListItem
+                    {
+                        Text = story.StoryName,
+                        Value = story.Id.ToString()
+                    });
+                }
+
+            }
+            @Html.LabelFor(t => t.TaskStoryId, new { id = "StoryListLabel" })
+            @Html.DropDownListFor(t => t.TaskStoryId, StoryListItems, new { @class = "form-control" })
+        </div>
+        <input type="hidden" asp-for="viewModelTaskAggregate" />
+
+        @Html.EditorFor(t => t.viewModelTaskAggregate)
+        @Html.HiddenFor(t => t.Id);
+        @Html.AntiForgeryToken()
+
+        <button type="submit" class="btn btn-primary">Update Task</button>
+
+    }
+</div>

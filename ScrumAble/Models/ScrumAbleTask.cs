@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ScrumAble.Models
 {
-    public class ScrumAbleTask
+    public class ScrumAbleTask : IScrumAbleTask
     {
         public int Id { get; set; }
 
@@ -55,8 +55,7 @@ namespace ScrumAble.Models
         public ViewModelTaskAggregate viewModelTaskAggregate { get; set; }
 
         //The owner of the task
-        [Display(Name = "Task Owner")]
-        [NotMapped]
+        [NotMapped, Display(Name = "Task Owner")]
         public string? TaskOwnerId { get; set; }
 
         //The ID of the sprint this task is in
