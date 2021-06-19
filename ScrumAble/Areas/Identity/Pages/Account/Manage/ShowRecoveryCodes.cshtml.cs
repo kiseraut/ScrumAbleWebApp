@@ -11,6 +11,7 @@ using ScrumAble.Areas.Identity.Data;
 
 namespace ScrumAble.Areas.Identity.Pages.Account.Manage
 {
+    [ExcludeFromCodeCoverage]
     public class ShowRecoveryCodesModel : PageModel
     {
         [ExcludeFromCodeCoverage]

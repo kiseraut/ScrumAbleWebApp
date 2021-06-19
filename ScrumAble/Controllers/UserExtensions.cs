@@ -5,6 +5,7 @@ using ScrumAble.Areas.Identity.Data;
 using ScrumAble.Data;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ScrumAble.Controllers
 {
-
+    [ExcludeFromCodeCoverage]
     public class UserExtensions : Controller
     {
 
@@ -24,19 +25,6 @@ namespace ScrumAble.Controllers
         {
             _userManager = userManager;
             _context = context;
-        }
-
-        public string Thisisatest()
-        {
-
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = _context.Users.Where(u => u.Id == userId)
-                .Include(u => u.UserTeamMappings)
-                    .ThenInclude(utm => utm.Team)
-                .SingleOrDefault();
-
-
-            return user.CurrentWorkingTeam.TeamName;
         }
     }
 }

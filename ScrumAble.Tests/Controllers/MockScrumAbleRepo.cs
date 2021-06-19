@@ -61,11 +61,6 @@ namespace ScrumAble.Tests.Controllers
                 .SingleOrDefault();
         }
 
-        public ScrumAbleUser PopulateUserMetadata(ScrumAbleUser user)
-        {
-            throw new NotImplementedException();
-        }
-
         public void SaveToDb(ScrumAbleUser user)
         {
             if (user.Id == "0")

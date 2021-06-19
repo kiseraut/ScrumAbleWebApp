@@ -67,26 +67,29 @@ namespace ScrumAble.Models
                 .ThenInclude(utm => utm.Team)
                 .FirstOrDefault();
 
-            var teammates = _context.UserTeamMapping.Where(utm => utm.Team.Id == user.CurrentWorkingTeam.Id)
-                .Include(utm => utm.User)
-                .ToList();
-
-            //add the teammates to the user object
-            ICollection<ScrumAbleUser> userTeammates = new List<ScrumAbleUser>();
-
-            foreach (var teammate in teammates)
+            if (user.CurrentWorkingTeam != null)
             {
-                userTeammates.Add(teammate.User);
-            }
+                var teammates = _context.UserTeamMapping.Where(utm => utm.Team.Id == user.CurrentWorkingTeam.Id)
+                    .Include(utm => utm.User)
+                    .ToList();
 
-            user.Teammates = userTeammates;
+                //add the teammates to the user object
+                ICollection<ScrumAbleUser> userTeammates = new List<ScrumAbleUser>();
+
+                foreach (var teammate in teammates)
+                {
+                    userTeammates.Add(teammate.User);
+                }
+
+                user.Teammates = userTeammates;
+            }
 
             return user;
         }
 
         public ScrumAbleUser GetUserByUsername(string username)
         {
-            var user = _context.Users.Where(u => u.Email == username)
+            var user = _context.Users.Where(u => u.UserName == username)
                 .Include(u => u.CurrentWorkingTeam)
                 .Include(u => u.CurrentWorkingRelease)
                 .Include(u => u.CurrentWorkingSprint)
@@ -95,40 +98,34 @@ namespace ScrumAble.Models
                 .ThenInclude(utm => utm.Team)
                 .FirstOrDefault();
 
-            var teammates = _context.UserTeamMapping.Where(utm => utm.Team.Id == user.CurrentWorkingTeam.Id)
-                .Include(utm => utm.User)
-                .ToList();
-
-            //add the teammates to the user object
-            ICollection<ScrumAbleUser> userTeammates = new List<ScrumAbleUser>();
-
-            foreach (var teammate in teammates)
+            if (user.CurrentWorkingTeam != null)
             {
-                userTeammates.Add(teammate.User);
-            }
+                var teammates = _context.UserTeamMapping.Where(utm => utm.Team.Id == user.CurrentWorkingTeam.Id)
+                    .Include(utm => utm.User)
+                    .ToList();
 
-            user.Teammates = userTeammates;
+                //add the teammates to the user object
+                ICollection<ScrumAbleUser> userTeammates = new List<ScrumAbleUser>();
+
+                foreach (var teammate in teammates)
+                {
+                    userTeammates.Add(teammate.User);
+                }
+
+                user.Teammates = userTeammates;
+            }
 
             return user;
         }
 
-        public ScrumAbleUser PopulateUserMetadata(ScrumAbleUser user)
-        {
-            throw new NotImplementedException();
-        }
-
         public void SaveToDb(ScrumAbleUser user)
         {
-            if (user.Id == "0")
+            //new users (identified by a 0 ID) are handled by Identity framework
+            if (user.Id != "0")
             {
-                //new users are handled by Identity framework
-            }
-            else
-            {
-                _context.Users.Add(user);
+                _context.Users.Update(user);
                 _context.SaveChanges();
             }
-            
         }
 
         public void DeleteFromDb(ScrumAbleUser user)
@@ -152,22 +149,28 @@ namespace ScrumAble.Models
         public ViewModelTaskAggregate GetTaskAggregateData(string userId)
         {
             var user = GetUserById(userId);
-
-            //get all of the current and future sprints for the current working team and release
-            var sprints = _context.Sprints.Where(s => s.Release.Id == user.CurrentWorkingRelease.Id)
-                .Where(s => s.SprintEndDate >= DateTime.Today)
-                .ToList();
-
-            //get all of the stories in the current and future sprints
-            var stories = _context.Stories
-                .FromSqlRaw("SELECT st.Id ,st.StoryName ,st.StoryStartDate ,st.StoryDueDate ,st.StoryCloseDate ,st.StoryPoints ,st.StoryDescription ,st.WorkflowStageId ,st.SprintId ,st.StoryOwnerId FROM Stories st INNER JOIN Sprints sp ON st.SprintId = sp.Id WHERE st.StoryStartDate < GETDATE() AND (st.StoryCloseDate > GETDATE() OR st.StoryCloseDate is NULL) AND sp.ReleaseId = {0}", user.CurrentWorkingRelease.Id)
-                .ToList();
-
-            //add all metadata to the viewmodelTaskAgregate object
             var viewmodelTaskAggregate = new ViewModelTaskAggregate();
+
+
+            if (user.CurrentWorkingRelease != null)
+            {
+                //get all of the current and future sprints for the current working team and release
+                var sprints = _context.Sprints.Where(s => s.Release.Id == user.CurrentWorkingRelease.Id)
+                    .Where(s => s.SprintEndDate >= DateTime.Today)
+                    .ToList();
+                
+                //get all of the stories in the current and future sprints
+                var stories = _context.Stories
+                    .FromSqlRaw(
+                        "SELECT st.Id ,st.StoryName ,st.StoryStartDate ,st.StoryDueDate ,st.StoryCloseDate ,st.StoryPoints ,st.StoryDescription ,st.WorkflowStageId ,st.SprintId ,st.StoryOwnerId FROM Stories st INNER JOIN Sprints sp ON st.SprintId = sp.Id WHERE st.StoryStartDate < GETDATE() AND (st.StoryCloseDate > GETDATE() OR st.StoryCloseDate is NULL) AND sp.ReleaseId = {0}",
+                        user.CurrentWorkingRelease.Id)
+                    .ToList();
+
+                viewmodelTaskAggregate.Add(sprints);
+                viewmodelTaskAggregate.Add(stories);
+            }
+            
             viewmodelTaskAggregate.Add(user.Teammates);
-            viewmodelTaskAggregate.Add(sprints);
-            viewmodelTaskAggregate.Add(stories);
 
             return viewmodelTaskAggregate;
 

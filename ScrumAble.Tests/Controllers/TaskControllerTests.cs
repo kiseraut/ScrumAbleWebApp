@@ -50,9 +50,11 @@ namespace ScrumAble.Tests.Controllers
             var context = new ScrumAbleContext(options);
             var scrumAbleRepo = new MockScrumAbleRepo(context);
             var taskController = new TaskController(scrumAbleRepo, null);
+            var testTask = MockScrumAbleTask.GenerateTask();
+            testTask.TaskSprintId = -1;
 
             // Act
-            IActionResult result = taskController.CreateTask(MockScrumAbleTask.GenerateTask()) as IActionResult;
+            IActionResult result = taskController.CreateTask(testTask) as IActionResult;
             MockScrumAbleTask taskDBItems = (MockScrumAbleTask) await context.Tasks.SingleAsync();
 
             // Assert
@@ -159,13 +161,21 @@ namespace ScrumAble.Tests.Controllers
             var scrumAbleRepo = new MockScrumAbleRepo(context);
             var taskController = new TaskController(scrumAbleRepo, null);
             var testTask = MockScrumAbleTask.GenerateTask();
+            var testUser = MockScrumAbleUser.GenerateScrumAbleUser();
+            var testRelease = MockScrumAbleRelease.GenerateRelease();
+            var testSprint = MockScrumAbleSprint.GenerateSprint(testRelease);
+            var testStory = MockScrumAbleStory.GenerateStory();
+            testTask.TaskOwnerId = testUser.Id;
+            testTask.TaskSprintId = testSprint.Id;
+            testTask.TaskStoryId = testStory.Id;
+
             context.Add(testTask);
             context.SaveChanges();
 
             testTask.TaskName = "Updated Test Task";
             
             // Act
-            IActionResult result = taskController.CreateTask(testTask) as IActionResult;
+            IActionResult result = taskController.UpdateTask(testTask) as IActionResult;
             MockScrumAbleTask taskDBItems = (MockScrumAbleTask) await context.Tasks.SingleAsync();
 
             // Assert

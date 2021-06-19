@@ -14,7 +14,6 @@ namespace ScrumAble.Models
         //User methods
         public ScrumAbleUser GetUserById(string id);
         public ScrumAbleUser GetUserByUsername(string username);
-        public ScrumAbleUser PopulateUserMetadata(ScrumAbleUser user);
         public void SaveToDb(ScrumAbleUser user);
         public void DeleteFromDb(ScrumAbleUser user);
 
