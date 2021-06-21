@@ -33,7 +33,7 @@ namespace ScrumAble.Tests.Models
             var result = scrumAbleRepo.GetTaskById(testTask.Id);
 
             // Assert
-            Assert.Equal(testTask.Id, result.Id);
+            Assert.Equal(testTask, result);
             context.Database.EnsureDeleted();
         }
 
@@ -179,7 +179,7 @@ namespace ScrumAble.Tests.Models
             var testUserReturned = scrumAbleRepo.GetUserById(testUser.Id);
 
             // Assert
-            Assert.Equal(testUser.Id, testUserReturned.Id);
+            Assert.Equal(testUser, testUserReturned);
 
             context.Database.EnsureDeleted();
         }

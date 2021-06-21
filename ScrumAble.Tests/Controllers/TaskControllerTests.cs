@@ -145,7 +145,7 @@ namespace ScrumAble.Tests.Controllers
             MockScrumAbleTask model = result.ViewData.Model as MockScrumAbleTask;
 
             // Assert
-            Assert.Equal(testTask1.Id, model.Id);
+            Assert.Equal(testTask1, model);
             context.Database.EnsureDeleted();
         }
 
@@ -209,51 +209,6 @@ namespace ScrumAble.Tests.Controllers
 
             context.Database.EnsureDeleted();
         }
-
-        /*
-        [Fact]
-        public void UT?_TaskController_EditTask_ShouldReturnCorrectTask()
-        {
-            // Arrange
-
-            var options = new DbContextOptionsBuilder<ScrumAbleContext>()
-                .UseInMemoryDatabase(databaseName: "TaskDatabase")
-                .Options;
-
-            var context = new ScrumAbleContext(options);
-            var scrumAbleRepo = new MockScrumAbleRepo(context);
-            var taskController = new TaskController(scrumAbleRepo, null);
-            var testTask1 = new ScrumAbleTask
-            {
-                TaskName = "Test Task 1",
-                TaskPoints = 5,
-                TaskDueDate = new DateTime(2021, 6, 5),
-                TaskDescription = "This is a test Task",
-                Destination = "Sprint"
-            };
-            var testTask2 = new ScrumAbleTask
-            {
-                TaskName = "Test Task 2",
-                TaskPoints = 5,
-                TaskDueDate = new DateTime(2021, 6, 5),
-                TaskDescription = "This is a test Task",
-                Destination = "Sprint"
-            };
-            context.Add(testTask1);
-            context.Add(testTask1);
-            context.SaveChanges();
-
-            
-
-
-            // Act
-            var result = taskController.EditTask(testTask1.Id) as ViewResult;
-            ScrumAbleTask model = result.ViewData.Model as ScrumAbleTask;
-
-            // Assert
-            Assert.Equal(testTask1.Id, model.Id);
-            context.Database.EnsureDeleted();
-        }*/
 
     }
 

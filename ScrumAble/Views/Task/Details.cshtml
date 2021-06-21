@@ -32,9 +32,10 @@
 <br />
 
 <b>Due:</b> @{
-    if (@Model.Sprint != null)
+    if (@Model.TaskDueDate != null)
     {
-        Html.DisplayFor(d => Model.TaskDueDate);
+        @Html.DisplayFor(d => Model.TaskDueDate);
+
     }
 }
 

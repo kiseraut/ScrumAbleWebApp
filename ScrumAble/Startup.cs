@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using ScrumAble.Data;
 using ScrumAble.Models;
@@ -37,6 +38,13 @@ namespace ScrumAble
             services.AddHttpContextAccessor();
             services.AddTransient<UserManager<ScrumAbleUser>>();
             services.AddScoped<IScrumAbleRepo, ScrumAbleRepo>();
+
+            services.AddAuthorization(options =>
+            {
+                options.FallbackPolicy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

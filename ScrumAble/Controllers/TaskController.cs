@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace ScrumAble.Controllers
 {
+    [Authorize]
     public class TaskController : Controller
     {
         private readonly IScrumAbleRepo _scrumAbleRepo;
