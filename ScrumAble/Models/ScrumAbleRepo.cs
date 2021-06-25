@@ -56,6 +56,11 @@ namespace ScrumAble.Models
             _context.SaveChanges();
         }
 
+        public bool IsAuthorized(ScrumAbleTask task, string userIdr)
+        {
+            throw new NotImplementedException();
+        }
+
         public ScrumAbleUser GetUserById(string id)
         {
             var user = _context.User.Where(u => u.Id == id)
@@ -140,10 +145,20 @@ namespace ScrumAble.Models
                 .SingleOrDefault();
         }
 
+        public bool IsAuthorized(ScrumAbleSprint sprint, string userId)
+        {
+            throw new NotImplementedException();
+        }
+
         public ScrumAbleStory GetStoryById(int id)
         {
             return _context.Stories.Where(s => s.Id == id)
                 .SingleOrDefault(); ;
+        }
+
+        public bool IsAuthorized(ScrumAbleStory story, string userId)
+        {
+            throw new NotImplementedException();
         }
 
         public ViewModelTaskAggregate GetTaskAggregateData(string userId)
@@ -176,5 +191,32 @@ namespace ScrumAble.Models
 
         }
 
+        public ScrumAbleTeam GetTeamById(int id)
+        {
+            var team = _context.Teams.Where(t => t.Id == id)
+                .Include(t => t.UserTeamMappings)
+                .ThenInclude(utm => utm.User)
+                .SingleOrDefault();
+
+            return team;
+        }
+
+        public bool IsAuthorized(ScrumAbleTeam team, string userId)
+        {
+            foreach (var mapping in team.UserTeamMappings)
+            {
+                if (mapping.User.Id == userId)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public bool IsAuthorized(ScrumAbleRelease release, string userId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

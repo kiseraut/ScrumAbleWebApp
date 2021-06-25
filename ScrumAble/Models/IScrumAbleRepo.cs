@@ -9,6 +9,7 @@ namespace ScrumAble.Models
         public ScrumAbleTask PopulateTaskMetadata(ScrumAbleTask task);
         public void SaveToDb(ScrumAbleTask task);
         public void DeleteFromDb(ScrumAbleTask task);
+        public bool IsAuthorized(ScrumAbleTask task, string userId);
 
 
         //User methods
@@ -19,12 +20,21 @@ namespace ScrumAble.Models
 
         //Sprint methods
         public ScrumAbleSprint GetSprintById(int id);
+        public bool IsAuthorized(ScrumAbleSprint sprint, string userId);
 
         //Story methods
         public ScrumAbleStory GetStoryById(int id);
+        public bool IsAuthorized(ScrumAbleStory story, string userId);
 
         //ViewModelTaskAggregate methods
         public ViewModelTaskAggregate GetTaskAggregateData(string userId);
+
+        //Team methods
+        public ScrumAbleTeam GetTeamById(int id);
+        public bool IsAuthorized(ScrumAbleTeam team, string userId);
+
+        //Release methods
+        public bool IsAuthorized(ScrumAbleRelease release, string userId);
 
 
     }

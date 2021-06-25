@@ -1,0 +1,33 @@
+﻿
+@using System.Diagnostics.CodeAnalysis
+@attribute [ExcludeFromCodeCoverage]
+@model ScrumAble.Models.ScrumAbleTeam
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Edit Team";
+
+}
+
+<h2>Edit Team "@Model.TeamName"</h2>
+
+<div style="width: 500px;">
+    @using (Html.BeginForm("UpdateTeam", "Team"))
+    {
+        <div class="form-group">
+            @Html.LabelFor(t => t.TeamName)
+            @Html.TextBoxFor(t => t.TeamName, new { @class = "form-control" })
+            @Html.ValidationMessageFor(t => t.TeamName)
+        </div>
+
+        
+            Model.Teammates.Add("user2");
+        
+
+        @Html.HiddenFor(t => t.Id);
+        @Html.AntiForgeryToken()
+
+        <button type="submit" class="btn btn-primary">Update Team</button>
+
+    }
+</div>

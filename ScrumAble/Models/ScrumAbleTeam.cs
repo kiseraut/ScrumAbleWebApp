@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace ScrumAble.Models
 {
@@ -19,5 +21,8 @@ namespace ScrumAble.Models
         public ICollection<ScrumAbleUserTeamMapping> UserTeamMappings { get; set; }
 
         public ICollection<ScrumAbleWorkflowStage> WorkFlowStages { get; set; }
+
+        [NotMapped]
+        public ICollection<string> Teammates { get; set; }
     }
 }
