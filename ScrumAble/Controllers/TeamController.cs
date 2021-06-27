@@ -5,6 +5,8 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Razor.Language;
+using Microsoft.EntityFrameworkCore;
 using ScrumAble.Areas.Identity.Data;
 using ScrumAble.Models;
 
@@ -21,13 +23,7 @@ namespace ScrumAble.Controllers
             _scrumAbleRepo = scrumAbleRepo;
             _userManager = userManager;
         }
-
-
-        public IActionResult Index()
-        {
-            return View();
-        }
-
+        
         public IActionResult Details(int id)
         {
 
@@ -39,15 +35,6 @@ namespace ScrumAble.Controllers
             }
 
             return View(scrumAbleTeam);
-
-            /*var scrumAbleTask = _scrumAbleRepo.GetTaskById(id);
-            scrumAbleTask = _scrumAbleRepo.PopulateTaskMetadata(scrumAbleTask);
-
-            if (scrumAbleTask == null)
-            {
-                return View("TaskNotFound");
-            }
-            return View(scrumAbleTask);*/
         }
 
         public IActionResult EditTeam(int id)
@@ -65,14 +52,87 @@ namespace ScrumAble.Controllers
 
         public IActionResult DeleteTeam(int id)
         {
-            return View(null);
+            _scrumAbleRepo.DeleteFromDb(_scrumAbleRepo.GetTeamById(id));
+            //TODO redirect back to dashboard
+            return RedirectToAction("Index", "Home");
         }
 
+        [HttpPost]
         public IActionResult UpdateTeam(ScrumAbleTeam team)
         {
-            var test = "something";
-            //throw new NotImplementedException();
-            return View(null);
+            var badUsers = new List<string>();
+            var goodUsers = new List<IScrumAbleUser>();
+            var addedUsersWithDups = team.TeammatesText.Split(Environment.NewLine,
+                StringSplitOptions.RemoveEmptyEntries);
+            var addedUsers = addedUsersWithDups.Distinct();
+
+            foreach (var user in addedUsers)
+            {
+                var foundUser = _scrumAbleRepo.GetUserByUsername(user);
+                if (foundUser == null)
+                {
+                    badUsers.Add(user);
+                    ModelState.AddModelError("Teammates", "Teammates are invalid");
+                }
+                else
+                {
+                    goodUsers.Add(foundUser);
+                }
+            }
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.data = badUsers;
+                return View("EditTeam", team);
+            }
+            
+            _scrumAbleRepo.SaveToDb(team, goodUsers);
+            return RedirectToAction("Details", "Team", new { id = team.Id });
+        }
+
+        public IActionResult AddTeam(ScrumAbleTeam scrumAbleTeam)
+        {
+            ModelState.Clear();
+            return View(scrumAbleTeam);
+        }
+
+        [HttpPost]
+        public IActionResult CreateTeam(ScrumAbleTeam team)
+        {
+            var badUsers = new List<string>();
+            var goodUsers = new List<IScrumAbleUser>();
+            team.TeammatesText += "\r\n" + User.FindFirstValue(ClaimTypes.Email);
+
+            if (team.TeammatesText != null)
+            {
+                
+                var addedUsersWithDups = team.TeammatesText.Split(Environment.NewLine,
+                    StringSplitOptions.RemoveEmptyEntries);
+                var addedUsers = addedUsersWithDups.Distinct();
+
+                foreach (var user in addedUsers)
+                {
+                    var foundUser = _scrumAbleRepo.GetUserByUsername(user);
+                    if (foundUser == null)
+                    {
+                        badUsers.Add(user);
+                        ModelState.AddModelError("Teammates", "Teammates are invalid");
+                    }
+                    else
+                    {
+                        goodUsers.Add(foundUser);
+                    }
+                }
+            }
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.data = badUsers;
+                return View("AddTeam", team);
+            }
+
+            _scrumAbleRepo.SaveToDb(team, goodUsers);
+            return RedirectToAction("Details", "Team", new { id = team.Id });
         }
     }
 }

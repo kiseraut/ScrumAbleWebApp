@@ -1,4 +1,6 @@
-﻿using ScrumAble.Areas.Identity.Data;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using ScrumAble.Areas.Identity.Data;
 
 namespace ScrumAble.Models
 {
@@ -35,6 +37,10 @@ namespace ScrumAble.Models
 
         //Release methods
         public bool IsAuthorized(ScrumAbleRelease release, string userId);
+
+        //UserTeamMapping methods
+        public void SaveToDb(ScrumAbleTeam team, List<IScrumAbleUser> users);
+        public void DeleteFromDb(ScrumAbleTeam team);
 
 
     }

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ScrumAble.Areas.Identity.Data;
@@ -103,7 +105,7 @@ namespace ScrumAble.Models
                 .ThenInclude(utm => utm.Team)
                 .FirstOrDefault();
 
-            if (user.CurrentWorkingTeam != null)
+            if (user != null && user.CurrentWorkingTeam != null)
             {
                 var teammates = _context.UserTeamMapping.Where(utm => utm.Team.Id == user.CurrentWorkingTeam.Id)
                     .Include(utm => utm.User)
@@ -198,6 +200,14 @@ namespace ScrumAble.Models
                 .ThenInclude(utm => utm.User)
                 .SingleOrDefault();
 
+            if (team != null)
+            {
+                foreach (var mapping in team.UserTeamMappings)
+                {
+                    team.TeammatesText += mapping.User.UserName + "\n";
+                }
+            }
+
             return team;
         }
 
@@ -217,6 +227,70 @@ namespace ScrumAble.Models
         public bool IsAuthorized(ScrumAbleRelease release, string userId)
         {
             throw new NotImplementedException();
+        }
+
+        public void SaveToDb(ScrumAbleTeam team, List<IScrumAbleUser> users)
+        {
+            if (team.Id == 0)
+            {
+                _context.Teams.Add(team);
+                _context.SaveChanges();
+
+                while (team.Id == 0)
+                {
+                    Thread.Sleep(1000);
+                }
+
+                foreach (var user in users)
+                {
+                    var DBCheck = _context.UserTeamMapping.Where(utm => utm.Team == team && utm.User == user)
+                        .SingleOrDefault();
+
+                    if (DBCheck == null)
+                    {
+                        _context.Database.ExecuteSqlRaw("INSERT INTO UserTeamMapping (UserId, TeamId) VALUES ({0}, {1})", user.Id, team.Id);
+                        _context.SaveChanges();
+                    }
+                }
+            }
+            else
+            {
+                var dbTeam = _context.Teams.First(t => t.Id == team.Id);
+                _context.Entry(dbTeam).CurrentValues.SetValues(team);
+                _context.SaveChanges();
+
+                while (team.Id == 0)
+                {
+                    Thread.Sleep(1000);
+                }
+
+                var teamMappings = _context.UserTeamMapping.Where(utm => utm.Team.Id == team.Id)
+                    .ToList();
+
+                foreach (var teamMapping in teamMappings)
+                {
+                    _context.Remove(teamMapping);
+                    _context.SaveChanges();
+                }
+
+                foreach (var user in users)
+                {
+                    var DBCheck = _context.UserTeamMapping.Where(utm => utm.Team == team && utm.User == user)
+                        .SingleOrDefault();
+
+                    if (DBCheck == null)
+                    {
+                        _context.Database.ExecuteSqlRaw("INSERT INTO UserTeamMapping (UserId, TeamId) VALUES ({0}, {1})", user.Id, team.Id);
+                        _context.SaveChanges();
+                    }
+                }
+            }
+        }
+
+        public void DeleteFromDb(ScrumAbleTeam team)
+        {
+            _context.Teams.Remove(team);
+            _context.SaveChanges();
         }
     }
 }

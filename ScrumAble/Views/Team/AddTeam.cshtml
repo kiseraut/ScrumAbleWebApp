@@ -1,18 +1,21 @@
-﻿
-@using System.Diagnostics.CodeAnalysis
+﻿@using System.Diagnostics.CodeAnalysis
+@using Microsoft.AspNetCore.Identity
+@using ScrumAble.Areas.Identity.Data
 @attribute [ExcludeFromCodeCoverage]
 @model ScrumAble.Models.ScrumAbleTeam
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject UserManager<ScrumAbleUser> UserManager
 
 @{
-    ViewData["Title"] = "Edit Team";
+    ViewData["Title"] = "Add Team";
 
 }
 
-<h2>Edit Team "@Model.TeamName"</h2>
+<h2>New Team</h2>
+<br/>
 
 <div style="width: 500px;">
-    @using (Html.BeginForm("UpdateTeam", "Team"))
+    @using (Html.BeginForm("CreateTeam", "Team"))
     {
         <div class="form-group">
             @Html.LabelFor(t => t.TeamName)
@@ -21,25 +24,22 @@
         </div>
 
 
-        <b>Team Members:</b>
-        <p>(add one team member's email address per line)</p>
-        @Html.TextAreaFor(t => t.TeammatesText,10, 10, new { @class = "form-control" })
-        
-
-
+        <text>Team Members:</text> <br/>
+        <text>(add one team member's email address per line)</text>
+        @Html.TextAreaFor(t => t.TeammatesText, 10, 10, new { @class = "form-control" })
+        <b>*@UserManager.GetUserName(User) will be added automatically</b>
         <br />
-
-
-        @Html.HiddenFor(t => t.Id);
+        <br />
+        //@Html.HiddenFor(t => t.Id);
         @Html.AntiForgeryToken()
 
-        <button type="submit" class="btn btn-primary">Update Team</button>
+        <button type="submit" class="btn btn-primary">Create Team</button>
 
     }
 
     @if (ViewBag.data != null)
     {
-        <br/>
+        <br />
         <p style="color:red">The following users were not found</p>
 
         <ul style="color:red">

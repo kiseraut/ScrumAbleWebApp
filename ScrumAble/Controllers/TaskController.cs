@@ -77,8 +77,7 @@ namespace ScrumAble.Controllers
             GetExternalObjectsFromIds(scrumAbleTask);
 
             _scrumAbleRepo.SaveToDb(scrumAbleTask);
-
-            //TODO redirect back to dashboard
+            
             return RedirectToAction("Details", "Task", new {id = scrumAbleTask.Id});
         }
 

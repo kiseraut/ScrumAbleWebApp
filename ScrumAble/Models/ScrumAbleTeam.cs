@@ -24,5 +24,8 @@ namespace ScrumAble.Models
 
         [NotMapped]
         public ICollection<string> Teammates { get; set; }
+        
+        [NotMapped]
+        public string TeammatesText { get; set; }
     }
 }

@@ -353,7 +353,26 @@ namespace ScrumAble.Tests.Models
             context.Database.EnsureDeleted();
         }
 
+        [Fact]
+        public void UT20_ScrumAbleRepo_GetTeamById_ShouldReturnTheCorrectTeam()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<ScrumAbleContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT20")
+                .Options;
+            var context = new ScrumAbleContext(options);
+            var scrumAbleRepo = new ScrumAbleRepo(context);
+            var testTeam = MockScrumAbleTeam.GenerateTeam();
+            context.Add(testTeam);
+            context.SaveChanges();
 
+            // Act
+            var result = scrumAbleRepo.GetTeamById(testTeam.Id);
+
+            // Assert
+            Assert.Equal(testTeam.Id, result.Id);
+            context.Database.EnsureDeleted();
+        }
 
 
 
