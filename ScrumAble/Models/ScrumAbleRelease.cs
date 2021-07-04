@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using ScrumAble.Areas.Identity.Data;
 
 namespace ScrumAble.Models
 {
@@ -27,6 +29,14 @@ namespace ScrumAble.Models
         public ScrumAbleTeam Team { get; set; }
 
         public ICollection<ScrumAbleSprint> Sprints { get; set; }
+
+        //The ID of the team this task is in
+        [Display(Name = "Add Release To Team")]
+        [NotMapped]
+        public int ReleaseTeamId { get; set; }
+
+        [NotMapped]
+        public ScrumAbleUser CurrentUser { get; set; }
 
     }
 }

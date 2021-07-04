@@ -2,15 +2,24 @@
 @using ScrumAble.Areas.Identity.Data
 @using ScrumAble.Controllers
 
+@using System.Diagnostics.CodeAnalysis
+@attribute [ExcludeFromCodeCoverage]
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model  ScrumAbleUser
 @inject SignInManager<ScrumAbleUser> SignInManager
 @inject UserManager<ScrumAbleUser> UserManager
-    
-    <div class="flex-shrink-0 p-3 bg-dark" style="width: 280px; height: 100%;">
 
+<div class="flex-shrink-0 p-3 bg-dark" style="width: 280px; height: 100%;">
     <a href="/" class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom" style="color: white; font-size: 21px;">
         <svg class="bi me-2" width="30" height="24"><use xlink:href="#bootstrap" /></svg>
-        <span class="fs-4 fw-semibold"> </span>
-    </a>   
+        @{
+            if (Model != null)
+            {
+                <span class="fs-4 fw-semibold">@Model.CurrentWorkingTeam.TeamName</span>
+            }
+        }
+
+    </a>
     <ul class="list-unstyled ps-0">
         <li class="mb-1">
             <button class="btn btn-toggle align-items-center rounded collapsed" style="color: white;" data-bs-toggle="collapse" data-bs-target="#home-collapse" aria-expanded="true">
@@ -18,10 +27,23 @@
             </button>
             <div class="collapse show" id="home-collapse">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                    <li><a href="#" class="link-dark rounded" style="color: white; font-size: 16px;">0.0.1</a></li>
-                    <li><a href="#" class="link-dark rounded" style="color: white; font-size: 16px;">0.1.2</a></li>
-                    <li><a href="#" class="link-dark rounded" style="color: white; font-size: 16px;">1.0</a></li>
-                    <li><a href="#" class="link-dark rounded" style="color: white; font-size: 13px;">+ New</a></li>
+                    @{
+                        if (Model != null)
+                        {
+                            foreach (var release in Model.CurrentWorkingTeam.Releases)
+                            {
+                                var weight = "normal";
+                                var color = "white";
+                                if (Model.CurrentWorkingRelease != null && Model.CurrentWorkingRelease.Id == release.Id)
+                                {
+                                    weight = "bold";
+                                    color = "#00F3FF";
+                                }
+                                <li><a href="/Release/SetCurrentRelease/@release.Id" class="link-dark rounded" style="color: @color; font-size: 14px; font-weight: @weight; margin-left: 36px">@release.ReleaseName</a></li>
+                            }
+                        }
+                    }
+                    <li><a href="/Release/AddRelease" class="link-dark rounded" style="color: White; font-size: 12px; font-weight: Normal; margin-left: 36px">+ Add New</a></li>
                 </ul>
             </div>
         </li>
@@ -34,11 +56,11 @@
                     <li><a href="#" class="link-dark rounded" style="color: white; font-size: 16px;">Sprint 1</a></li>
                     <li><a href="#" class="link-dark rounded" style="color: white; font-size: 16px;">Sprint 2</a></li>
                     <li><a href="#" class="link-dark rounded" style="color: white; font-size: 16px;">Sprint 3</a></li>
-                    <li><a class="link-dark rounded" asp-area="" asp-controller="Task" asp-action="Index"style="color: white; font-size: 13px;">+ New</a></li>
+                    <li><a class="link-dark rounded" asp-area="" asp-controller="Task" asp-action="Index" style="color: white; font-size: 13px;">+ New</a></li>
                 </ul>
             </div>
         </li>
-        
+
         <li class="border-top my-3"></li>
         <li class="mb-1">
             <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#account-collapse" aria-expanded="false">

@@ -2,11 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using ScrumAble.Areas.Identity.Data;
 using ScrumAble.Data;
 
@@ -72,6 +68,7 @@ namespace ScrumAble.Models
                 .Include(u => u.Stories)
                 .Include(u => u.UserTeamMappings)
                 .ThenInclude(utm => utm.Team)
+                .ThenInclude(t => t.Releases)
                 .FirstOrDefault();
 
             if (user.CurrentWorkingTeam != null)
@@ -139,6 +136,24 @@ namespace ScrumAble.Models
         {
             _context.Users.Remove(user);
             _context.SaveChanges();
+        }
+
+        public void SetCurrentRelease(string userId, int releaseId)
+        {
+            var user = GetUserById(userId);
+            user.CurrentWorkingRelease = GetReleaseById(releaseId);
+            SaveToDb(user);
+
+        }
+
+        public void SetCurrentSprint(string userId, int sprintId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetCurrentTeam(string userId, int TeamId)
+        {
+            throw new NotImplementedException();
         }
 
         public ScrumAbleSprint GetSprintById(int id)
@@ -224,9 +239,62 @@ namespace ScrumAble.Models
             return false;
         }
 
+        public List<IScrumAbleTeam> getAllUserTeams(string userID)
+        {
+            var userTeamMappings = _context.UserTeamMapping.Where(utm => utm.User.Id == userID)
+                .Include(utm => utm.Team)
+                .ToList();
+
+            var teams = new List<IScrumAbleTeam>();
+
+            foreach (var mapping in userTeamMappings)
+            {
+                teams.Add(mapping.Team);
+            }
+
+            return teams;
+        }
+
+        public void DeleteFromDb(ScrumAbleRelease release)
+        {
+            _context.Releases.Remove(release);
+            _context.SaveChanges();
+        }
+
+        public ScrumAbleRelease GetReleaseById(int id)
+        {
+            var release = _context.Releases.Where(r => r.Id == id)
+                .Include(r => r.Sprints)
+                .Include(r => r.Team)
+                .SingleOrDefault();
+
+            return release;
+        }
+
         public bool IsAuthorized(ScrumAbleRelease release, string userId)
         {
-            throw new NotImplementedException();
+            if (release.Team != null)
+            {
+                var team = GetTeamById(release.Team.Id);
+                return IsAuthorized(team, userId);
+            }
+
+            return false;
+        }
+
+        public void SaveToDb(ScrumAbleRelease release)
+        {
+            if (release.Id == 0)
+            {
+                _context.Releases.Add(release);
+                _context.SaveChanges();
+            }
+            else
+            {
+                var dbRelease = _context.Releases.First(r => r.Id == release.Id);
+                _context.Entry(dbRelease).CurrentValues.SetValues(release);
+                _context.SaveChanges();
+            }
         }
 
         public void SaveToDb(ScrumAbleTeam team, List<IScrumAbleUser> users)

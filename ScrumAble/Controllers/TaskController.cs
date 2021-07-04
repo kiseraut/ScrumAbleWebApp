@@ -34,7 +34,7 @@ namespace ScrumAble.Controllers
 
         public IActionResult Details(int id)
         {
-            
+            ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var scrumAbleTask = _scrumAbleRepo.GetTaskById(id);
             scrumAbleTask = _scrumAbleRepo.PopulateTaskMetadata(scrumAbleTask);
 
@@ -42,11 +42,13 @@ namespace ScrumAble.Controllers
             {
                 return View("TaskNotFound");
             }
+
             return View(scrumAbleTask);
         }
 
         public IActionResult AddTask(ScrumAbleTask scrumAbleTask)
         {
+            ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
             scrumAbleTask.viewModelTaskAggregate = _scrumAbleRepo.GetTaskAggregateData(User.FindFirstValue(ClaimTypes.NameIdentifier));
             ModelState.Clear();
             return View(scrumAbleTask);
@@ -54,6 +56,7 @@ namespace ScrumAble.Controllers
         
         public IActionResult EditTask(int id)
         {
+            ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var scrumAbleTask = _scrumAbleRepo.GetTaskById(id);
             scrumAbleTask = _scrumAbleRepo.PopulateTaskMetadata(scrumAbleTask);
 
@@ -68,6 +71,7 @@ namespace ScrumAble.Controllers
         [HttpPost]
         public IActionResult CreateTask(ScrumAbleTask scrumAbleTask)
         {
+            ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
             if (!ModelState.IsValid)
             {
                 scrumAbleTask.viewModelTaskAggregate = _scrumAbleRepo.GetTaskAggregateData(User.FindFirstValue(ClaimTypes.NameIdentifier));
@@ -83,6 +87,7 @@ namespace ScrumAble.Controllers
 
         public IActionResult UpdateTask(ScrumAbleTask scrumAbleTask)
         {
+            ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
             if (!ModelState.IsValid)
             {
                 scrumAbleTask.viewModelTaskAggregate = _scrumAbleRepo.GetTaskAggregateData(User.FindFirstValue(ClaimTypes.NameIdentifier));
@@ -98,6 +103,7 @@ namespace ScrumAble.Controllers
 
         public IActionResult DeleteTask(int id)
         {
+            ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
             _scrumAbleRepo.DeleteFromDb(_scrumAbleRepo.GetTaskById(id));
 
             //TODO redirect back to dashboard
