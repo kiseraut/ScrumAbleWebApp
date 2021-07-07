@@ -43,7 +43,7 @@ namespace ScrumAble.Controllers
             ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var scrumAbleTeam = _scrumAbleRepo.GetTeamById(id);
 
-            if (!_scrumAbleRepo.IsAuthorized(scrumAbleTeam, User.FindFirstValue(ClaimTypes.NameIdentifier)))
+            if (scrumAbleTeam == null || !_scrumAbleRepo.IsAuthorized(scrumAbleTeam, User.FindFirstValue(ClaimTypes.NameIdentifier)))
             {
                 return View("TeamNotFound");
             }
@@ -65,6 +65,10 @@ namespace ScrumAble.Controllers
             ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var badUsers = new List<string>();
             var goodUsers = new List<IScrumAbleUser>();
+            if (team.TeammatesText == null)
+            {
+                team.TeammatesText += "\r\n" + User.FindFirstValue(ClaimTypes.Email);
+            }
             var addedUsersWithDups = team.TeammatesText.Split(Environment.NewLine,
                 StringSplitOptions.RemoveEmptyEntries);
             var addedUsers = addedUsersWithDups.Distinct();
@@ -138,6 +142,12 @@ namespace ScrumAble.Controllers
 
             _scrumAbleRepo.SaveToDb(team, goodUsers);
             return RedirectToAction("Details", "Team", new { id = team.Id });
+        }
+
+        public IActionResult SetCurrentTeam(int id)
+        {
+            _scrumAbleRepo.SetCurrentTeam(User.FindFirstValue(ClaimTypes.NameIdentifier), id);
+            return RedirectToAction("Details", "Team", new { id = id });
         }
     }
 }

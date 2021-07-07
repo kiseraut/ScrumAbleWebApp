@@ -37,7 +37,7 @@ namespace ScrumAble.Models
         //Team methods
         public ScrumAbleTeam GetTeamById(int id);
         public bool IsAuthorized(ScrumAbleTeam team, string userId);
-        public List<IScrumAbleTeam> getAllUserTeams(string userID);
+        public List<ScrumAbleTeam> getAllUserTeams(string userID);
         public void DeleteFromDb(ScrumAbleRelease release);
 
         //Release methods

@@ -79,20 +79,18 @@ namespace ScrumAble.Controllers
 
         public IActionResult EditRelease(int id)
         {
-            ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var user = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            ViewBag.User = user;
 
             var scrumAbleRelease = _scrumAbleRepo.GetReleaseById(id);
 
-            if (!_scrumAbleRepo.IsAuthorized(scrumAbleRelease, User.FindFirstValue(ClaimTypes.NameIdentifier)))
+            if (scrumAbleRelease == null || !_scrumAbleRepo.IsAuthorized(scrumAbleRelease, User.FindFirstValue(ClaimTypes.NameIdentifier)))
             {
                 return View("ReleaseNotFound");
             }
-            var user = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
             scrumAbleRelease.Team = user.CurrentWorkingTeam;
             scrumAbleRelease.ReleaseTeamId = user.CurrentWorkingTeam.Id;
-
-            ViewBag.data = _scrumAbleRepo.getAllUserTeams(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            
             return View(scrumAbleRelease);
         }
 

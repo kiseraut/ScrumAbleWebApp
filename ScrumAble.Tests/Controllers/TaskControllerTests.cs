@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 using ScrumAble.Tests.Models;
 using Xunit;
 
@@ -31,6 +33,8 @@ namespace ScrumAble.Tests.Controllers
             context.Add(MockScrumAbleTask.GenerateTask());
             context.SaveChanges();
 
+            taskController = AddClaimsIdentityToController(taskController);
+            
             // Act
             var result = taskController.Details(5000) as IActionResult;
 
@@ -52,6 +56,8 @@ namespace ScrumAble.Tests.Controllers
             var taskController = new TaskController(scrumAbleRepo, null);
             var testTask = MockScrumAbleTask.GenerateTask();
             testTask.TaskSprintId = -1;
+
+            taskController = AddClaimsIdentityToController(taskController);
 
             // Act
             IActionResult result = taskController.CreateTask(testTask) as IActionResult;
@@ -100,6 +106,8 @@ namespace ScrumAble.Tests.Controllers
             context.Add(MockScrumAbleTask.GenerateTask());
             context.SaveChanges();
 
+            taskController = AddClaimsIdentityToController(taskController);
+
             // Act
             IActionResult result = taskController.EditTask(5000) as IActionResult;
 
@@ -139,6 +147,8 @@ namespace ScrumAble.Tests.Controllers
             context.Add(testTask1);
             context.SaveChanges();
 
+            taskController = AddClaimsIdentityToController(taskController);
+
 
             // Act
             var result = taskController.Details(testTask1.Id) as ViewResult;
@@ -173,7 +183,9 @@ namespace ScrumAble.Tests.Controllers
             context.SaveChanges();
 
             testTask.TaskName = "Updated Test Task";
-            
+
+            taskController = AddClaimsIdentityToController(taskController);
+
             // Act
             IActionResult result = taskController.UpdateTask(testTask) as IActionResult;
             MockScrumAbleTask taskDBItems = (MockScrumAbleTask) await context.Tasks.SingleAsync();
@@ -200,6 +212,8 @@ namespace ScrumAble.Tests.Controllers
             context.Add(testTask);
             context.SaveChanges();
 
+            taskController = AddClaimsIdentityToController(taskController);
+
             // Act
             IActionResult result = taskController.DeleteTask(testTask.Id) as IActionResult;
             var numRecords = context.Tasks.Count();
@@ -208,6 +222,25 @@ namespace ScrumAble.Tests.Controllers
             Assert.Equal(0, numRecords);
 
             context.Database.EnsureDeleted();
+        }
+
+        private TaskController AddClaimsIdentityToController(TaskController taskController)
+        {
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+            {
+                new Claim(ClaimTypes.Name, "example name"),
+                new Claim(ClaimTypes.NameIdentifier, "1"),
+                new Claim("custom-claim", "example claim value"),
+            }, "mock"));
+
+
+            var controller = taskController;
+            controller.ControllerContext = new ControllerContext()
+            {
+                HttpContext = new DefaultHttpContext() { User = user }
+            };
+
+            return controller;
         }
 
     }

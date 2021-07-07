@@ -22,7 +22,7 @@
 </div>
 <h2>@Model.TeamName</h2>
 
-
+<br />
 
 <b>Team Members:</b> @{
                   if (@Model.UserTeamMappings != null)
@@ -35,6 +35,20 @@
                       </ul>
                   }
               }
+
+<br />
+
+<b>Releases:</b> @{
+                         if (@Model.Releases != null)
+                         {
+                             <ul>
+                                 @foreach (var release in @Model.Releases)
+                                 {
+                                     <li>@Html.ActionLink(release.ReleaseName, "Details", "Release", new { Id = release.Id} )</li>
+                                 }
+                             </ul>
+                         }
+                     }
 
 <br />
 
