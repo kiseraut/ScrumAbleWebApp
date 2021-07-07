@@ -32,6 +32,9 @@ namespace ScrumAble.Areas.Identity.Data
         [NotMapped]
         public ICollection<ScrumAbleUser> Teammates { get; set; }
         
+        [NotMapped]
+        public List<ScrumAbleTeam> TeamsJoined { get; set; }
+        
 
     }
 }

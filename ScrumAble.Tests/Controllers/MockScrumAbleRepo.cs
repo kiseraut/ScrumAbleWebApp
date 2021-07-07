@@ -59,8 +59,37 @@ namespace ScrumAble.Tests.Controllers
 
         public ScrumAbleUser GetUserById(string id)
         {
-            return _context.Users.Where(u => u.Id == id)
-                .SingleOrDefault();
+            var user = _context.User.Where(u => u.Id == id)
+                .Include(u => u.CurrentWorkingTeam)
+                .Include(u => u.CurrentWorkingRelease)
+                .Include(u => u.CurrentWorkingSprint)
+                .Include(u => u.Stories)
+                .Include(u => u.UserTeamMappings)
+                .ThenInclude(utm => utm.Team)
+                .ThenInclude(t => t.Releases)
+                .ThenInclude(r => r.Sprints)
+                .FirstOrDefault();
+
+            /*if (user.CurrentWorkingTeam != null)
+            {
+                var teammates = _context.UserTeamMapping.Where(utm => utm.Team.Id == user.CurrentWorkingTeam.Id)
+                    .Include(utm => utm.User)
+                    .ToList();
+
+                //add the teammates to the user object
+                ICollection<ScrumAbleUser> userTeammates = new List<ScrumAbleUser>();
+
+                foreach (var teammate in teammates)
+                {
+                    userTeammates.Add(teammate.User);
+                }
+
+                user.Teammates = userTeammates;
+            }
+
+            user.TeamsJoined = getAllUserTeams(user.Id);*/
+
+            return user;
         }
 
         public ScrumAbleUser GetUserByUsername(string username)
@@ -87,6 +116,22 @@ namespace ScrumAble.Tests.Controllers
         {
             _context.Users.Remove(user);
             _context.SaveChanges();
+        }
+
+        public void SetCurrentRelease(string userId, int releaseId)
+        {
+           //do nothing in mock
+
+        }
+
+        public void SetCurrentSprint(string userId, int sprintId)
+        {
+            //do nothing in mock
+        }
+
+        public void SetCurrentTeam(string userId, int TeamId)
+        {
+            //do nothing in mock
         }
 
         public ScrumAbleSprint GetSprintById(int id)
@@ -148,20 +193,48 @@ namespace ScrumAble.Tests.Controllers
 
         public bool IsAuthorized(ScrumAbleTeam team, string userId)
         {
-            foreach (var mapping in team.UserTeamMappings)
-            {
-                if (mapping.User.Id == userId)
-                {
-                    return true;
-                }
-            }
+            return true;
+        }
 
-            return false;
+        public List<ScrumAbleTeam> getAllUserTeams(string userID)
+        {
+            return null;
+        }
+
+        public void DeleteFromDb(ScrumAbleRelease release)
+        {
+            _context.Releases.Remove(release);
+            _context.SaveChanges();
+        }
+
+        public ScrumAbleRelease GetReleaseById(int id)
+        {
+            var release = _context.Releases.Where(r => r.Id == id)
+                .Include(r => r.Sprints)
+                .Include(r => r.Team)
+                .SingleOrDefault();
+
+            return release;
         }
 
         public bool IsAuthorized(ScrumAbleRelease release, string userId)
         {
             throw new NotImplementedException();
+        }
+
+        public void SaveToDb(ScrumAbleRelease release)
+        {
+            if (release.Id == 0)
+            {
+                _context.Releases.Add(release);
+                _context.SaveChanges();
+            }
+            else
+            {
+                var dbRelease = _context.Releases.First(r => r.Id == release.Id);
+                _context.Entry(dbRelease).CurrentValues.SetValues(release);
+                _context.SaveChanges();
+            }
         }
 
         public void SaveToDb(ScrumAbleTeam team, List<IScrumAbleUser> users)
@@ -183,8 +256,8 @@ namespace ScrumAble.Tests.Controllers
 
                     if (DBCheck == null)
                     {
-                        _context.Database.ExecuteSqlRaw("INSERT INTO UserTeamMapping (UserId, TeamId) VALUES ({0}, {1})", user.Id, team.Id);
-                        _context.SaveChanges();
+                        //_context.Database.ExecuteSqlRaw("INSERT INTO UserTeamMapping (UserId, TeamId) VALUES ({0}, {1})", user.Id, team.Id);
+                        //_context.SaveChanges();
                     }
                 }
             }
@@ -215,8 +288,8 @@ namespace ScrumAble.Tests.Controllers
 
                     if (DBCheck == null)
                     {
-                        _context.Database.ExecuteSqlRaw("INSERT INTO UserTeamMapping (UserId, TeamId) VALUES ({0}, {1})", user.Id, team.Id);
-                        _context.SaveChanges();
+                        //_context.Database.ExecuteSqlRaw("INSERT INTO UserTeamMapping (UserId, TeamId) VALUES ({0}, {1})", user.Id, team.Id);
+                        //_context.SaveChanges();
                     }
                 }
             }

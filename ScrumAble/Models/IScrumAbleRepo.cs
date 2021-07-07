@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 using ScrumAble.Areas.Identity.Data;
 
 namespace ScrumAble.Models
@@ -13,12 +14,14 @@ namespace ScrumAble.Models
         public void DeleteFromDb(ScrumAbleTask task);
         public bool IsAuthorized(ScrumAbleTask task, string userId);
 
-
         //User methods
         public ScrumAbleUser GetUserById(string id);
         public ScrumAbleUser GetUserByUsername(string username);
         public void SaveToDb(ScrumAbleUser user);
         public void DeleteFromDb(ScrumAbleUser user);
+        public void SetCurrentRelease(string userId, int releaseId);
+        public void SetCurrentSprint(string userId, int sprintId);
+        public void SetCurrentTeam(string userId, int TeamId);
 
         //Sprint methods
         public ScrumAbleSprint GetSprintById(int id);
@@ -34,14 +37,19 @@ namespace ScrumAble.Models
         //Team methods
         public ScrumAbleTeam GetTeamById(int id);
         public bool IsAuthorized(ScrumAbleTeam team, string userId);
+        public List<ScrumAbleTeam> getAllUserTeams(string userID);
+        public void DeleteFromDb(ScrumAbleRelease release);
 
         //Release methods
+        public ScrumAbleRelease GetReleaseById(int id);
         public bool IsAuthorized(ScrumAbleRelease release, string userId);
+        public void SaveToDb(ScrumAbleRelease scrumAbleRelease);
 
         //UserTeamMapping methods
         public void SaveToDb(ScrumAbleTeam team, List<IScrumAbleUser> users);
         public void DeleteFromDb(ScrumAbleTeam team);
 
 
+        
     }
 }

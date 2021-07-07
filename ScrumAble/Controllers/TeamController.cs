@@ -26,11 +26,12 @@ namespace ScrumAble.Controllers
         
         public IActionResult Details(int id)
         {
-
+            ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var scrumAbleTeam = _scrumAbleRepo.GetTeamById(id);
 
-            if (!_scrumAbleRepo.IsAuthorized(scrumAbleTeam, User.FindFirstValue(ClaimTypes.NameIdentifier)))
+            if (scrumAbleTeam == null || !_scrumAbleRepo.IsAuthorized(scrumAbleTeam, User.FindFirstValue(ClaimTypes.NameIdentifier)))
             {
+
                 return View("TeamNotFound");
             }
 
@@ -39,10 +40,10 @@ namespace ScrumAble.Controllers
 
         public IActionResult EditTeam(int id)
         {
-
+            ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var scrumAbleTeam = _scrumAbleRepo.GetTeamById(id);
 
-            if (!_scrumAbleRepo.IsAuthorized(scrumAbleTeam, User.FindFirstValue(ClaimTypes.NameIdentifier)))
+            if (scrumAbleTeam == null || !_scrumAbleRepo.IsAuthorized(scrumAbleTeam, User.FindFirstValue(ClaimTypes.NameIdentifier)))
             {
                 return View("TeamNotFound");
             }
@@ -52,6 +53,7 @@ namespace ScrumAble.Controllers
 
         public IActionResult DeleteTeam(int id)
         {
+            ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
             _scrumAbleRepo.DeleteFromDb(_scrumAbleRepo.GetTeamById(id));
             //TODO redirect back to dashboard
             return RedirectToAction("Index", "Home");
@@ -60,8 +62,13 @@ namespace ScrumAble.Controllers
         [HttpPost]
         public IActionResult UpdateTeam(ScrumAbleTeam team)
         {
+            ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var badUsers = new List<string>();
             var goodUsers = new List<IScrumAbleUser>();
+            if (team.TeammatesText == null)
+            {
+                team.TeammatesText += "\r\n" + User.FindFirstValue(ClaimTypes.Email);
+            }
             var addedUsersWithDups = team.TeammatesText.Split(Environment.NewLine,
                 StringSplitOptions.RemoveEmptyEntries);
             var addedUsers = addedUsersWithDups.Distinct();
@@ -92,6 +99,7 @@ namespace ScrumAble.Controllers
 
         public IActionResult AddTeam(ScrumAbleTeam scrumAbleTeam)
         {
+            ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
             ModelState.Clear();
             return View(scrumAbleTeam);
         }
@@ -99,6 +107,7 @@ namespace ScrumAble.Controllers
         [HttpPost]
         public IActionResult CreateTeam(ScrumAbleTeam team)
         {
+            ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var badUsers = new List<string>();
             var goodUsers = new List<IScrumAbleUser>();
             team.TeammatesText += "\r\n" + User.FindFirstValue(ClaimTypes.Email);
@@ -133,6 +142,12 @@ namespace ScrumAble.Controllers
 
             _scrumAbleRepo.SaveToDb(team, goodUsers);
             return RedirectToAction("Details", "Team", new { id = team.Id });
+        }
+
+        public IActionResult SetCurrentTeam(int id)
+        {
+            _scrumAbleRepo.SetCurrentTeam(User.FindFirstValue(ClaimTypes.NameIdentifier), id);
+            return RedirectToAction("Details", "Team", new { id = id });
         }
     }
 }

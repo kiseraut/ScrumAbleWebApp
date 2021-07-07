@@ -2,26 +2,106 @@
 @using ScrumAble.Areas.Identity.Data
 @using ScrumAble.Controllers
 
+@using System.Diagnostics.CodeAnalysis
+@attribute [ExcludeFromCodeCoverage]
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model  ScrumAbleUser
 @inject SignInManager<ScrumAbleUser> SignInManager
 @inject UserManager<ScrumAbleUser> UserManager
-    
-    <div class="flex-shrink-0 p-3 bg-dark" style="width: 280px; height: 100%;">
 
-    <a href="/" class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom" style="color: white; font-size: 21px;">
-        <svg class="bi me-2" width="30" height="24"><use xlink:href="#bootstrap" /></svg>
-        <span class="fs-4 fw-semibold"> </span>
-    </a>   
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<div class="flex-shrink-0 p-3 bg-dark" style="width: 280px; height: 100%;">
+    
+    <div class="align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom" style="color: white; font-size: 21px;">
+
+        @{
+            if (Model != null)
+            {
+                if (Model.CurrentWorkingTeam != null)
+                {
+                    <svg class="bi me-2" width="30" height="24"><use xlink:href="#bootstrap" /></svg>
+                    <span class="fs-4 fw-semibold">@Model.CurrentWorkingTeam.TeamName</span>
+                }
+                if (Model.CurrentWorkingRelease != null)
+                {
+                    <br />
+                    <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        <svg class="bi me-2" width="30" height="24"><use xlink:href="#bootstrap" /></svg>
+                        <span class="fs-4 fw-semibold" style="margin-left: 5px;">
+                            <i class="fa fa-level-up fa-rotate-90" style="margin-right: 5px;"></i>
+
+                            @Model.CurrentWorkingRelease.ReleaseName
+
+                        </span>
+                    </div>
+                }
+                if (Model.CurrentWorkingSprint != null)
+                {
+                    <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        <svg class="bi me-2" width="30" height="24"><use xlink:href="#bootstrap" /></svg>
+                        <span class="fs-4 fw-semibold" style="margin-left: 15px;">
+                            <i class="fa fa-level-up fa-rotate-90" style="margin-right: 5px;"></i>
+
+                            @Model.CurrentWorkingSprint.SprintName
+
+                        </span>
+                    </div>
+                    
+                }
+            }
+        }
+
+    </div>
     <ul class="list-unstyled ps-0">
         <li class="mb-1">
-            <button class="btn btn-toggle align-items-center rounded collapsed" style="color: white;" data-bs-toggle="collapse" data-bs-target="#home-collapse" aria-expanded="true">
+            <button class="btn btn-toggle align-items-center rounded collapsed" style="color: white;" data-bs-toggle="collapse" data-bs-target="#team-collapse" aria-expanded="false">
+                Teams
+            </button>
+            <div class="collapse" id="team-collapse">
+                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                    @{
+                        if (Model.TeamsJoined != null)
+                        {
+                            foreach (var team in Model.TeamsJoined)
+                            {
+                                var weight = "normal";
+                                var color = "white";
+                                if (Model.CurrentWorkingTeam != null && Model.CurrentWorkingTeam.Id == team.Id)
+                                {
+                                    weight = "bold";
+                                    color = "#00F3FF";
+                                }
+                                <li><a href="/Team/SetCurrentTeam/@team.Id" class="link-dark rounded" style="color: @color; font-size: 14px; font-weight: @weight; margin-left: 36px">@team.TeamName</a></li>
+                            }
+                        }
+                    }
+                    <li><a href="/Team/AddTeam" class="link-dark rounded" style="color: White; font-size: 12px; font-weight: Normal; margin-left: 36px">+ Add New</a></li>
+                </ul>
+            </div>
+        </li>
+        <li class="mb-1">
+            <button class="btn btn-toggle align-items-center rounded collapsed" style="color: white;" data-bs-toggle="collapse" data-bs-target="#home-collapse" aria-expanded="false">
                 Releases
             </button>
-            <div class="collapse show" id="home-collapse">
+            <div class="collapse" id="home-collapse">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                    <li><a href="#" class="link-dark rounded" style="color: white; font-size: 16px;">0.0.1</a></li>
-                    <li><a href="#" class="link-dark rounded" style="color: white; font-size: 16px;">0.1.2</a></li>
-                    <li><a href="#" class="link-dark rounded" style="color: white; font-size: 16px;">1.0</a></li>
-                    <li><a href="#" class="link-dark rounded" style="color: white; font-size: 13px;">+ New</a></li>
+                    @{
+                        if (Model.CurrentWorkingTeam.Releases != null)
+                        {
+                            foreach (var release in Model.CurrentWorkingTeam.Releases)
+                            {
+                                var weight = "normal";
+                                var color = "white";
+                                if (Model.CurrentWorkingRelease != null && Model.CurrentWorkingRelease.Id == release.Id)
+                                {
+                                    weight = "bold";
+                                    color = "#00F3FF";
+                                }
+                                <li><a href="/Release/SetCurrentRelease/@release.Id" class="link-dark rounded" style="color: @color; font-size: 14px; font-weight: @weight; margin-left: 36px">@release.ReleaseName</a></li>
+                            }
+                        }
+                    }
+                    <li><a href="/Release/AddRelease" class="link-dark rounded" style="color: White; font-size: 12px; font-weight: Normal; margin-left: 36px">+ Add New</a></li>
                 </ul>
             </div>
         </li>
@@ -31,27 +111,30 @@
             </button>
             <div class="collapse" id="dashboard-collapse">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                    <li><a href="#" class="link-dark rounded" style="color: white; font-size: 16px;">Sprint 1</a></li>
-                    <li><a href="#" class="link-dark rounded" style="color: white; font-size: 16px;">Sprint 2</a></li>
-                    <li><a href="#" class="link-dark rounded" style="color: white; font-size: 16px;">Sprint 3</a></li>
-                    <li><a class="link-dark rounded" asp-area="" asp-controller="Task" asp-action="Index"style="color: white; font-size: 13px;">+ New</a></li>
+
+                    @{
+                        if (Model.CurrentWorkingRelease != null)
+                        {
+                            foreach (var sprint in Model.CurrentWorkingRelease.Sprints)
+                            {
+
+                                var weight = "normal";
+                                var color = "white";
+                                if (Model.CurrentWorkingSprint != null && Model.CurrentWorkingSprint.Id == sprint.Id)
+                                {
+                                    weight = "bold";
+                                    color = "#00F3FF";
+                                }
+                                <li><a href="/Sprint/SetCurrentSprint/@sprint.Id" class="link-dark rounded" style="color: @color; font-size: 14px; font-weight: @weight; margin-left: 36px">@sprint.SprintName</a></li>
+                            }
+                        }
+                    }
+                    <li><a href="/Sprint/AddSprint" class="link-dark rounded" style="color: White; font-size: 12px; font-weight: Normal; margin-left: 36px">+ Add New</a></li>
                 </ul>
             </div>
         </li>
-        
+
         <li class="border-top my-3"></li>
-        <li class="mb-1">
-            <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#account-collapse" aria-expanded="false">
-                Account
-            </button>
-            <div class="collapse" id="account-collapse">
-                <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                    <li><a href="#" class="link-dark rounded">New...</a></li>
-                    <li><a href="#" class="link-dark rounded">Profile</a></li>
-                    <li><a href="#" class="link-dark rounded">Settings</a></li>
-                    <li><a href="#" class="link-dark rounded">Sign out</a></li>
-                </ul>
-            </div>
-        </li>
+
     </ul>
 </div>
