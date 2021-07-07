@@ -58,9 +58,9 @@ namespace ScrumAble.Models
             _context.SaveChanges();
         }
 
-        public bool IsAuthorized(ScrumAbleTask task, string userIdr)
+        public bool IsAuthorized(ScrumAbleTask task, string userId)
         {
-            throw new NotImplementedException();
+            return IsAuthorized(task.Story, userId);
         }
 
         public ScrumAbleUser GetUserById(string id)
@@ -149,7 +149,7 @@ namespace ScrumAble.Models
 
         public bool IsAuthorized(ScrumAbleSprint sprint, string userId)
         {
-            throw new NotImplementedException();
+            return IsAuthorized(sprint.Release, userId);
         }
 
         public ScrumAbleStory GetStoryById(int id)
@@ -160,7 +160,7 @@ namespace ScrumAble.Models
 
         public bool IsAuthorized(ScrumAbleStory story, string userId)
         {
-            throw new NotImplementedException();
+            return IsAuthorized(story.Sprint, userId);
         }
 
         public ViewModelTaskAggregate GetTaskAggregateData(string userId)
@@ -226,7 +226,7 @@ namespace ScrumAble.Models
 
         public bool IsAuthorized(ScrumAbleRelease release, string userId)
         {
-            throw new NotImplementedException();
+            return IsAuthorized(release.Team, userId);
         }
 
         public void SaveToDb(ScrumAbleTeam team, List<IScrumAbleUser> users)
@@ -280,6 +280,12 @@ namespace ScrumAble.Models
 
                     if (DBCheck == null)
                     {
+                        //var userTeamMapping = new ScrumAbleUserTeamMapping()
+                        //{
+                        //    User = user,
+                        //    Team = team
+                        //};
+                        //_context.UserTeamMapping.Add(userTeamMapping);
                         _context.Database.ExecuteSqlRaw("INSERT INTO UserTeamMapping (UserId, TeamId) VALUES ({0}, {1})", user.Id, team.Id);
                         _context.SaveChanges();
                     }

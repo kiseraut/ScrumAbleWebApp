@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using ScrumAble.Areas.Identity.Data;
 using ScrumAble.Tests.Controllers;
 using Xunit;
 
@@ -374,7 +375,175 @@ namespace ScrumAble.Tests.Models
             context.Database.EnsureDeleted();
         }
 
+        [Fact]
+        public async void UT21_ScrumAbleRepo_SaveToDb_ShouldUpdateTeamInDb()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<ScrumAbleContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT20")
+                .Options;
 
+            var context = new ScrumAbleContext(options);
+            var scrumAbleRepo = new ScrumAbleRepo(context);
+            var userList = new List<IScrumAbleUser>(){};
+            var testTeam = MockScrumAbleTeam.GenerateTeam();
+            context.Add(testTeam);
+            context.SaveChanges();
+
+            testTeam.TeamName = "Changed";
+
+            // Act
+            scrumAbleRepo.SaveToDb(testTeam, userList);
+
+            var teamDBItem = (MockScrumAbleTeam)await context.Teams.SingleAsync();
+
+            // Assert
+            Assert.Equal("Changed", testTeam.TeamName);
+
+            context.Database.EnsureDeleted();
+        }
+
+        [Fact]
+        public async void UT22_ScrumAbleRepo_DeleteFromDb_ShouldDeleteTeamFromDb()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<ScrumAbleContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT22")
+                .Options;
+
+            var context = new ScrumAbleContext(options);
+            var scrumAbleRepo = new ScrumAbleRepo(context);
+            var testTeam = MockScrumAbleTeam.GenerateTeam();
+            context.Add(testTeam);
+            context.SaveChanges();
+
+
+            // Act
+            scrumAbleRepo.DeleteFromDb(testTeam);
+            var numRecords = context.Teams.Count();
+
+            // Assert
+            Assert.Equal(0, numRecords);
+
+            context.Database.EnsureDeleted();
+        }
+
+        [Fact]
+        public void UT23_ScrumAbleRepo_IsAuthorized_ShouldNotAllowUnauthorizedUserToAccessElements()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<ScrumAbleContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT23")
+                .Options;
+            var context = new ScrumAbleContext(options);
+            var scrumAbleRepo = new ScrumAbleRepo(context);
+
+            var testTeam = MockScrumAbleTeam.GenerateTeam();
+            var testUser1 = MockScrumAbleUser.GenerateScrumAbleUser();
+            var testUser2 = MockScrumAbleUser.GenerateScrumAbleUser();
+            var testUserTeamMapping = MockScrumAbleUserTeamMapping.GenerateScrumAbleUserTeamMapping(testUser2, testTeam);
+            var testWorkflowStage = MockScrumAbleWorkflowStage.GenerateWorkflowStage(testTeam);
+            var testRelease = MockScrumAbleRelease.GenerateRelease(testTeam);
+            var testSprint = MockScrumAbleSprint.GenerateSprint(testRelease);
+            var testStory = MockScrumAbleStory.GenerateStory(testSprint);
+            var testTask = MockScrumAbleTask.GenerateTask(testStory, testWorkflowStage, testSprint, testUser2);
+
+            context.Add(testUser1);
+            context.Add(testUser2);
+            context.Add(testTeam);
+            context.Add(testUserTeamMapping);
+            context.Add(testWorkflowStage);
+            context.Add(testRelease);
+            context.Add(testSprint);
+            context.Add(testStory);
+            context.Add(testTask);
+            context.SaveChanges();
+
+            // Act
+            var teamResult = scrumAbleRepo.IsAuthorized(testTeam, testUser1.Id);
+            var releaseResult = scrumAbleRepo.IsAuthorized(testRelease, testUser1.Id);
+            var storyResult = scrumAbleRepo.IsAuthorized(testStory, testUser1.Id);
+            var taskResult = scrumAbleRepo.IsAuthorized(testTask, testUser1.Id);
+
+            // Assert
+            Assert.False(teamResult);
+            Assert.False(releaseResult);
+            Assert.False(storyResult);
+            Assert.False(taskResult);
+
+            context.Database.EnsureDeleted();
+        }
+
+        [Fact]
+        public void UT24_ScrumAbleRepo_IsAuthorized_ShouldAllowAuthorizedUserToAccessElements()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<ScrumAbleContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT24")
+                .Options;
+            var context = new ScrumAbleContext(options);
+            var scrumAbleRepo = new ScrumAbleRepo(context);
+
+            var testTeam = MockScrumAbleTeam.GenerateTeam();
+            var testUser1 = MockScrumAbleUser.GenerateScrumAbleUser();
+            var testUser2 = MockScrumAbleUser.GenerateScrumAbleUser();
+            var testUserTeamMapping = MockScrumAbleUserTeamMapping.GenerateScrumAbleUserTeamMapping(testUser2, testTeam);
+            var testWorkflowStage = MockScrumAbleWorkflowStage.GenerateWorkflowStage(testTeam);
+            var testRelease = MockScrumAbleRelease.GenerateRelease(testTeam);
+            var testSprint = MockScrumAbleSprint.GenerateSprint(testRelease);
+            var testStory = MockScrumAbleStory.GenerateStory(testSprint);
+            var testTask = MockScrumAbleTask.GenerateTask(testStory, testWorkflowStage, testSprint, testUser2);
+
+            context.Add(testUser1);
+            context.Add(testUser2);
+            context.Add(testTeam);
+            context.Add(testUserTeamMapping);
+            context.Add(testWorkflowStage);
+            context.Add(testRelease);
+            context.Add(testSprint);
+            context.Add(testStory);
+            context.Add(testTask);
+            context.SaveChanges();
+
+            // Act
+            var teamResult = scrumAbleRepo.IsAuthorized(testTeam, testUser2.Id);
+            var releaseResult = scrumAbleRepo.IsAuthorized(testRelease, testUser2.Id);
+            var storyResult = scrumAbleRepo.IsAuthorized(testStory, testUser2.Id);
+            var taskResult = scrumAbleRepo.IsAuthorized(testTask, testUser2.Id);
+
+            // Assert
+            Assert.True(teamResult);
+            Assert.True(releaseResult);
+            Assert.True(storyResult);
+            Assert.True(taskResult);
+
+            context.Database.EnsureDeleted();
+        }
+
+        [Fact]
+        public async void UT25_ScrumAbleRepo_SaveToDb_ShouldAddTeamToDb()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<ScrumAbleContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT25")
+                .Options;
+
+            var context = new ScrumAbleContext(options);
+            var scrumAbleRepo = new ScrumAbleRepo(context);
+            var userList = new List<IScrumAbleUser>() { };
+            var testTeam = MockScrumAbleTeam.GenerateTeam();
+            testTeam.TeamName = "New Test Team";
+
+            // Act
+            scrumAbleRepo.SaveToDb(testTeam, userList);
+            MockScrumAbleTeam teamDBItems = (MockScrumAbleTeam)await context.Teams.SingleAsync();
+
+            // Assert
+            Assert.NotNull(teamDBItems);
+            Assert.Equal("New Test Team", teamDBItems.TeamName);
+
+            context.Database.EnsureDeleted();
+        }
 
 
     }

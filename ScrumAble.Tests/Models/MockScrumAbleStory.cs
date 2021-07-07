@@ -19,5 +19,15 @@ namespace ScrumAble.Tests.Models
                 StoryPoints = 6
             };
         }
+
+        public static ScrumAbleStory GenerateStory(MockScrumAbleSprint sprint)
+        {
+            return new MockScrumAbleStory
+            {
+                StoryName = "Test Story",
+                StoryPoints = 6,
+                Sprint = sprint
+            };
+        }
     }
 }
