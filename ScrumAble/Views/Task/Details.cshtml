@@ -44,7 +44,7 @@
 <b>Sprint:</b> @{
     if (@Model.Sprint != null)
     {
-        @Model.Sprint.SprintName;
+        @Html.ActionLink(Model.Sprint.SprintName, "Details", "Sprint", new { Id = Model.Sprint.Id })
     }
 }
 
@@ -53,7 +53,11 @@
 <b>Story:</b> @{
     if (@Model.Story != null)
     {
-        @Model.Story.StoryName;
+        @Html.ActionLink(Model.Story.StoryName, "Details", "Story", new { Id = Model.Story.Id })
+    }
+    else
+    {
+        <text>None</text>
     }
 }
 

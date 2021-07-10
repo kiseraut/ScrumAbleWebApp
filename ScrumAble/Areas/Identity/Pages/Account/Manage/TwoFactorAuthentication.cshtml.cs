@@ -35,7 +35,7 @@ namespace ScrumAble.Areas.Identity.Pages.Account.Manage
         public int RecoveryCodesLeft { get; set; }
 
         [BindProperty]
-        public bool Is2faEnabled { get; set; }
+        public bool Is2FaEnabled { get; set; }
 
         public bool IsMachineRemembered { get; set; }
 
@@ -51,7 +51,7 @@ namespace ScrumAble.Areas.Identity.Pages.Account.Manage
             }
 
             HasAuthenticator = await _userManager.GetAuthenticatorKeyAsync(user) != null;
-            Is2faEnabled = await _userManager.GetTwoFactorEnabledAsync(user);
+            Is2FaEnabled = await _userManager.GetTwoFactorEnabledAsync(user);
             IsMachineRemembered = await _signInManager.IsTwoFactorClientRememberedAsync(user);
             RecoveryCodesLeft = await _userManager.CountRecoveryCodesAsync(user);
 

@@ -49,7 +49,7 @@ namespace ScrumAble.Controllers
         public IActionResult AddTask(ScrumAbleTask scrumAbleTask)
         {
             ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            scrumAbleTask.viewModelTaskAggregate = _scrumAbleRepo.GetTaskAggregateData(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            scrumAbleTask.ViewModelTaskAggregate = _scrumAbleRepo.GetTaskAggregateData(User.FindFirstValue(ClaimTypes.NameIdentifier));
             ModelState.Clear();
             return View(scrumAbleTask);
         }
@@ -64,7 +64,7 @@ namespace ScrumAble.Controllers
             {
                 return View("TaskNotFound");
             }
-            scrumAbleTask.viewModelTaskAggregate = _scrumAbleRepo.GetTaskAggregateData(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            scrumAbleTask.ViewModelTaskAggregate = _scrumAbleRepo.GetTaskAggregateData(User.FindFirstValue(ClaimTypes.NameIdentifier));
             return View(scrumAbleTask);
         }
 
@@ -74,7 +74,7 @@ namespace ScrumAble.Controllers
             ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
             if (!ModelState.IsValid)
             {
-                scrumAbleTask.viewModelTaskAggregate = _scrumAbleRepo.GetTaskAggregateData(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                scrumAbleTask.ViewModelTaskAggregate = _scrumAbleRepo.GetTaskAggregateData(User.FindFirstValue(ClaimTypes.NameIdentifier));
                 return View("AddTask", scrumAbleTask);
             }
 
@@ -90,7 +90,7 @@ namespace ScrumAble.Controllers
             ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
             if (!ModelState.IsValid)
             {
-                scrumAbleTask.viewModelTaskAggregate = _scrumAbleRepo.GetTaskAggregateData(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                scrumAbleTask.ViewModelTaskAggregate = _scrumAbleRepo.GetTaskAggregateData(User.FindFirstValue(ClaimTypes.NameIdentifier));
                 return View("EditTask", scrumAbleTask);
             }
 

@@ -129,7 +129,7 @@ namespace ScrumAble.Tests.Controllers
             //do nothing in mock
         }
 
-        public void SetCurrentTeam(string userId, int TeamId)
+        public void SetCurrentTeam(string userId, int teamId)
         {
             //do nothing in mock
         }
@@ -141,6 +141,16 @@ namespace ScrumAble.Tests.Controllers
         }
 
         public bool IsAuthorized(ScrumAbleSprint sprint, string userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SaveToDb(ScrumAbleSprint sprint)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteFromDb(ScrumAbleSprint sprint)
         {
             throw new NotImplementedException();
         }
@@ -196,7 +206,7 @@ namespace ScrumAble.Tests.Controllers
             return true;
         }
 
-        public List<ScrumAbleTeam> getAllUserTeams(string userID)
+        public List<ScrumAbleTeam> GetAllUserTeams(string userId)
         {
             return null;
         }
@@ -218,6 +228,11 @@ namespace ScrumAble.Tests.Controllers
         }
 
         public bool IsAuthorized(ScrumAbleRelease release, string userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<ScrumAbleRelease> GetAllTeamReleases(int teamId)
         {
             throw new NotImplementedException();
         }
@@ -251,10 +266,10 @@ namespace ScrumAble.Tests.Controllers
 
                 foreach (var user in users)
                 {
-                    var DBCheck = _context.UserTeamMapping.Where(utm => utm.Team == team && utm.User == user)
+                    var dbCheck = _context.UserTeamMapping.Where(utm => utm.Team == team && utm.User == user)
                         .SingleOrDefault();
 
-                    if (DBCheck == null)
+                    if (dbCheck == null)
                     {
                         //_context.Database.ExecuteSqlRaw("INSERT INTO UserTeamMapping (UserId, TeamId) VALUES ({0}, {1})", user.Id, team.Id);
                         //_context.SaveChanges();
@@ -283,10 +298,10 @@ namespace ScrumAble.Tests.Controllers
 
                 foreach (var user in users)
                 {
-                    var DBCheck = _context.UserTeamMapping.Where(utm => utm.Team == team && utm.User == user)
+                    var dbCheck = _context.UserTeamMapping.Where(utm => utm.Team == team && utm.User == user)
                         .SingleOrDefault();
 
-                    if (DBCheck == null)
+                    if (dbCheck == null)
                     {
                         //_context.Database.ExecuteSqlRaw("INSERT INTO UserTeamMapping (UserId, TeamId) VALUES ({0}, {1})", user.Id, team.Id);
                         //_context.SaveChanges();

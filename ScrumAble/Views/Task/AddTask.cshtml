@@ -32,7 +32,7 @@
                     Selected = true
                 });
 
-                foreach (var teammate in Model.viewModelTaskAggregate.Users)
+                foreach (var teammate in Model.ViewModelTaskAggregate.Users)
                 {
                     ownerListItems.Add(new SelectListItem
                     {
@@ -64,19 +64,19 @@
 
         <div class="form-group">
             @{
-                List<SelectListItem> SprintListItems = new List<SelectListItem>();
+                List<SelectListItem> sprintListItems = new List<SelectListItem>();
                 //add current and future sprints to this list
 
-                SprintListItems.Add(new SelectListItem
+                sprintListItems.Add(new SelectListItem
                 {
                     Text = "Backlog",
                     Value = "-1",
                     Selected = true
                 });
 
-                foreach (var sprint in Model.viewModelTaskAggregate.Sprints)
+                foreach (var sprint in Model.ViewModelTaskAggregate.Sprints)
                 {
-                    SprintListItems.Add(new SelectListItem
+                    sprintListItems.Add(new SelectListItem
                     {
                         Text = sprint.SprintName,
                         Value = sprint.Id.ToString()
@@ -85,25 +85,25 @@
 
             }
             @Html.LabelFor(t => t.TaskSprintId)
-            @Html.DropDownListFor(t => t.TaskSprintId, SprintListItems, new { @class = "form-control" })
+            @Html.DropDownListFor(t => t.TaskSprintId, sprintListItems, new { @class = "form-control" })
 
         </div>
 
         <div class="form-group">
             @{
-                List<SelectListItem> StoryListItems = new List<SelectListItem>();
+                List<SelectListItem> storyListItems = new List<SelectListItem>();
                 //add all stories from the selected sprint above
 
-                StoryListItems.Add(new SelectListItem
+                storyListItems.Add(new SelectListItem
                 {
                     Text = "None",
                     Value = "-1",
                     Selected = true
                 });
 
-                foreach (var story in Model.viewModelTaskAggregate.Stories)
+                foreach (var story in Model.ViewModelTaskAggregate.Stories)
                 {
-                    StoryListItems.Add(new SelectListItem
+                    storyListItems.Add(new SelectListItem
                     {
                         Text = story.StoryName,
                         Value = story.Id.ToString()
@@ -112,11 +112,11 @@
 
             }
             @Html.LabelFor(t => t.TaskStoryId, new { id = "StoryListLabel" })
-            @Html.DropDownListFor(t => t.TaskStoryId, StoryListItems, new { @class = "form-control" })
+            @Html.DropDownListFor(t => t.TaskStoryId, storyListItems, new { @class = "form-control" })
         </div>
-        <input type="hidden" asp-for="viewModelTaskAggregate" />
+        <input type="hidden" asp-for="ViewModelTaskAggregate" />
 
-        @Html.EditorFor(t => t.viewModelTaskAggregate)
+        @Html.EditorFor(t => t.ViewModelTaskAggregate)
         @Html.AntiForgeryToken()
 
         <button type="submit" class="btn btn-primary">Add Task</button>

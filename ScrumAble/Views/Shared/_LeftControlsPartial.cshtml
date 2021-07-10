@@ -6,8 +6,8 @@
 @attribute [ExcludeFromCodeCoverage]
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @model  ScrumAbleUser
-@inject SignInManager<ScrumAbleUser> SignInManager
-@inject UserManager<ScrumAbleUser> UserManager
+@inject SignInManager<ScrumAbleUser> _signInManager
+@inject UserManager<ScrumAbleUser> _userManager
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <div class="flex-shrink-0 p-3 bg-dark" style="width: 280px; height: 100%;">
@@ -86,7 +86,7 @@
             <div class="collapse" id="home-collapse">
                 <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                     @{
-                        if (Model.CurrentWorkingTeam.Releases != null)
+                        if (Model.CurrentWorkingTeam != null && Model.CurrentWorkingTeam.Releases != null)
                         {
                             foreach (var release in Model.CurrentWorkingTeam.Releases)
                             {

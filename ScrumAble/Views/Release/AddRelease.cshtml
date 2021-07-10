@@ -1,0 +1,67 @@
+﻿@using System.Diagnostics.CodeAnalysis
+@using Microsoft.AspNetCore.Identity
+@using ScrumAble.Areas.Identity.Data
+@attribute [ExcludeFromCodeCoverage]
+@model ScrumAble.Models.ScrumAbleRelease
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject UserManager<ScrumAbleUser> _userManager
+
+@{
+    ViewData["Title"] = "Add Release";
+
+}
+
+<h2>New Release</h2>
+<br />
+
+<div style="width: 500px;">
+    @using (Html.BeginForm("CreateRelease", "Release"))
+    {
+        <div class="form-group">
+            @Html.LabelFor(r => r.ReleaseName)
+            @Html.TextBoxFor(r => r.ReleaseName, new { @class = "form-control" })
+            @Html.ValidationMessageFor(r => r.ReleaseName)
+        </div>
+
+
+        <div class="form-group">
+            @Html.LabelFor(r => r.ReleaseStartDate)
+            <input class="form-control" asp-for="ReleaseStartDate" />
+            @Html.ValidationMessageFor(r => r.ReleaseStartDate)
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(r => r.ReleaseEndDate)
+            <input class="form-control" asp-for="ReleaseEndDate" />
+            @Html.ValidationMessageFor(r => r.ReleaseEndDate)
+        </div>
+
+
+
+
+
+        <div class="form-group">
+            @{
+                List<SelectListItem> teamListItems = new List<SelectListItem>();
+
+                foreach (ScrumAbleTeam team in ViewBag.data)
+                {
+                    teamListItems.Add(new SelectListItem
+                    {
+                        Text = team.TeamName,
+                        Value = team.Id.ToString(),
+                        Selected = false
+                    });
+                }
+
+            }
+            @Html.LabelFor(r => r.ReleaseTeamId)
+            @Html.DropDownListFor(r => r.ReleaseTeamId, teamListItems, new { @class = "form-control" })
+        </div>
+
+            @Html.AntiForgeryToken()
+
+            <button type="submit" class="btn btn-primary">Create Release</button>
+            }
+
+        </div>

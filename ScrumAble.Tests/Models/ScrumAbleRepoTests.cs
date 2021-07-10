@@ -90,11 +90,11 @@ namespace ScrumAble.Tests.Models
 
             // Act
             scrumAbleRepo.SaveToDb(testTask);
-            MockScrumAbleTask taskDBItems = (MockScrumAbleTask) await context.Tasks.SingleAsync();
+            MockScrumAbleTask taskDbItems = (MockScrumAbleTask) await context.Tasks.SingleAsync();
 
             // Assert
-            Assert.NotNull(taskDBItems);
-            Assert.Equal("Test Task", taskDBItems.TaskName);
+            Assert.NotNull(taskDbItems);
+            Assert.Equal("Test Task", taskDbItems.TaskName);
 
             context.Database.EnsureDeleted();
         }
@@ -117,10 +117,10 @@ namespace ScrumAble.Tests.Models
 
             // Act
             scrumAbleRepo.SaveToDb(testTask);
-            MockScrumAbleTask taskDBItems = (MockScrumAbleTask)await context.Tasks.SingleAsync();
+            MockScrumAbleTask taskDbItems = (MockScrumAbleTask)await context.Tasks.SingleAsync();
 
             // Assert
-            Assert.Equal("Updated Name", taskDBItems.TaskName);
+            Assert.Equal("Updated Name", taskDbItems.TaskName);
 
             context.Database.EnsureDeleted();
         }
@@ -238,10 +238,10 @@ namespace ScrumAble.Tests.Models
 
             // Act
             scrumAbleRepo.SaveToDb(testUser);
-            var UserDBItem = (MockScrumAbleUser)await context.User.SingleAsync();
+            var userDbItem = (MockScrumAbleUser)await context.User.SingleAsync();
 
             // Assert
-            Assert.Equal("changed@test.com", UserDBItem.UserName);
+            Assert.Equal("changed@test.com", userDbItem.UserName);
 
             context.Database.EnsureDeleted();
         }
@@ -395,7 +395,7 @@ namespace ScrumAble.Tests.Models
             // Act
             scrumAbleRepo.SaveToDb(testTeam, userList);
 
-            var teamDBItem = (MockScrumAbleTeam)await context.Teams.SingleAsync();
+            var teamDbItem = (MockScrumAbleTeam)await context.Teams.SingleAsync();
 
             // Assert
             Assert.Equal("Changed", testTeam.TeamName);
@@ -536,11 +536,11 @@ namespace ScrumAble.Tests.Models
 
             // Act
             scrumAbleRepo.SaveToDb(testTeam, userList);
-            MockScrumAbleTeam teamDBItems = (MockScrumAbleTeam)await context.Teams.SingleAsync();
+            MockScrumAbleTeam teamDbItems = (MockScrumAbleTeam)await context.Teams.SingleAsync();
 
             // Assert
-            Assert.NotNull(teamDBItems);
-            Assert.Equal("New Test Team", teamDBItems.TeamName);
+            Assert.NotNull(teamDbItems);
+            Assert.Equal("New Test Team", teamDbItems.TeamName);
 
             context.Database.EnsureDeleted();
         }

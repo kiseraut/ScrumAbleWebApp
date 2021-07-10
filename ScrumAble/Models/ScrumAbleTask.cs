@@ -52,7 +52,7 @@ namespace ScrumAble.Models
         public ScrumAbleStory Story { get; set; }
 
         [NotMapped]
-        public ViewModelTaskAggregate viewModelTaskAggregate { get; set; }
+        public ViewModelTaskAggregate ViewModelTaskAggregate { get; set; }
 
         //The owner of the task
         [NotMapped, Display(Name = "Task Owner")]

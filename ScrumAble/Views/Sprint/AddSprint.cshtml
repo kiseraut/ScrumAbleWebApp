@@ -1,0 +1,72 @@
+﻿@using System.Diagnostics.CodeAnalysis
+@using Microsoft.AspNetCore.Identity
+@using ScrumAble.Areas.Identity.Data
+@attribute [ExcludeFromCodeCoverage]
+@model ScrumAble.Models.ScrumAbleSprint
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject UserManager<ScrumAbleUser> _userManager
+
+@{
+    ViewData["Title"] = "Add Sprint";
+
+}
+
+<h2>New Sprint</h2>
+<br />
+
+<div style="width: 500px;">
+    @using (Html.BeginForm("CreateSprint", "Sprint"))
+    {
+        <div class="form-group">
+            @Html.LabelFor(s => s.SprintName)
+            @Html.TextBoxFor(s => s.SprintName, new { @class = "form-control" })
+            @Html.ValidationMessageFor(s => s.SprintName)
+        </div>
+
+
+        <div class="form-group">
+            @Html.LabelFor(s => s.SprintStartDate)
+            <input class="form-control" asp-for="SprintStartDate" />
+            @Html.ValidationMessageFor(s => s.SprintStartDate)
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(s => s.SprintEndDate)
+            <input class="form-control" asp-for="SprintEndDate" />
+            @Html.ValidationMessageFor(s => s.SprintEndDate)
+        </div>
+
+
+
+
+
+        <div class="form-group">
+            @{
+                List<SelectListItem> releaseListItems = new List<SelectListItem>();
+
+                foreach (ScrumAbleRelease release in ViewBag.data)
+                {
+                    var selected = false;
+                    if (ViewBag.User.CurrentWorkingRelease.Id == release.Id)
+                    {
+                        selected = true;
+                    }
+                    releaseListItems.Add(new SelectListItem
+                    {
+                        Text = release.ReleaseName,
+                        Value = release.Id.ToString(),
+                        Selected = selected
+                    });
+                }
+
+            }
+            @Html.LabelFor(s => s.SprintReleaseId)
+            @Html.DropDownListFor(s => s.SprintReleaseId, releaseListItems, new { @class = "form-control" })
+        </div>
+
+        @Html.AntiForgeryToken()
+
+        <button type="submit" class="btn btn-primary">Create Sprint</button>
+    }
+
+</div>

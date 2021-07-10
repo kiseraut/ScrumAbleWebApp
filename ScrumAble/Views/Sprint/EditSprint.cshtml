@@ -1,0 +1,45 @@
+﻿@using System.Diagnostics.CodeAnalysis
+@using Microsoft.AspNetCore.Identity
+@using ScrumAble.Areas.Identity.Data
+@attribute [ExcludeFromCodeCoverage]
+@model ScrumAble.Models.ScrumAbleSprint
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject UserManager<ScrumAbleUser> _userManager
+
+@{
+    ViewData["Title"] = "Edit Sprint";
+
+}
+
+<h2>Edit Sprint "@Model.SprintName"</h2>
+<br />
+
+<div style="width: 500px;">
+    @using (Html.BeginForm("UpdateSprint", "Sprint"))
+    {
+        <div class="form-group">
+            @Html.LabelFor(s => s.SprintName)
+            @Html.TextBoxFor(s => s.SprintName, new { @class = "form-control" })
+            @Html.ValidationMessageFor(s => s.SprintName)
+        </div>
+
+
+        <div class="form-group">
+            @Html.LabelFor(s => s.SprintStartDate)
+            <input class="form-control" asp-for="SprintStartDate" />
+            @Html.ValidationMessageFor(s => s.SprintStartDate)
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(s => s.SprintEndDate)
+            <input class="form-control" asp-for="SprintEndDate" />
+            @Html.ValidationMessageFor(s => s.SprintEndDate)
+        </div>
+
+        @Html.HiddenFor(s => s.Id)
+        @Html.AntiForgeryToken()
+
+        <button type="submit" class="btn btn-primary">Update Sprint</button>
+    }
+
+</div>

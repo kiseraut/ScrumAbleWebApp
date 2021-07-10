@@ -89,7 +89,7 @@ namespace ScrumAble.Models
                 user.Teammates = userTeammates;
             }
 
-            user.TeamsJoined = getAllUserTeams(user.Id);
+            user.TeamsJoined = GetAllUserTeams(user.Id);
 
             return user;
         }
@@ -163,13 +163,13 @@ namespace ScrumAble.Models
             SaveToDb(user);
         }
 
-        public void SetCurrentTeam(string userId, int TeamId)
+        public void SetCurrentTeam(string userId, int teamId)
         {
             var user = GetUserById(userId);
-            var team = GetTeamById(TeamId);
+            var team = GetTeamById(teamId);
 
             var release = _context.Releases
-                .FirstOrDefault(r => r.Team.Id == TeamId);
+                .FirstOrDefault(r => r.Team.Id == teamId);
 
             if (release != null)
             {
@@ -190,13 +190,40 @@ namespace ScrumAble.Models
 
         public ScrumAbleSprint GetSprintById(int id)
         {
-            return _context.Sprints.Where(s => s.Id == id)
+            var sprint = _context.Sprints.Where(s => s.Id == id)
+                .Include(s => s.Stories)
+                .Include(s => s.Tasks)
+                .Include(s => s.Release)
                 .SingleOrDefault();
+
+            return sprint;
         }
 
         public bool IsAuthorized(ScrumAbleSprint sprint, string userId)
         {
             return IsAuthorized(sprint.Release, userId);
+        }
+
+        public void SaveToDb(ScrumAbleSprint sprint)
+        {
+            if (sprint.Id == 0)
+            {
+                _context.Sprints.Add(sprint);
+                _context.SaveChanges();
+            }
+            else
+            {
+                var dbSprint = _context.Sprints.First(s => s.Id == sprint.Id);
+                _context.Entry(dbSprint).CurrentValues.SetValues(sprint);
+                _context.SaveChanges();
+            }
+        
+        }
+
+        public void DeleteFromDb(ScrumAbleSprint sprint)
+        {
+            _context.Sprints.Remove(sprint);
+            _context.SaveChanges();
         }
 
         public ScrumAbleStory GetStoryById(int id)
@@ -272,9 +299,9 @@ namespace ScrumAble.Models
             return false;
         }
 
-        public List<ScrumAbleTeam> getAllUserTeams(string userID)
+        public List<ScrumAbleTeam> GetAllUserTeams(string userId)
         {
-            var userTeamMappings = _context.UserTeamMapping.Where(utm => utm.User.Id == userID)
+            var userTeamMappings = _context.UserTeamMapping.Where(utm => utm.User.Id == userId)
                 .Include(utm => utm.Team)
                 .ToList();
 
@@ -315,6 +342,14 @@ namespace ScrumAble.Models
             return false;
         }
 
+        public List<ScrumAbleRelease> GetAllTeamReleases(int teamId)
+        {
+            var releaseList = _context.Releases.Where(r => r.Team.Id == teamId)
+                .ToList();
+
+            return releaseList;
+        }
+
         public void SaveToDb(ScrumAbleRelease release)
         {
             if (release.Id == 0)
@@ -344,10 +379,10 @@ namespace ScrumAble.Models
 
                 foreach (var user in users)
                 {
-                    var DBCheck = _context.UserTeamMapping.Where(utm => utm.Team == team && utm.User == user)
+                    var dbCheck = _context.UserTeamMapping.Where(utm => utm.Team == team && utm.User == user)
                         .SingleOrDefault();
 
-                    if (DBCheck == null)
+                    if (dbCheck == null)
                     {
                         _context.Database.ExecuteSqlRaw("INSERT INTO UserTeamMapping (UserId, TeamId) VALUES ({0}, {1})", user.Id, team.Id);
                         _context.SaveChanges();
@@ -376,10 +411,10 @@ namespace ScrumAble.Models
 
                 foreach (var user in users)
                 {
-                    var DBCheck = _context.UserTeamMapping.Where(utm => utm.Team == team && utm.User == user)
+                    var dbCheck = _context.UserTeamMapping.Where(utm => utm.Team == team && utm.User == user)
                         .SingleOrDefault();
 
-                    if (DBCheck == null)
+                    if (dbCheck == null)
                     {
                         _context.Database.ExecuteSqlRaw("INSERT INTO UserTeamMapping (UserId, TeamId) VALUES ({0}, {1})", user.Id, team.Id);
                         _context.SaveChanges();

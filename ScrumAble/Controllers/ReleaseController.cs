@@ -55,7 +55,7 @@ namespace ScrumAble.Controllers
             scrumAbleRelease.Team = user.CurrentWorkingTeam;
             scrumAbleRelease.ReleaseTeamId = user.CurrentWorkingTeam.Id;
 
-            ViewBag.data = _scrumAbleRepo.getAllUserTeams(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            ViewBag.data = _scrumAbleRepo.GetAllUserTeams(User.FindFirstValue(ClaimTypes.NameIdentifier));
             ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
             return View(scrumAbleRelease);
@@ -109,6 +109,7 @@ namespace ScrumAble.Controllers
 
             return RedirectToAction("Details", "Release", new { id = scrumAbleRelease.Id });
         }
+
         public IActionResult DeleteRelease(int id)
         {
             ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));

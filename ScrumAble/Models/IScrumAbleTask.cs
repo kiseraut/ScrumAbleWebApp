@@ -16,7 +16,7 @@ namespace ScrumAble.Models
         ScrumAbleWorkflowStage WorkflowStage { get; set; }
         ScrumAbleSprint Sprint { get; set; }
         ScrumAbleStory Story { get; set; }
-        ViewModelTaskAggregate viewModelTaskAggregate { get; set; }
+        ViewModelTaskAggregate ViewModelTaskAggregate { get; set; }
         string? TaskOwnerId { get; set; }
         int? TaskSprintId { get; set; }
         int? TaskStoryId { get; set; }

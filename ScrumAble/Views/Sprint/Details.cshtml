@@ -1,0 +1,87 @@
+﻿@using System.Diagnostics.CodeAnalysis
+@attribute [ExcludeFromCodeCoverage]
+@model ScrumAble.Models.ScrumAbleSprint
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Sprint Details";
+
+}
+
+<div>
+    <ul class="navbar-nav" style="flex-direction: row;">
+        <li class="nav-item" style="margin-right: 15px;">
+            @Html.ActionLink("Edit", "EditSprint", new { Id = Model.Id })
+        </li>
+        <li class="nav-item">
+
+            @Html.ActionLink("Delete", "DeleteSprint", new { Id = Model.Id })
+        </li>
+    </ul>
+
+</div>
+<h2>@Model.SprintName</h2>
+
+<b>Release:</b> @{
+    if (@Model.Release != null)
+    {
+        @Html.ActionLink(Model.Release.ReleaseName, "Details", "Release", new { Id = Model.Release.Id })
+    }
+                }
+<br/>
+
+<b>Start Date:</b> @{
+    @Html.DisplayFor(s => Model.SprintStartDate);   
+}
+
+<br />
+
+<b>End Date:</b> @{
+        @Html.DisplayFor(s => Model.SprintEndDate);
+}
+
+<br />
+<br />
+
+<b>Stories:</b>
+<ul>
+    @{
+
+        if (Model.Stories != null)
+        {
+            foreach (var story in Model.Stories)
+            {
+                <li>@Html.ActionLink(story.StoryName, "Details", "Story", new { Id = story.Id })</li>
+            }
+        }
+        <li>@Html.ActionLink("+ Add New", "AddStory", "Story")</li>
+    }
+</ul>
+
+
+<br />
+
+<b>Tasks:</b>
+<ul>
+    @{
+
+        if (Model.Tasks != null)
+        {
+            foreach (var task in Model.Tasks)
+            {
+                <li>@Html.ActionLink(task.TaskName, "Details", "Task", new { Id = task.Id })</li>
+            }
+        }
+        <li>@Html.ActionLink("+ Add New", "AddTask", "Task")</li>
+    }
+</ul>
+<br />
+
+
+
+
+<!--javascript libraries for unobtrusive client-side validation-->
+@section scripts {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+}

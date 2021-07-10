@@ -62,11 +62,11 @@ namespace ScrumAble.Tests.Controllers
 
             // Act
             IActionResult result = releaseController.CreateRelease(testRelease) as IActionResult;
-            MockScrumAbleRelease taskDBItems = (MockScrumAbleRelease)await context.Releases.SingleAsync();
+            MockScrumAbleRelease taskDbItems = (MockScrumAbleRelease)await context.Releases.SingleAsync();
 
             // Assert
-            Assert.NotNull(taskDBItems);
-            Assert.Equal("Test Release", taskDBItems.ReleaseName);
+            Assert.NotNull(taskDbItems);
+            Assert.Equal("Test Release", taskDbItems.ReleaseName);
 
             context.Database.EnsureDeleted();
         }
@@ -97,11 +97,11 @@ namespace ScrumAble.Tests.Controllers
             
             // Act
             releaseController.UpdateRelease(updatedTestRelease);
-            var releaseDBItems = context.Releases.Single();
+            var releaseDbItems = context.Releases.Single();
 
             // Assert
-            Assert.NotNull(releaseDBItems);
-            Assert.Equal("Updated Test Release", releaseDBItems.ReleaseName);
+            Assert.NotNull(releaseDbItems);
+            Assert.Equal("Updated Test Release", releaseDbItems.ReleaseName);
 
             context.Database.EnsureDeleted();
         }

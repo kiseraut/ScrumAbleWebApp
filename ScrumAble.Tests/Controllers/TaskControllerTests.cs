@@ -61,11 +61,11 @@ namespace ScrumAble.Tests.Controllers
 
             // Act
             IActionResult result = taskController.CreateTask(testTask) as IActionResult;
-            MockScrumAbleTask taskDBItems = (MockScrumAbleTask) await context.Tasks.SingleAsync();
+            MockScrumAbleTask taskDbItems = (MockScrumAbleTask) await context.Tasks.SingleAsync();
 
             // Assert
-            Assert.NotNull(taskDBItems);
-            Assert.Equal("Test Task", taskDBItems.TaskName);
+            Assert.NotNull(taskDbItems);
+            Assert.Equal("Test Task", taskDbItems.TaskName);
 
             context.Database.EnsureDeleted();
         }
@@ -188,11 +188,11 @@ namespace ScrumAble.Tests.Controllers
 
             // Act
             IActionResult result = taskController.UpdateTask(testTask) as IActionResult;
-            MockScrumAbleTask taskDBItems = (MockScrumAbleTask) await context.Tasks.SingleAsync();
+            MockScrumAbleTask taskDbItems = (MockScrumAbleTask) await context.Tasks.SingleAsync();
 
             // Assert
-            Assert.NotNull(taskDBItems);
-            Assert.Equal("Updated Test Task", taskDBItems.TaskName);
+            Assert.NotNull(taskDbItems);
+            Assert.Equal("Updated Test Task", taskDbItems.TaskName);
 
             context.Database.EnsureDeleted();
         }

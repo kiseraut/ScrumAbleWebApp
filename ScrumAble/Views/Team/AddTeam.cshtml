@@ -4,7 +4,7 @@
 @attribute [ExcludeFromCodeCoverage]
 @model ScrumAble.Models.ScrumAbleTeam
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@inject UserManager<ScrumAbleUser> UserManager
+@inject UserManager<ScrumAbleUser> _userManager
 
 @{
     ViewData["Title"] = "Add Team";
@@ -27,7 +27,7 @@
         <text>Team Members:</text> <br/>
         <text>(add one team member's email address per line)</text>
         @Html.TextAreaFor(t => t.TeammatesText, 10, 10, new { @class = "form-control" })
-        <b>*@UserManager.GetUserName(User) will be added automatically</b>
+        <b>*@_userManager.GetUserName(User) will be added automatically</b>
         <br />
         <br />
         //@Html.HiddenFor(t => t.Id);

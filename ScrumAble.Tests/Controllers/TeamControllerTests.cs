@@ -62,11 +62,11 @@ namespace ScrumAble.Tests.Controllers
 
             // Act
             IActionResult result = teamController.CreateTeam(testTeam) as IActionResult;
-            MockScrumAbleTeam teamDBItems = (MockScrumAbleTeam)await context.Teams.SingleAsync();
+            MockScrumAbleTeam teamDbItems = (MockScrumAbleTeam)await context.Teams.SingleAsync();
 
             // Assert
-            Assert.NotNull(teamDBItems);
-            Assert.Equal("Test Team", teamDBItems.TeamName);
+            Assert.NotNull(teamDbItems);
+            Assert.Equal("Test Team", teamDbItems.TeamName);
 
             context.Database.EnsureDeleted();
         }
@@ -94,11 +94,11 @@ namespace ScrumAble.Tests.Controllers
 
             // Act
             IActionResult result = teamController.UpdateTeam(testTeam) as IActionResult;
-            MockScrumAbleTeam taskDBItems = (MockScrumAbleTeam)await context.Teams.SingleAsync();
+            MockScrumAbleTeam taskDbItems = (MockScrumAbleTeam)await context.Teams.SingleAsync();
 
             // Assert
-            Assert.NotNull(taskDBItems);
-            Assert.Equal("Updated Test Team", taskDBItems.TeamName);
+            Assert.NotNull(taskDbItems);
+            Assert.Equal("Updated Test Team", taskDbItems.TeamName);
 
             context.Database.EnsureDeleted();
         }
