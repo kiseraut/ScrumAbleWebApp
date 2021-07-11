@@ -86,10 +86,7 @@ namespace ScrumAble.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult CreateSprint(ScrumAbleSprint scrumableSprint)
         {
-            if (ModelState.ErrorCount > 1)
-            {
-                return View("AddSprint", scrumableSprint);
-            }
+            if (ModelState.ErrorCount > 1) { return View("AddSprint", scrumableSprint); }
 
             scrumableSprint.Release = _scrumAbleRepo.GetReleaseById(scrumableSprint.SprintReleaseId);
             //scrumAbleRelease.Team = _scrumAbleRepo.GetTeamById(scrumAbleRelease.ReleaseTeamId);
@@ -103,10 +100,7 @@ namespace ScrumAble.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult UpdateSprint(ScrumAbleSprint scrumAbleSprint)
         {
-            if (ModelState.ErrorCount > 1)
-            {
-                return View("AddSprint", scrumAbleSprint);
-            }
+            if (ModelState.ErrorCount > 1) { return View("AddSprint", scrumAbleSprint); }
 
             _scrumAbleRepo.SaveToDb(scrumAbleSprint);
 

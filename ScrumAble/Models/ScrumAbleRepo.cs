@@ -72,6 +72,8 @@ namespace ScrumAble.Models
                 .ThenInclude(r => r.Sprints)
                 .FirstOrDefault();
 
+            if (user == null) return null;
+            
             if (user.CurrentWorkingTeam != null)
             {
                 var teammates = _context.UserTeamMapping.Where(utm => utm.Team.Id == user.CurrentWorkingTeam.Id)
@@ -90,6 +92,7 @@ namespace ScrumAble.Models
             }
 
             user.TeamsJoined = GetAllUserTeams(user.Id);
+            
 
             return user;
         }
@@ -177,10 +180,7 @@ namespace ScrumAble.Models
                     .FirstOrDefault(s => s.Release.Id == release.Id);
                 user.CurrentWorkingSprint = sprint;
             }
-            else
-            {
-                user.CurrentWorkingSprint = null;
-            }
+            else { user.CurrentWorkingSprint = null; }
 
             user.CurrentWorkingTeam = team;
             user.CurrentWorkingRelease = release;
@@ -229,7 +229,7 @@ namespace ScrumAble.Models
         public ScrumAbleStory GetStoryById(int id)
         {
             return _context.Stories.Where(s => s.Id == id)
-                .SingleOrDefault(); ;
+                .SingleOrDefault();
         }
 
         public bool IsAuthorized(ScrumAbleStory story, string userId)

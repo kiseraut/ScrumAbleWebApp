@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -158,6 +154,36 @@ namespace ScrumAble.Tests.Controllers
             // Assert
             Assert.Equal(0, numRecords);
 
+            context.Database.EnsureDeleted();
+        }
+
+        [Fact]
+        public void UT43_SprintController_AddSprint_ShouldReturnSprintObject()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<ScrumAbleContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT43")
+                .Options;
+
+            var context = new ScrumAbleContext(options);
+            var scrumAbleRepo = new MockScrumAbleRepo(context);
+            var releaseController = new ReleaseController(scrumAbleRepo, null);
+            var user = MockScrumAbleUser.GenerateScrumAbleUser();
+            var team = MockScrumAbleTeam.GenerateTeam();
+            var testRelease = MockScrumAbleRelease.GenerateRelease();
+            user.CurrentWorkingTeam = team;
+            context.Add(user);
+            context.Add(team);
+            context.SaveChanges();
+
+            releaseController = AddClaimsIdentityToController(releaseController, user);
+
+            // Act
+            var result = releaseController.AddRelease(MockScrumAbleRelease.GenerateRelease()) as ViewResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.IsType<MockScrumAbleRelease>(result.Model);
             context.Database.EnsureDeleted();
         }
 

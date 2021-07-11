@@ -34,15 +34,8 @@ namespace ScrumAble.Controllers
             }
 
             scrumAbleRelease.CurrentUser = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            
 
             return View(scrumAbleRelease);
-        }
-
-        public IActionResult SetCurrentRelease(int id)
-        {
-            _scrumAbleRepo.SetCurrentRelease(User.FindFirstValue(ClaimTypes.NameIdentifier), id);
-            return RedirectToAction("Details", "Release", new { id = id });
         }
 
         public IActionResult AddRelease(ScrumAbleRelease scrumAbleRelease)
@@ -61,22 +54,6 @@ namespace ScrumAble.Controllers
             return View(scrumAbleRelease);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult CreateRelease(ScrumAbleRelease scrumAbleRelease)
-        {
-            if (ModelState.ErrorCount > 1)
-            {
-                return View("AddRelease", scrumAbleRelease);
-            }
-
-            scrumAbleRelease.Team = _scrumAbleRepo.GetTeamById(scrumAbleRelease.ReleaseTeamId);
-
-            _scrumAbleRepo.SaveToDb(scrumAbleRelease);
-            _scrumAbleRepo.SetCurrentRelease(User.FindFirstValue(ClaimTypes.NameIdentifier), scrumAbleRelease.Id);
-            return RedirectToAction("Details", "Release", new { id = scrumAbleRelease.Id });
-        }
-
         public IActionResult EditRelease(int id)
         {
             var user = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
@@ -93,15 +70,38 @@ namespace ScrumAble.Controllers
             scrumAbleRelease.ReleaseTeamId = user.CurrentWorkingTeam.Id;
             return View(scrumAbleRelease);
         }
+        public IActionResult DeleteRelease(int id)
+        {
+            ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            _scrumAbleRepo.DeleteFromDb(_scrumAbleRepo.GetReleaseById(id));
+            //TODO redirect back to dashboard
+            return RedirectToAction("Index", "Home");
+        }
+
+        public IActionResult SetCurrentRelease(int id)
+        {
+            _scrumAbleRepo.SetCurrentRelease(User.FindFirstValue(ClaimTypes.NameIdentifier), id);
+            return RedirectToAction("Details", "Release", new { id = id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CreateRelease(ScrumAbleRelease scrumAbleRelease)
+        {
+            if (ModelState.ErrorCount > 1) { return View("AddRelease", scrumAbleRelease); }
+
+            scrumAbleRelease.Team = _scrumAbleRepo.GetTeamById(scrumAbleRelease.ReleaseTeamId);
+
+            _scrumAbleRepo.SaveToDb(scrumAbleRelease);
+            _scrumAbleRepo.SetCurrentRelease(User.FindFirstValue(ClaimTypes.NameIdentifier), scrumAbleRelease.Id);
+            return RedirectToAction("Details", "Release", new { id = scrumAbleRelease.Id });
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult UpdateRelease(ScrumAbleRelease scrumAbleRelease)
         {
-            if (ModelState.ErrorCount > 1)
-            {
-                return View("AddRelease", scrumAbleRelease);
-            }
+            if (ModelState.ErrorCount > 1) { return View("AddRelease", scrumAbleRelease); }
 
             scrumAbleRelease.Team = _scrumAbleRepo.GetTeamById(scrumAbleRelease.ReleaseTeamId);
 
@@ -110,12 +110,6 @@ namespace ScrumAble.Controllers
             return RedirectToAction("Details", "Release", new { id = scrumAbleRelease.Id });
         }
 
-        public IActionResult DeleteRelease(int id)
-        {
-            ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            _scrumAbleRepo.DeleteFromDb(_scrumAbleRepo.GetReleaseById(id));
-            //TODO redirect back to dashboard
-            return RedirectToAction("Index", "Home");
-        }
+        
     }
 }

@@ -100,16 +100,12 @@ namespace ScrumAble.Tests.Controllers
 
         public void SaveToDb(ScrumAbleUser user)
         {
-            if (user.Id == "0")
+            if (user.Id != "0")
             {
-                //new users are handled by Identity framework
-            }
-            else
-            {
-                _context.Users.Add(user);
+                _context.Users.Update(user);
                 _context.SaveChanges();
             }
-            
+
         }
 
         public void DeleteFromDb(ScrumAbleUser user)
@@ -126,7 +122,9 @@ namespace ScrumAble.Tests.Controllers
 
         public void SetCurrentSprint(string userId, int sprintId)
         {
-            //do nothing in mock
+            var user = GetUserById(userId);
+            user.CurrentWorkingSprint = GetSprintById(sprintId);
+            SaveToDb(user);
         }
 
         public void SetCurrentTeam(string userId, int teamId)
@@ -142,17 +140,28 @@ namespace ScrumAble.Tests.Controllers
 
         public bool IsAuthorized(ScrumAbleSprint sprint, string userId)
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         public void SaveToDb(ScrumAbleSprint sprint)
         {
-            throw new NotImplementedException();
+            if (sprint.Id == 0)
+            {
+                _context.Sprints.Add(sprint);
+                _context.SaveChanges();
+            }
+            else
+            {
+                var dbSprint = _context.Sprints.First(s => s.Id == sprint.Id);
+                _context.Entry(dbSprint).CurrentValues.SetValues(sprint);
+                _context.SaveChanges();
+            }
         }
 
         public void DeleteFromDb(ScrumAbleSprint sprint)
         {
-            throw new NotImplementedException();
+            _context.Sprints.Remove(sprint);
+            _context.SaveChanges();
         }
 
         public ScrumAbleStory GetStoryById(int id)
@@ -234,7 +243,7 @@ namespace ScrumAble.Tests.Controllers
 
         public List<ScrumAbleRelease> GetAllTeamReleases(int teamId)
         {
-            throw new NotImplementedException();
+            return _context.Releases.ToList();
         }
 
         public void SaveToDb(ScrumAbleRelease release)

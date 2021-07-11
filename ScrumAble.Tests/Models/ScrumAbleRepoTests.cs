@@ -545,6 +545,256 @@ namespace ScrumAble.Tests.Models
             context.Database.EnsureDeleted();
         }
 
+        [Fact]
+        public async void UT44_ScrumAbleRepo_SetCurrentRelease_ShouldSetTheCurrentReleaseForTheUser()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<ScrumAbleContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT44")
+                .Options;
+
+            var context = new ScrumAbleContext(options);
+            var scrumAbleRepo = new ScrumAbleRepo(context);
+            var testTeam = MockScrumAbleTeam.GenerateTeam();
+            var testUser = MockScrumAbleUser.GenerateScrumAbleUser();
+            var testWorkflowStage = MockScrumAbleWorkflowStage.GenerateWorkflowStage(testTeam);
+            var testRelease = MockScrumAbleRelease.GenerateRelease(testTeam);
+            var testSprint = MockScrumAbleSprint.GenerateSprint(testRelease);
+            var testStory = MockScrumAbleStory.GenerateStory();
+            var testTask = MockScrumAbleTask.GenerateTask(testStory, testWorkflowStage, testSprint, testUser);
+
+
+            context.Add(testTeam);
+            context.Add(testWorkflowStage);
+            context.Add(testRelease);
+            context.Add(testSprint);
+            context.Add(testStory);
+            context.Add(testTask);
+            context.SaveChanges();
+
+            //Act
+            scrumAbleRepo.SetCurrentRelease(testUser.Id, testRelease.Id);
+            MockScrumAbleUser dbUser = (MockScrumAbleUser)await context.User.SingleAsync();
+
+            //Assert
+            Assert.Equal(testRelease, dbUser.CurrentWorkingRelease);
+        }
+
+        [Fact]
+        public async void UT45_ScrumAbleRepo_SetCurrentSprint_ShouldSetTheCurrentSprintForTheUser()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<ScrumAbleContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT45")
+                .Options;
+
+            var context = new ScrumAbleContext(options);
+            var scrumAbleRepo = new ScrumAbleRepo(context);
+            var testTeam = MockScrumAbleTeam.GenerateTeam();
+            var testUser = MockScrumAbleUser.GenerateScrumAbleUser();
+            var testWorkflowStage = MockScrumAbleWorkflowStage.GenerateWorkflowStage(testTeam);
+            var testRelease = MockScrumAbleRelease.GenerateRelease(testTeam);
+            var testSprint = MockScrumAbleSprint.GenerateSprint(testRelease);
+            var testStory = MockScrumAbleStory.GenerateStory();
+            var testTask = MockScrumAbleTask.GenerateTask(testStory, testWorkflowStage, testSprint, testUser);
+            
+
+            context.Add(testTeam);
+            context.Add(testWorkflowStage);
+            context.Add(testRelease);
+            context.Add(testSprint);
+            context.Add(testStory);
+            context.Add(testTask);
+            context.SaveChanges();
+
+            //Act
+            scrumAbleRepo.SetCurrentSprint(testUser.Id, testSprint.Id);
+            MockScrumAbleUser dbUser = (MockScrumAbleUser)await context.User.SingleAsync();
+
+            //Assert
+            Assert.Equal(testSprint, dbUser.CurrentWorkingSprint);
+        }
+
+        [Fact]
+        public async void UT46_ScrumAbleRepo_SetCurrentTeam_ShouldSetTheCurrentTeamForTheUser()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<ScrumAbleContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT46")
+                .Options;
+
+            var context = new ScrumAbleContext(options);
+            var scrumAbleRepo = new ScrumAbleRepo(context);
+            var testTeam = MockScrumAbleTeam.GenerateTeam();
+            var testUser = MockScrumAbleUser.GenerateScrumAbleUser();
+            var testWorkflowStage = MockScrumAbleWorkflowStage.GenerateWorkflowStage(testTeam);
+            var testRelease = MockScrumAbleRelease.GenerateRelease(testTeam);
+            var testSprint = MockScrumAbleSprint.GenerateSprint(testRelease);
+            var testStory = MockScrumAbleStory.GenerateStory();
+            var testTask = MockScrumAbleTask.GenerateTask(testStory, testWorkflowStage, testSprint, testUser);
+
+
+            context.Add(testTeam);
+            context.Add(testWorkflowStage);
+            context.Add(testRelease);
+            context.Add(testSprint);
+            context.Add(testStory);
+            context.Add(testTask);
+            context.SaveChanges();
+
+            //Act
+            scrumAbleRepo.SetCurrentTeam(testUser.Id, testTeam.Id);
+            MockScrumAbleUser dbUser = (MockScrumAbleUser)await context.User.SingleAsync();
+
+            //Assert
+            Assert.Equal(testTeam, dbUser.CurrentWorkingTeam);
+        }
+
+        [Fact]
+        public async void UT47_ScrumAbleRepo_SaveToDb_ShouldUpdateSprintInDb()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<ScrumAbleContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT47")
+                .Options;
+
+            var context = new ScrumAbleContext(options);
+            var scrumAbleRepo = new ScrumAbleRepo(context);
+            var testSprint = MockScrumAbleSprint.GenerateSprint();
+            context.Add(testSprint);
+            context.SaveChanges();
+
+            testSprint.SprintName = "Updated";
+
+            // Act
+            scrumAbleRepo.SaveToDb(testSprint);
+            var sprintDbItem = (MockScrumAbleSprint)await context.Sprints.SingleAsync();
+
+            // Assert
+            Assert.Equal("Updated", sprintDbItem.SprintName);
+
+            context.Database.EnsureDeleted();
+        }
+
+        [Fact]
+        public async void UT48_ScrumAbleRepo_SaveToDb_ShouldAddSprintToDb()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<ScrumAbleContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT48")
+                .Options;
+
+            var context = new ScrumAbleContext(options);
+            var scrumAbleRepo = new ScrumAbleRepo(context);
+            var testSprint = MockScrumAbleSprint.GenerateSprint();
+
+            // Act
+            scrumAbleRepo.SaveToDb(testSprint);
+            var sprintDbItem = (MockScrumAbleSprint)await context.Sprints.SingleAsync();
+
+            // Assert
+            Assert.NotNull(sprintDbItem);
+
+            context.Database.EnsureDeleted();
+        }
+
+        [Fact]
+        public async void UT49_ScrumAbleRepo_DeleteFromDb_ShouldDeleteSprintFromDb()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<ScrumAbleContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT49")
+                .Options;
+
+            var context = new ScrumAbleContext(options);
+            var scrumAbleRepo = new ScrumAbleRepo(context);
+            var testSprint = MockScrumAbleSprint.GenerateSprint();
+            context.Add(testSprint);
+            context.SaveChanges();
+
+
+            // Act
+            scrumAbleRepo.DeleteFromDb(testSprint);
+            var numRecords = context.Sprints.Count();
+
+            // Assert
+            Assert.Equal(0, numRecords);
+
+            context.Database.EnsureDeleted();
+        }
+
+        [Fact]
+        public async void UT50_ScrumAbleRepo_DeleteFromDb_ShouldDeleteReleaseFromDb()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<ScrumAbleContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT50")
+                .Options;
+
+            var context = new ScrumAbleContext(options);
+            var scrumAbleRepo = new ScrumAbleRepo(context);
+            var testRelease = MockScrumAbleRelease.GenerateRelease();
+            context.Add(testRelease);
+            context.SaveChanges();
+
+
+            // Act
+            scrumAbleRepo.DeleteFromDb(testRelease);
+            var numRecords = context.Releases.Count();
+
+            // Assert
+            Assert.Equal(0, numRecords);
+
+            context.Database.EnsureDeleted();
+        }
+
+        [Fact]
+        public async void UT51_ScrumAbleRepo_SaveToDb_ShouldUpdateReleaseInDb()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<ScrumAbleContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT51")
+                .Options;
+
+            var context = new ScrumAbleContext(options);
+            var scrumAbleRepo = new ScrumAbleRepo(context);
+            var testRelease = MockScrumAbleRelease.GenerateRelease();
+            context.Add(testRelease);
+            context.SaveChanges();
+
+            testRelease.ReleaseName = "Updated";
+
+            // Act
+            scrumAbleRepo.SaveToDb(testRelease);
+            var sprintDbItem = (MockScrumAbleRelease)await context.Releases.SingleAsync();
+
+            // Assert
+            Assert.Equal("Updated", sprintDbItem.ReleaseName);
+
+            context.Database.EnsureDeleted();
+        }
+
+        [Fact]
+        public async void UT52_ScrumAbleRepo_SaveToDb_ShouldAddSprintToDb()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<ScrumAbleContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT52")
+                .Options;
+
+            var context = new ScrumAbleContext(options);
+            var scrumAbleRepo = new ScrumAbleRepo(context);
+            var testRelease = MockScrumAbleRelease.GenerateRelease();
+
+            // Act
+            scrumAbleRepo.SaveToDb(testRelease);
+            var releaseDbItem = (MockScrumAbleRelease)await context.Releases.SingleAsync();
+
+            // Assert
+            Assert.NotNull(releaseDbItem);
+
+            context.Database.EnsureDeleted();
+        }
 
     }
 }
