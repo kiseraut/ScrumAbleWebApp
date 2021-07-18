@@ -23,6 +23,12 @@
 </div>
 <h2>@Model.WorkflowStageName</h2>
 
+<br />
+
+<b>Team: </b>
+@Html.ActionLink(Model.Team.TeamName, "Details", "Team", new { Id = Model.Team.Id })
+
+<br/>
 <br/>
 
 <b>Workflow Stage Position:</b>
@@ -33,7 +39,7 @@
         {
             if (workflowStage.Id == Model.Id)
             {
-                <li style="font-weight: bold" >
+                <li style="font-weight: bold">
                     @workflowStage.WorkflowStageName
                 </li>
             }
@@ -43,7 +49,7 @@
                     @workflowStage.WorkflowStageName
                 </li>
             }
-            
+
         }
     }
 </ol>

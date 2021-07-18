@@ -45,6 +45,7 @@ namespace ScrumAble.Controllers
 
             var user = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
             scrumAbleSprint.Release = user.CurrentWorkingRelease;
+            scrumAbleSprint.SprintReleaseId = user.CurrentWorkingRelease.Id;
 
 
             ViewBag.data = _scrumAbleRepo.GetAllTeamReleases(user.CurrentWorkingTeam.Id);
@@ -71,9 +72,10 @@ namespace ScrumAble.Controllers
         public IActionResult DeleteSprint(int id)
         {
             ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            _scrumAbleRepo.DeleteFromDb(_scrumAbleRepo.GetSprintById(id));
+            var scrumableSprint = _scrumAbleRepo.GetSprintById(id);
+            _scrumAbleRepo.DeleteFromDb(scrumableSprint);
             //TODO redirect back to dashboard
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Details", "Release", new { id = scrumableSprint.Release.Id });
         }
 
         public IActionResult SetCurrentSprint(int id)

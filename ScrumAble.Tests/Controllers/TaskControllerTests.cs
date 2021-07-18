@@ -209,7 +209,10 @@ namespace ScrumAble.Tests.Controllers
             var scrumAbleRepo = new MockScrumAbleRepo(context);
             var taskController = new TaskController(scrumAbleRepo, null);
             var testTask = MockScrumAbleTask.GenerateTask();
+            var testSprint = MockScrumAbleSprint.GenerateSprint();
+            testTask.Sprint = testSprint;
             context.Add(testTask);
+            context.Add(testSprint);
             context.SaveChanges();
 
             taskController = AddClaimsIdentityToController(taskController);

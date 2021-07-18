@@ -36,12 +36,13 @@ namespace ScrumAble.Controllers
         {
             ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var scrumAbleTask = _scrumAbleRepo.GetTaskById(id);
-            scrumAbleTask = _scrumAbleRepo.PopulateTaskMetadata(scrumAbleTask);
 
             if (scrumAbleTask == null)
             {
                 return View("TaskNotFound");
             }
+
+            scrumAbleTask = _scrumAbleRepo.PopulateTaskMetadata(scrumAbleTask);
 
             return View(scrumAbleTask);
         }
@@ -107,10 +108,11 @@ namespace ScrumAble.Controllers
         public IActionResult DeleteTask(int id)
         {
             ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            _scrumAbleRepo.DeleteFromDb(_scrumAbleRepo.GetTaskById(id));
+            var scrumAbleTask = _scrumAbleRepo.GetTaskById(id);
+            _scrumAbleRepo.DeleteFromDb(scrumAbleTask);
 
             //TODO redirect back to dashboard
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Details", "Sprint", new {id = scrumAbleTask.Sprint.Id});
         }
 
         private void GetExternalObjectsFromIds(ScrumAbleTask scrumAbleTask)

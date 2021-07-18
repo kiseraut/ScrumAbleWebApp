@@ -113,6 +113,8 @@ namespace ScrumAble.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult UpdateWorkflowStage(ScrumAbleWorkflowStage scrumAbleWorkflowStage)
         {
+            var user = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            scrumAbleWorkflowStage.Team = user.CurrentWorkingTeam;
             if (ModelState.ErrorCount > 1) { return View("AddWorkflowStage", scrumAbleWorkflowStage); }
 
             _scrumAbleRepo.SaveToDb(scrumAbleWorkflowStage, _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier)));

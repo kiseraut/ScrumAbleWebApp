@@ -68,15 +68,17 @@ namespace ScrumAble.Controllers
 
             scrumAbleRelease.Team = user.CurrentWorkingTeam;
             scrumAbleRelease.ReleaseTeamId = user.CurrentWorkingTeam.Id;
+            ViewBag.data = _scrumAbleRepo.GetAllUserTeams(User.FindFirstValue(ClaimTypes.NameIdentifier));
             return View(scrumAbleRelease);
         }
 
         public IActionResult DeleteRelease(int id)
         {
             ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            _scrumAbleRepo.DeleteFromDb(_scrumAbleRepo.GetReleaseById(id));
+            var scrumAbleRelease = _scrumAbleRepo.GetReleaseById(id);
+            _scrumAbleRepo.DeleteFromDb(scrumAbleRelease);
             //TODO redirect back to dashboard
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Details", "Team", new {id = scrumAbleRelease.Team.Id});
         }
 
         public IActionResult SetCurrentRelease(int id)

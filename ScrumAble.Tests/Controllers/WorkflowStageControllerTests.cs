@@ -130,9 +130,7 @@ namespace ScrumAble.Tests.Controllers
             Assert.Equal(0, numRecords);
             context.Database.EnsureDeleted();
         }
-        /// <summary>
-        /// ///////////////////////
-        /// </summary>
+
         [Fact]
         public async void UT57_WorkflowStageController_CreateWorkflowStage_ShouldAddWorkflowStageToDb()
         {
