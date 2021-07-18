@@ -158,7 +158,7 @@ namespace ScrumAble.Tests.Controllers
         }
 
         [Fact]
-        public void UT43_SprintController_AddSprint_ShouldReturnSprintObject()
+        public void UT43_SprintController_AddRelease_ShouldReturnReleaseObject()
         {
             // Arrange
             var options = new DbContextOptionsBuilder<ScrumAbleContext>()

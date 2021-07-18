@@ -70,6 +70,7 @@ namespace ScrumAble.Controllers
             scrumAbleRelease.ReleaseTeamId = user.CurrentWorkingTeam.Id;
             return View(scrumAbleRelease);
         }
+
         public IActionResult DeleteRelease(int id)
         {
             ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));

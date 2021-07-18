@@ -48,9 +48,12 @@ namespace ScrumAble.Controllers
 
         public IActionResult AddTask(ScrumAbleTask scrumAbleTask)
         {
-            ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var user = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            ViewBag.User = user;
             scrumAbleTask.ViewModelTaskAggregate = _scrumAbleRepo.GetTaskAggregateData(User.FindFirstValue(ClaimTypes.NameIdentifier));
             ModelState.Clear();
+            scrumAbleTask.TaskSprintId = user.CurrentWorkingSprint.Id;
+
             return View(scrumAbleTask);
         }
         

@@ -54,8 +54,8 @@
                 <li>@Html.ActionLink(story.StoryName, "Details", "Story", new { Id = story.Id })</li>
             }
         }
-        <li>@Html.ActionLink("+ Add New", "AddStory", "Story")</li>
     }
+    <text style="font-size: 12px; font-weight: bold;"> @Html.ActionLink("+ Add New", "AddStory", "Story") </text>
 </ul>
 
 
@@ -72,8 +72,8 @@
                 <li>@Html.ActionLink(task.TaskName, "Details", "Task", new { Id = task.Id })</li>
             }
         }
-        <li>@Html.ActionLink("+ Add New", "AddTask", "Task")</li>
     }
+    <text style="font-size: 12px; font-weight: bold;"> @Html.ActionLink("+ Add New", "AddTask", "Task") </text>
 </ul>
 <br />
 

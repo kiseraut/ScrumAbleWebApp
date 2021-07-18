@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using ScrumAble.Areas.Identity.Data;
 using ScrumAble.Data;
 using ScrumAble.Models;
+using ScrumAble.Tests.Models;
 
 namespace ScrumAble.Tests.Controllers
 {
@@ -323,6 +324,64 @@ namespace ScrumAble.Tests.Controllers
         {
             _context.Teams.Remove(team);
             _context.SaveChanges();
+        }
+
+        public ScrumAbleWorkflowStage GetWorkflowStageById(int id)
+        {
+            var workflowStage = _context.WorkflowStages.Where(w => w.Id == id)
+                .Include(w => w.Team)
+                .Include(w => w.Stories)
+                .Include(w => w.Tasks)
+                .SingleOrDefault();
+
+            if (workflowStage != null)
+            {
+                workflowStage.AssociatedWorkflowStages = GetTeamWorkflowStages(workflowStage.Team);
+            }
+
+            return workflowStage;
+        }
+
+        public bool IsAuthorized(ScrumAbleWorkflowStage workflowStage, string userId)
+        {
+            return true;
+        }
+
+        public bool SaveToDb(ScrumAbleWorkflowStage workflowStage, ScrumAbleUser user)
+        {
+            if (workflowStage.Id == 0)
+            {
+                _context.Add(workflowStage);
+                _context.SaveChanges();
+            }
+            else
+            {
+                var dbWorkflowStage = _context.WorkflowStages.First(w => w.Id == workflowStage.Id);
+                _context.Entry(dbWorkflowStage).CurrentValues.SetValues(workflowStage);
+                _context.SaveChanges();
+
+            }
+
+            return true;
+        }
+
+        public void DeleteFromDb(ScrumAbleWorkflowStage workflowStage)
+        {
+            _context.WorkflowStages.Remove(workflowStage);
+            _context.SaveChanges();
+        }
+
+        public List<ScrumAbleWorkflowStage> GetTeamWorkflowStages(ScrumAbleTeam team)
+        {
+            var mockWorkflowStage1 = MockScrumAbleWorkflowStage.GenerateWorkflowStage();
+            var mockWorkflowStage2 = MockScrumAbleWorkflowStage.GenerateWorkflowStage();
+            var mockWorkflowStage3 = MockScrumAbleWorkflowStage.GenerateWorkflowStage();
+
+            mockWorkflowStage1.WorkflowStagePosition = 0;
+            mockWorkflowStage2.WorkflowStagePosition = 1;
+            mockWorkflowStage3.WorkflowStagePosition = 2;
+
+            return new List<ScrumAbleWorkflowStage>() {mockWorkflowStage1, mockWorkflowStage2, mockWorkflowStage3};
         }
     }
 }

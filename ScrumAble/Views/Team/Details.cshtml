@@ -52,6 +52,21 @@
 
 <br />
 
+<b>Workflow Stages:</b> @{
+                     if (@Model.Releases != null)
+                     {
+                         var unsortedWorkflowStageList = Model.WorkFlowStages.OrderBy(a => a.WorkflowStagePosition);
+                         <ol>
+                             @foreach (var workflowStage in @unsortedWorkflowStageList)
+                             {
+                                 <li>@Html.ActionLink(workflowStage.WorkflowStageName, "Details", "WorkflowStage", new { Id = workflowStage.Id} )</li>
+                             }
+
+                            <text style="font-size: 12px; font-weight: bold;"> @Html.ActionLink("+ Add New", "AddWorkflowStage", "WorkflowStage") </text>
+                         </ol>
+                     }
+                 }
+
 <!--javascript libraries for unobtrusive client-side validation-->
 @section scripts {
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>

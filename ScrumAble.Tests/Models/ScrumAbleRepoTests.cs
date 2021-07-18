@@ -464,12 +464,14 @@ namespace ScrumAble.Tests.Models
             var releaseResult = scrumAbleRepo.IsAuthorized(testRelease, testUser1.Id);
             var storyResult = scrumAbleRepo.IsAuthorized(testStory, testUser1.Id);
             var taskResult = scrumAbleRepo.IsAuthorized(testTask, testUser1.Id);
+            var workflowStageResult = scrumAbleRepo.IsAuthorized(testWorkflowStage, testUser1.Id);
 
             // Assert
             Assert.False(teamResult);
             Assert.False(releaseResult);
             Assert.False(storyResult);
             Assert.False(taskResult);
+            Assert.False(workflowStageResult);
 
             context.Database.EnsureDeleted();
         }
@@ -510,12 +512,14 @@ namespace ScrumAble.Tests.Models
             var releaseResult = scrumAbleRepo.IsAuthorized(testRelease, testUser2.Id);
             var storyResult = scrumAbleRepo.IsAuthorized(testStory, testUser2.Id);
             var taskResult = scrumAbleRepo.IsAuthorized(testTask, testUser2.Id);
+            var workflowStageResult = scrumAbleRepo.IsAuthorized(testWorkflowStage, testUser2.Id);
 
             // Assert
             Assert.True(teamResult);
             Assert.True(releaseResult);
             Assert.True(storyResult);
             Assert.True(taskResult);
+            Assert.True(workflowStageResult);
 
             context.Database.EnsureDeleted();
         }
@@ -775,7 +779,7 @@ namespace ScrumAble.Tests.Models
         }
 
         [Fact]
-        public async void UT52_ScrumAbleRepo_SaveToDb_ShouldAddSprintToDb()
+        public async void UT52_ScrumAbleRepo_SaveToDb_ShouldAddReleaseToDb()
         {
             // Arrange
             var options = new DbContextOptionsBuilder<ScrumAbleContext>()
@@ -795,6 +799,143 @@ namespace ScrumAble.Tests.Models
 
             context.Database.EnsureDeleted();
         }
+
+        [Fact]
+        public void UT59_ScrumAbleRepo_GetWorkflowStageById_ShouldReturnTheCorrectWorkflowStage()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<ScrumAbleContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT59")
+                .Options;
+            var context = new ScrumAbleContext(options);
+            var scrumAbleRepo = new ScrumAbleRepo(context);
+            var testWorkflowStage = MockScrumAbleWorkflowStage.GenerateWorkflowStage();
+            context.Add(testWorkflowStage);
+            context.SaveChanges();
+
+            // Act
+            var result = scrumAbleRepo.GetWorkflowStageById(testWorkflowStage.Id);
+
+            // Assert
+            Assert.Equal(testWorkflowStage.Id, result.Id);
+            context.Database.EnsureDeleted();
+        }
+
+        [Fact]
+        public void UT60_ScrumAbleRepo_SaveToDb_ShouldAddWorkflowStageToDb()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<ScrumAbleContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT60")
+                .Options;
+
+            var context = new ScrumAbleContext(options);
+            var scrumAbleRepo = new ScrumAbleRepo(context);
+            var workflowStageSprint = MockScrumAbleWorkflowStage.GenerateWorkflowStage();
+
+            var testTeam = MockScrumAbleTeam.GenerateTeam();
+            var testUser = MockScrumAbleUser.GenerateScrumAbleUser();
+            var testUserTeamMapping = MockScrumAbleUserTeamMapping.GenerateScrumAbleUserTeamMapping(testUser, testTeam);
+            var testWorkflowStage = MockScrumAbleWorkflowStage.GenerateWorkflowStage(testTeam);
+            var testWorkflowStage2 = MockScrumAbleWorkflowStage.GenerateWorkflowStage(testTeam);
+            var testWorkflowStage3 = MockScrumAbleWorkflowStage.GenerateWorkflowStage(testTeam);
+            var testWorkflowStage4 = MockScrumAbleWorkflowStage.GenerateWorkflowStage(testTeam);
+            context.Add(testUser);
+            context.Add(testTeam);
+            context.Add(testUserTeamMapping);
+            context.Add(testWorkflowStage2);
+            context.Add(testWorkflowStage3);
+            context.Add(testWorkflowStage4);
+            context.SaveChanges();
+
+            testWorkflowStage.NewWorkflowStageOrder = new List<int>() { testWorkflowStage2.Id, testWorkflowStage3.Id, testWorkflowStage4.Id, -1};
+
+
+            // Act
+            var result = scrumAbleRepo.SaveToDb(testWorkflowStage, testUser);
+            var numRecords = context.WorkflowStages.Count();
+            var workflowStageDbItem = context.WorkflowStages.Where(w => w.Id == testWorkflowStage.Id).SingleOrDefault();
+
+            // Assert
+            Assert.NotNull(workflowStageDbItem);
+            Assert.Equal(4, numRecords);
+            Assert.True(result);
+
+            context.Database.EnsureDeleted();
+        }
+
+        [Fact]
+        public void UT61_ScrumAbleRepo_SaveToDb_ShouldUpdateWorkflowStageInDb()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<ScrumAbleContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT61")
+                .Options;
+
+            var context = new ScrumAbleContext(options);
+            var scrumAbleRepo = new ScrumAbleRepo(context);
+            var workflowStageSprint = MockScrumAbleWorkflowStage.GenerateWorkflowStage();
+
+            var testTeam = MockScrumAbleTeam.GenerateTeam();
+            var testUser = MockScrumAbleUser.GenerateScrumAbleUser();
+            var testUserTeamMapping = MockScrumAbleUserTeamMapping.GenerateScrumAbleUserTeamMapping(testUser, testTeam);
+            var testWorkflowStage = MockScrumAbleWorkflowStage.GenerateWorkflowStage(testTeam);
+            var testWorkflowStage2 = MockScrumAbleWorkflowStage.GenerateWorkflowStage(testTeam);
+            var testWorkflowStage3 = MockScrumAbleWorkflowStage.GenerateWorkflowStage(testTeam);
+            var testWorkflowStage4 = MockScrumAbleWorkflowStage.GenerateWorkflowStage(testTeam);
+            context.Add(testUser);
+            context.Add(testTeam);
+            context.Add(testUserTeamMapping);
+            context.Add(testWorkflowStage);
+            context.Add(testWorkflowStage2);
+            context.Add(testWorkflowStage3);
+            context.Add(testWorkflowStage4);
+            context.SaveChanges();
+
+            testWorkflowStage.NewWorkflowStageOrder = new List<int>() { testWorkflowStage2.Id, testWorkflowStage3.Id, testWorkflowStage4.Id, -1 };
+            testWorkflowStage.WorkflowStageName = "Updated Test Workflow Stage";
+
+
+            // Act
+            var result = scrumAbleRepo.SaveToDb(testWorkflowStage, testUser);
+            var numRecords = context.WorkflowStages.Count();
+            var workflowStageDbItem = context.WorkflowStages.Where(w => w.Id == testWorkflowStage.Id).SingleOrDefault();
+
+            // Assert
+            Assert.NotNull(workflowStageDbItem);
+            Assert.Equal("Updated Test Workflow Stage", workflowStageDbItem.WorkflowStageName);
+            Assert.Equal(4, numRecords);
+            Assert.True(result);
+
+            context.Database.EnsureDeleted();
+        }
+
+        [Fact]
+        public void UT62_ScrumAbleRepo_DeleteFromDb_ShouldDeleteWorkflowStageFromDb()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<ScrumAbleContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT62")
+                .Options;
+
+            var context = new ScrumAbleContext(options);
+            var scrumAbleRepo = new ScrumAbleRepo(context);
+            var testWorkflowStage = MockScrumAbleWorkflowStage.GenerateWorkflowStage();
+            context.Add(testWorkflowStage);
+            context.SaveChanges();
+
+
+            // Act
+            scrumAbleRepo.DeleteFromDb(testWorkflowStage);
+            var numRecords = context.WorkflowStages.Count();
+
+            // Assert
+            Assert.Equal(0, numRecords);
+
+            context.Database.EnsureDeleted();
+        }
+
+
 
     }
 }

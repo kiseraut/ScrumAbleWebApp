@@ -10,5 +10,6 @@ namespace ScrumAble.Models
         ScrumAbleTeam Team { get; set; }
         ICollection<ScrumAbleStory> Stories { get; set; }
         ICollection<ScrumAbleTask> Tasks { get; set; }
+        public List<ScrumAbleWorkflowStage> AssociatedWorkflowStages { get; set; }
     }
 }

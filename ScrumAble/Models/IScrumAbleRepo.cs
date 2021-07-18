@@ -52,7 +52,14 @@ namespace ScrumAble.Models
         public void SaveToDb(ScrumAbleTeam team, List<IScrumAbleUser> users);
         public void DeleteFromDb(ScrumAbleTeam team);
 
+        //Workflow Stage methods
+        public ScrumAbleWorkflowStage GetWorkflowStageById(int id);
+        public bool IsAuthorized(ScrumAbleWorkflowStage workflowStage, string userId);
+        public bool SaveToDb(ScrumAbleWorkflowStage workflowStage, ScrumAbleUser user);
+        public void DeleteFromDb(ScrumAbleWorkflowStage workflowStage);
+        public List<ScrumAbleWorkflowStage> GetTeamWorkflowStages(ScrumAbleTeam team);
 
-        
+
+
     }
 }

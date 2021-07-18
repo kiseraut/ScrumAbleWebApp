@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using ScrumAble.Areas.Identity.Data;
 using ScrumAble.Data;
@@ -273,6 +274,7 @@ namespace ScrumAble.Models
                 .Include(t => t.UserTeamMappings)
                 .ThenInclude(utm => utm.User)
                 .Include(t => t.Releases)
+                .Include(t => t.WorkFlowStages)
                 .SingleOrDefault();
 
             if (team != null)
@@ -426,6 +428,82 @@ namespace ScrumAble.Models
         public void DeleteFromDb(ScrumAbleTeam team)
         {
             _context.Teams.Remove(team);
+            _context.SaveChanges();
+        }
+
+        public ScrumAbleWorkflowStage GetWorkflowStageById(int id)
+        {
+            var workflowStage = _context.WorkflowStages.Where(w => w.Id == id)
+                .Include(w => w.Team)
+                .Include(w => w.Stories)
+                .Include(w => w.Tasks)
+                .SingleOrDefault();
+
+            if (workflowStage != null)
+            {
+                workflowStage.AssociatedWorkflowStages = GetTeamWorkflowStages(workflowStage.Team);
+            }
+
+            return workflowStage;
+        }
+
+        public List<ScrumAbleWorkflowStage> GetTeamWorkflowStages(ScrumAbleTeam team)
+        {
+            return _context.WorkflowStages
+                .Where(w => w.Team == team)
+                .ToList();
+        }
+
+        public bool IsAuthorized(ScrumAbleWorkflowStage workflowStage, string userId)
+        {
+            if (workflowStage == null) return false;
+            var team = GetTeamById(workflowStage.Team.Id);
+            return IsAuthorized(team, userId);
+        }
+
+        public bool SaveToDb(ScrumAbleWorkflowStage workflowStage, ScrumAbleUser user)
+        {
+
+            if (!IsAuthorized(workflowStage.Team, user.Id)) { return false; }
+
+            //first set the positions for all workflow stages in this team
+            var i = 0;
+            foreach (var workflowStageId in workflowStage.NewWorkflowStageOrder)
+            {
+                if (workflowStageId == -1)
+                {
+                    workflowStage.WorkflowStagePosition = i;
+                }
+                else
+                {
+                    
+                    var currentWorkflowStage = GetWorkflowStageById(workflowStageId);
+                    if (!IsAuthorized(currentWorkflowStage.Team, user.Id) || currentWorkflowStage.Team != workflowStage.Team) { return false; }
+                    currentWorkflowStage.WorkflowStagePosition = i;
+                    _context.Update(currentWorkflowStage);
+                }
+
+                i++;
+            }
+
+            if (workflowStage.Id == 0)
+            {
+                _context.WorkflowStages.Add(workflowStage);
+                _context.SaveChanges();
+            }
+            else
+            {
+                var dbWorkflowStage = _context.WorkflowStages.First(w => w.Id == workflowStage.Id);
+                _context.Entry(dbWorkflowStage).CurrentValues.SetValues(workflowStage);
+                _context.SaveChanges();
+            }
+
+            return true;
+        }
+
+        public void DeleteFromDb(ScrumAbleWorkflowStage workflowStage)
+        {
+            _context.WorkflowStages.Remove(workflowStage);
             _context.SaveChanges();
         }
     }

@@ -1,0 +1,182 @@
+﻿@using System.Diagnostics.CodeAnalysis
+@using Microsoft.AspNetCore.Identity
+@using ScrumAble.Areas.Identity.Data
+@attribute [ExcludeFromCodeCoverage]
+@model ScrumAble.Models.ScrumAbleWorkflowStage
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject UserManager<ScrumAbleUser> _userManager
+
+@{
+    ViewData["Title"] = "Edit Workflow Stage";
+
+}
+
+<style>
+    .grabable:hover {
+        cursor: move;
+        cursor: grab;
+    }
+
+    .grabable.grabbing {
+        cursor: grabbing;
+    }
+</style>
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+
+
+<h2>Edit Workflow Stage @Model.WorkflowStageName</h2>
+<br />
+
+<div style="width: 500px;" ng-app="app" ng-contrller="ctrl">
+    @using (Html.BeginForm("UpdateWorkflowStage", "WorkflowStage"))
+    {
+        <div class="form-group">
+            @{ var init = "WorkflowStageName='" + Model.WorkflowStageName + "'";}
+            @Html.LabelFor(w => w.WorkflowStageName)
+            @Html.TextBoxFor(w => w.WorkflowStageName, new { @class = "form-control", ng_model = "WorkflowStageName", ng_init = @init })
+            @Html.ValidationMessageFor(w => w.WorkflowStageName)
+        </div>
+
+        <b>Workflow Stage Position:</b>
+        <p style="font-size: 12px;">*Drag the workflow stages to re-order them</p>
+        <ol id="WSList">
+            @{
+                if (Model.AssociatedWorkflowStages != null)
+                {
+                    var sortedWorkflowStageList = Model.AssociatedWorkflowStages.OrderBy(a => a.WorkflowStagePosition).ToList();
+
+
+                    for (var i = 0; i < sortedWorkflowStageList.Count(); i++)
+                    {
+                        if (@sortedWorkflowStageList[i].Id == Model.Id)
+                        {
+                            <li class="grabable" style="font-weight: bold" draggable="true" ondragover="dragOver(event)" ondragstart="dragStart(event)">
+                                {{WorkflowStageName}}
+                                <input type="hidden" name="workflowItem" value="-1">
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="grabable" name="WorkflowStageItem" style="cursor: grab; color: darkgrey; font-size: 12px;" draggable="true" ondragover="dragOver(event)" ondragstart="dragStart(event)">
+                                @sortedWorkflowStageList[i].WorkflowStageName
+                                <input type="hidden" name="workflowItem" value="@sortedWorkflowStageList[i].Id" pos="@i">
+                            </li>
+                        }
+
+                    }
+
+
+                }
+            }
+        </ol>
+
+
+        @for (var i = 0; i < Model.NewWorkflowStageOrder.Count(); i++)
+        {
+            @Html.HiddenFor(w => w.NewWorkflowStageOrder[i])
+        }
+
+        @Html.HiddenFor(w => w.Id)
+
+        @Html.AntiForgeryToken()
+
+        <button onclick="submitTest()" class="btn btn-primary">Edit Workflow Stage</button>
+    }
+
+</div>
+
+<script>
+    function submitTest() {
+
+        //get all of the workflow stages from the ordered list
+        var olElement = document.getElementById("WSList");
+        var olChildren = olElement.childNodes;
+        var liElements = pruneArray(olChildren, "li");
+        var inputElements = findChildren(liElements, "input");
+
+        var wfIdsInOrder = [];
+        for (var i = 0; i < inputElements.length; i++) {
+
+            if (inputElements[i].localName == "input") {
+                wfIdsInOrder.push(inputElements[i].value);
+            }
+        }
+
+        //update the bound inputs for the workflow stages
+        for (var i = 0; i < wfIdsInOrder.length; i++) {
+            var idString = "NewWorkflowStageOrder_" + i + "_";
+            var element = document.getElementById(idString);
+            element.value = wfIdsInOrder[i];
+        }
+    }
+
+    function pruneArray(element, localName) {
+
+        var pruned = [];
+        for (var i = 0; i < element.length; i++) {
+
+            if (element[i].localName == localName) {
+                pruned.push(element[i]);
+            }
+        }
+        return pruned;
+    }
+
+    function findChildren(element, localName) {
+        var pruned = [];
+        for (var i = 0; i < element.length; i++) {
+
+            for (var h = 0; h < element[i].childNodes.length; h++) {
+                if (element[i].childNodes[h].localName == localName) {
+                    pruned.push(element[i].childNodes[h]);
+                }
+            }
+        }
+        return pruned;
+    }
+</script>
+
+<script>
+    //two way binding between name text box and position
+    var app = angular.module('app', []);
+    app.controller('ctrl',['$scope', function ($scope) {
+        $scope.WorkflowStageName = "New Workflow Stage";
+        $scope.test = "test";
+        $scope.$apply();
+    }]);
+</script>
+
+<script>
+    var _el;
+
+    function dragOver(e) {
+        e.dataTransfer.dropEffect = "move";
+        if (isBefore(_el, e.target))
+            e.target.parentNode.insertBefore(_el, e.target);
+        else
+            e.target.parentNode.insertBefore(_el, e.target.nextSibling);
+    }
+
+    function dragStart(e) {
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/plain", null);
+        _el = e.target;
+    }
+
+    function isBefore(el1, el2) {
+        if (el2.parentNode === el1.parentNode)
+            for (var cur = el1.previousSibling; cur && cur.nodeType !== 9; cur = cur.previousSibling)
+                if (cur === el2)
+                    return true;
+        return false;
+    }
+
+
+</script>
+
+<!--javascript libraries for unobtrusive client-side validation-->
+@section scripts {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+}

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace ScrumAble.Models
 {
@@ -25,5 +27,11 @@ namespace ScrumAble.Models
         public ICollection<ScrumAbleStory> Stories { get; set; }
 
         public ICollection<ScrumAbleTask> Tasks { get; set; }
+
+        [NotMapped] 
+        public List<ScrumAbleWorkflowStage> AssociatedWorkflowStages { get; set; }
+        
+        [NotMapped] 
+        public List<int> NewWorkflowStageOrder { get; set; }
     }
 }
