@@ -1,0 +1,98 @@
+﻿
+@using System.Diagnostics.CodeAnalysis
+@using ScrumAble.Areas.Identity.Data
+@attribute [ExcludeFromCodeCoverage]
+@model ScrumAble.Models.ScrumAbleStory
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Edit Story";
+
+}
+
+<h2>Edit Story @Model.StoryName</h2>
+
+<div style="width: 500px;">
+    @using (Html.BeginForm("UpdateStory", "Story"))
+    {
+        <div class="form-group">
+            @Html.LabelFor(s => s.StoryName)
+            @Html.TextBoxFor(s => s.StoryName, new { @class = "form-control" })
+            @Html.ValidationMessageFor(s => s.StoryName)
+        </div>
+
+        <div class="form-group">
+            @{
+                ICollection<ScrumAbleUser> teammates = ViewBag.User.Teammates;
+
+                List<SelectListItem> ownerListItems = new List<SelectListItem>();
+                //add all team members to this list
+
+                ownerListItems.Add(new SelectListItem
+                {
+                    Text = "None",
+                    Value = "-1",
+                    Selected = true
+                });
+
+                foreach (var teammate in teammates)
+                {
+                    ownerListItems.Add(new SelectListItem
+                    {
+                        Text = teammate.Email,
+                        Value = teammate.Email
+                    });
+                }
+            }
+            @Html.LabelFor(s => s.StoryOwnerEmail)
+            @Html.DropDownListFor(s => s.StoryOwnerEmail, ownerListItems, new { @class = "form-control" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(s => s.StoryPoints)
+            @Html.TextBoxFor(s => s.StoryPoints, new { @class = "form-control" })
+            @Html.ValidationMessageFor(s => s.StoryPoints)
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(s => s.StoryDueDate)
+            <input class="form-control" asp-for="StoryDueDate" />
+            @Html.ValidationMessageFor(s => s.StoryDueDate)
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(s => s.StoryDescription)
+            @Html.TextAreaFor(s => s.StoryDescription, new { @class = "form-control" })
+        </div>
+
+        <div class="form-group">
+            @{
+                List<SelectListItem> sprintListItems = new List<SelectListItem>();
+                //add current and future sprints to this list
+
+                if (ViewBag.Sprints != null)
+                {
+                    foreach (ScrumAbleSprint sprint in ViewBag.Sprints)
+                    {
+                        sprintListItems.Add(new SelectListItem
+                        {
+                            Text = sprint.SprintName,
+                            Value = sprint.Id.ToString()
+                        });
+                    }
+                }
+
+            }
+            @Html.LabelFor(s => s.StorySprintId)<br />
+            *only current and future sprints in the current working release <br /><i>@ViewBag.User.CurrentWorkingRelease.ReleaseName</i> are shown
+            @Html.DropDownListFor(s => s.StorySprintId, sprintListItems, new { @class = "form-control" })
+
+        </div>
+
+
+        @Html.AntiForgeryToken()
+
+        <button type="submit" class="btn btn-primary">Update Story</button>
+
+    }
+</div>

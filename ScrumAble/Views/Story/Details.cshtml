@@ -1,0 +1,111 @@
+﻿@using System.Diagnostics.CodeAnalysis
+@attribute [ExcludeFromCodeCoverage]
+@model ScrumAble.Models.ScrumAbleStory
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Story Details";
+
+}
+
+<div>
+    <ul class="navbar-nav" style="flex-direction: row;">
+        <li class="nav-item" style="margin-right: 15px;">
+            @Html.ActionLink("Edit", "EditStory", new { Id = Model.Id })
+        </li>
+        <li class="nav-item">
+            @{ var message = "return confirm('Are you sure you want to delete \"" + Model.StoryName + "\"?');";}
+            @Html.ActionLink("Delete", "DeleteStory", new { Id = Model.Id }, new { onclick = @message })
+        </li>
+    </ul>
+
+</div>
+<h2>@Model.StoryName</h2>
+
+<b>Sprint:</b> @{
+    if (@Model.Sprint != null)
+    {
+        @Html.ActionLink(Model.Sprint.SprintName, "Details", "Sprint", new { Id = Model.Sprint.Id })
+    }
+}
+
+<br />
+
+<b>Owner:</b> @{
+    if (@Model.StoryOwner != null)
+    {
+        @Model.StoryOwner.Email
+    }
+}
+
+<br />
+
+<b>Due:</b> @{
+    if (@Model.StoryDueDate != null)
+    {
+        @Html.DisplayFor(d => Model.StoryDueDate);
+
+    }
+}
+
+<br />
+
+
+<b>Workflow Stage:</b> @{
+    if (@Model.WorkflowStage != null)
+    {
+        @Model.WorkflowStage.WorkflowStageName;
+    }
+}
+
+<br />
+
+<b>Points:</b> @{
+    if (@Model.StoryPoints != null)
+    {
+        @Model.StoryPoints;
+    }
+}
+
+<br />
+
+<b>Description:</b> @{
+    if (@Model.StoryDescription != null)
+    {
+        @Model.StoryDescription;
+    }
+}
+
+<br />
+
+
+<b>Tasks:</b>
+<ul>
+    @{
+
+        if (@Model.Tasks != null)
+        {
+            var sortedTaskList = Model.Tasks.OrderBy(a => a.TaskDueDate);
+
+            @foreach (var task in sortedTaskList)
+            {
+                <li>@Html.ActionLink(task.TaskName, "Details", "Task", new { Id = task.Id })</li>
+            }
+        }
+        else
+        {
+            <li>none</li>
+        }
+
+    }
+    <text style="font-size: 12px; font-weight: bold;"> @Html.ActionLink("+ Add New", "AddTask", "Task") </text>
+</ul>
+
+
+
+
+<!--javascript libraries for unobtrusive client-side validation-->
+@section scripts {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+}

@@ -28,10 +28,13 @@ namespace ScrumAble.Models
         public bool IsAuthorized(ScrumAbleSprint sprint, string userId);
         public void SaveToDb(ScrumAbleSprint sprint);
         public void DeleteFromDb(ScrumAbleSprint sprint);
+        public List<ScrumAbleSprint> GetAllSprintsInRelease(int releaseId);
 
         //Story methods
         public ScrumAbleStory GetStoryById(int id);
         public bool IsAuthorized(ScrumAbleStory story, string userId);
+        public void SaveToDb(ScrumAbleStory story);
+        public void DeleteFromDb(ScrumAbleStory story);
 
         //ViewModelTaskAggregate methods
         public ViewModelTaskAggregate GetTaskAggregateData(string userId);

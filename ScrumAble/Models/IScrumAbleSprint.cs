@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.SignalR;
 
 namespace ScrumAble.Models
 {
@@ -12,5 +13,6 @@ namespace ScrumAble.Models
         ScrumAbleRelease Release { get; set; }
         ICollection<ScrumAbleStory> Stories { get; set; }
         ICollection<ScrumAbleTask> Tasks { get; set; }
+        bool IsBacklog { get; set; }
     }
 }

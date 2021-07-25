@@ -17,5 +17,6 @@ namespace ScrumAble.Models
         ScrumAbleWorkflowStage WorkflowStage { get; set; }
         ScrumAbleSprint Sprint { get; set; }
         ICollection<ScrumAbleTask> Tasks { get; set; }
+        int StorySprintId { get; set; }
     }
 }

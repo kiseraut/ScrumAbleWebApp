@@ -165,6 +165,11 @@ namespace ScrumAble.Tests.Controllers
             _context.SaveChanges();
         }
 
+        public List<ScrumAbleSprint> GetAllSprintsInRelease(int releaseId)
+        {
+            throw new NotImplementedException();
+        }
+
         public ScrumAbleStory GetStoryById(int id)
         {
             return _context.Stories.Where(s => s.Id == id)
@@ -172,6 +177,11 @@ namespace ScrumAble.Tests.Controllers
         }
 
         public bool IsAuthorized(ScrumAbleStory story, string userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SaveToDb(ScrumAbleStory story)
         {
             throw new NotImplementedException();
         }

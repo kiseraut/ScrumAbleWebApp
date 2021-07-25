@@ -67,13 +67,6 @@
                 List<SelectListItem> sprintListItems = new List<SelectListItem>();
                 //add current and future sprints to this list
 
-                sprintListItems.Add(new SelectListItem
-                {
-                    Text = "Backlog",
-                    Value = "-1",
-                    Selected = true
-                });
-
                 if (Model.ViewModelTaskAggregate.Sprints != null)
                 {
                     foreach (var sprint in Model.ViewModelTaskAggregate.Sprints)

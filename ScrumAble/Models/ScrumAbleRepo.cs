@@ -227,15 +227,44 @@ namespace ScrumAble.Models
             _context.SaveChanges();
         }
 
+        public List<ScrumAbleSprint> GetAllSprintsInRelease(int releaseId)
+        {
+            return _context.Sprints.Where(s => s.Release.Id == releaseId)
+                .Where(s => s.SprintEndDate >= DateTime.Today)
+                .ToList();
+        }
+
         public ScrumAbleStory GetStoryById(int id)
         {
             return _context.Stories.Where(s => s.Id == id)
+                .Include(s => s.Tasks)
                 .SingleOrDefault();
         }
 
         public bool IsAuthorized(ScrumAbleStory story, string userId)
         {
             return IsAuthorized(story.Sprint, userId);
+        }
+
+        public void SaveToDb(ScrumAbleStory story)
+        {
+            if (story.Id == 0)
+            {
+                _context.Stories.Add(story);
+                _context.SaveChanges();
+            }
+            else
+            {
+                var dbStory = _context.Stories.First(s => s.Id == story.Id);
+                _context.Entry(dbStory).CurrentValues.SetValues(story);
+                _context.SaveChanges();
+            }
+        }
+
+        public void DeleteFromDb(ScrumAbleStory story)
+        {
+            _context.Stories.Remove(story);
+            _context.SaveChanges();
         }
 
         public ViewModelTaskAggregate GetTaskAggregateData(string userId)
@@ -254,7 +283,7 @@ namespace ScrumAble.Models
                 //get all of the stories in the current and future sprints
                 var stories = _context.Stories
                     .FromSqlRaw(
-                        "SELECT st.Id ,st.StoryName ,st.StoryStartDate ,st.StoryDueDate ,st.StoryCloseDate ,st.StoryPoints ,st.StoryDescription ,st.WorkflowStageId ,st.SprintId ,st.StoryOwnerId FROM Stories st INNER JOIN Sprints sp ON st.SprintId = sp.Id WHERE st.StoryStartDate < GETDATE() AND (st.StoryCloseDate > GETDATE() OR st.StoryCloseDate is NULL) AND sp.ReleaseId = {0}",
+                        "SELECT st.Id ,st.StoryName ,st.StoryStartDate ,st.StoryDueDate ,st.StoryCloseDate ,st.StoryPoints ,st.StoryDescription ,st.WorkflowStageId ,st.SprintId ,st.StoryOwnerId FROM Stories st INNER JOIN Sprints sp ON st.SprintId = sp.Id WHERE (st.StoryStartDate < GETDATE() OR st.StoryStartDate is NULL) AND (st.StoryCloseDate > GETDATE() OR st.StoryCloseDate is NULL) AND sp.ReleaseId = {0}",
                         user.CurrentWorkingRelease.Id)
                     .ToList();
 
@@ -358,6 +387,21 @@ namespace ScrumAble.Models
             {
                 _context.Releases.Add(release);
                 _context.SaveChanges();
+
+                var backlog = new ScrumAbleSprint()
+                {
+                    SprintName = "Backlog",
+                    SprintStartDate = release.ReleaseStartDate,
+                    SprintEndDate = new DateTime(3000,12,31),
+                    Release = release,
+                    IsBacklog = true
+                };
+
+                _context.Sprints.Add(backlog);
+                _context.SaveChanges();
+
+
+
             }
             else
             {

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -42,9 +43,19 @@ namespace ScrumAble.Models
         //The ID of the stage (swim lane) that the story is in
         public ScrumAbleWorkflowStage WorkflowStage { get; set; }
 
-        //The ID of the sprint this story is in
+        //The sprint this story is in
         [Display(Name = "Add Task To Sprint")]
         public ScrumAbleSprint Sprint { get; set; }
+
+        //The ID of the sprint this story is in
+        [Display(Name = "Add Task To Sprint")]
+        [NotMapped]
+        public int StorySprintId { get; set; }
+
+        //The ID of the sprint this story is in
+        [Display(Name = "Story Owner")]
+        [NotMapped]
+        public string StoryOwnerEmail { get; set; }
 
 
         public ICollection<ScrumAbleTask> Tasks { get; set; }

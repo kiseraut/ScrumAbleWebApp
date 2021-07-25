@@ -45,7 +45,10 @@ namespace ScrumAble.Controllers
 
             var user = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
             scrumAbleSprint.Release = user.CurrentWorkingRelease;
-            scrumAbleSprint.SprintReleaseId = user.CurrentWorkingRelease.Id;
+            if (user.CurrentWorkingRelease != null)
+            {
+                scrumAbleSprint.SprintReleaseId = user.CurrentWorkingRelease.Id;
+            }
 
 
             ViewBag.data = _scrumAbleRepo.GetAllTeamReleases(user.CurrentWorkingTeam.Id);
