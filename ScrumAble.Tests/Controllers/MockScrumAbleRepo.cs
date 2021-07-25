@@ -167,7 +167,9 @@ namespace ScrumAble.Tests.Controllers
 
         public List<ScrumAbleSprint> GetAllSprintsInRelease(int releaseId)
         {
-            throw new NotImplementedException();
+            return _context.Sprints.Where(s => s.Release.Id == releaseId)
+                .Where(s => s.SprintEndDate >= DateTime.Today)
+                .ToList();
         }
 
         public ScrumAbleStory GetStoryById(int id)
@@ -178,12 +180,28 @@ namespace ScrumAble.Tests.Controllers
 
         public bool IsAuthorized(ScrumAbleStory story, string userId)
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         public void SaveToDb(ScrumAbleStory story)
         {
-            throw new NotImplementedException();
+            if (story.Id == 0)
+            {
+                _context.Stories.Add(story);
+                _context.SaveChanges();
+            }
+            else
+            {
+                var dbStory = _context.Stories.First(s => s.Id == story.Id);
+                _context.Entry(dbStory).CurrentValues.SetValues(story);
+                _context.SaveChanges();
+            }
+        }
+
+        public void DeleteFromDb(ScrumAbleStory story)
+        {
+            _context.Stories.Remove(story);
+            _context.SaveChanges();
         }
 
         public ViewModelTaskAggregate GetTaskAggregateData(string userId)
