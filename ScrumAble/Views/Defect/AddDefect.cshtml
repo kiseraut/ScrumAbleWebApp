@@ -1,0 +1,101 @@
+﻿@using System.Diagnostics.CodeAnalysis
+@using Microsoft.AspNetCore.Identity
+@using ScrumAble.Areas.Identity.Data
+@attribute [ExcludeFromCodeCoverage]
+@model ScrumAble.Models.ScrumAbleDefect
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject UserManager<ScrumAbleUser> _userManager
+
+@{
+    ViewData["Title"] = "Add Sprint";
+
+}
+
+<h2>New Defect</h2>
+<br />
+
+<div style="width: 500px;">
+    @using (Html.BeginForm("CreateDefect", "Defect"))
+    {
+        <div class="form-group">
+            @Html.LabelFor(d => d.DefectName)
+            @Html.TextBoxFor(d => d.DefectName, new { @class = "form-control" })
+            @Html.ValidationMessageFor(d => d.DefectName)
+        </div>
+
+
+        <div class="form-group">
+            @{
+                ICollection<ScrumAbleUser> teammates = ViewBag.User.Teammates;
+
+                List<SelectListItem> ownerListItems = new List<SelectListItem>();
+                //add all team members to this list
+
+                ownerListItems.Add(new SelectListItem
+                {
+                    Text = "None",
+                    Value = "-1",
+                    Selected = true
+                });
+
+                foreach (var teammate in teammates)
+                {
+                    ownerListItems.Add(new SelectListItem
+                    {
+                        Text = teammate.Email,
+                        Value = teammate.Email
+                    });
+                }
+            }
+            @Html.LabelFor(d => d.DefectOwnerEmail)
+            @Html.DropDownListFor(d => d.DefectOwnerEmail, ownerListItems, new { @class = "form-control" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(d => d.DefectPoints)
+            @Html.TextBoxFor(d => d.DefectPoints, new { @class = "form-control" })
+            @Html.ValidationMessageFor(d => d.DefectPoints)
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(d => d.DefectDueDate)
+            <input class="form-control" asp-for="DefectDueDate" />
+            @Html.ValidationMessageFor(d => d.DefectDueDate)
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(d => d.DefectDescription)
+            @Html.TextAreaFor(d => d.DefectDescription, new { @class = "form-control" })
+        </div>
+
+        <div class="form-group">
+            @{
+                List<SelectListItem> sprintListItems = new List<SelectListItem>();
+                //add current and future sprints to this list
+
+                if (ViewBag.Sprints != null)
+                {
+                    foreach (ScrumAbleSprint sprint in ViewBag.Sprints)
+                    {
+                        sprintListItems.Add(new SelectListItem
+                        {
+                            Text = sprint.SprintName,
+                            Value = sprint.Id.ToString()
+                        });
+                    }
+                }
+
+            }
+            @Html.LabelFor(d => d.DefectSprintId)<br />
+            *only current and future sprints in the current working release <br /><i>@ViewBag.User.CurrentWorkingRelease.ReleaseName</i> are shown
+            @Html.DropDownListFor(d => d.DefectSprintId, sprintListItems, new { @class = "form-control" })
+
+        </div>
+
+
+        @Html.AntiForgeryToken()
+
+        <button type="submit" class="btn btn-primary">Add Defect</button>
+
+    }
+</div>

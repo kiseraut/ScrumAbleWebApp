@@ -195,6 +195,7 @@ namespace ScrumAble.Models
                 .Include(s => s.Stories)
                 .Include(s => s.Tasks)
                 .Include(s => s.Release)
+                .Include(s => s.Defects)
                 .SingleOrDefault();
 
             return sprint;
@@ -357,6 +358,7 @@ namespace ScrumAble.Models
             var release = _context.Releases.Where(r => r.Id == id)
                 .Include(r => r.Sprints)
                 .Include(r => r.Team)
+                .Include(r => r.Defects)
                 .SingleOrDefault();
 
             return release;
@@ -496,6 +498,39 @@ namespace ScrumAble.Models
             return _context.WorkflowStages
                 .Where(w => w.Team == team)
                 .ToList();
+        }
+
+        public ScrumAbleDefect GetDefectById(int id)
+        {
+            return _context.Defects.Where(d => d.Id == id)
+                .FirstOrDefault();
+        }
+
+        public bool IsAuthorized(ScrumAbleDefect defect, string userId)
+        {
+            return IsAuthorized(defect.Sprint, userId);
+        }
+
+        public void SaveToDb(ScrumAbleDefect defect)
+        {
+            if (defect.Id == 0)
+            {
+                _context.Defects.Add(defect);
+                _context.SaveChanges();
+            }
+            else
+            {
+                var dbDefect = _context.Defects.First(d => d.Id == defect.Id);
+                _context.Entry(dbDefect).CurrentValues.SetValues(defect);
+                dbDefect.Sprint = defect.Sprint;
+                _context.SaveChanges();
+            }
+        }
+
+        public void DeleteFromDb(ScrumAbleDefect defect)
+        {
+            _context.Defects.Remove(defect);
+            _context.SaveChanges();
         }
 
         public bool IsAuthorized(ScrumAbleWorkflowStage workflowStage, string userId)

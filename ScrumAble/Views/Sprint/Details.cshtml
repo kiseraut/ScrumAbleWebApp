@@ -10,18 +10,18 @@
 
 <div>
     <ul class="navbar-nav" style="flex-direction: row;">
-    @{
-        if (!Model.IsBacklog)
-        {
-            <li class="nav-item" style="margin-right: 15px;">
-                @Html.ActionLink("Edit", "EditSprint", new {Id = Model.Id})
-            </li>
-            <li class="nav-item">
-                @{ var message = "return confirm('Are you sure you want to delete \"" + Model.SprintName + "\"?');"; }
-                @Html.ActionLink("Delete", "DeleteSprint", new {Id = Model.Id}, new {onclick = @message})
-            </li>
+        @{
+            if (!Model.IsBacklog)
+            {
+                <li class="nav-item" style="margin-right: 15px;">
+                    @Html.ActionLink("Edit", "EditSprint", new { Id = Model.Id })
+                </li>
+                <li class="nav-item">
+                    @{ var message = "return confirm('Are you sure you want to delete \"" + Model.SprintName + "\"?');"; }
+                    @Html.ActionLink("Delete", "DeleteSprint", new { Id = Model.Id }, new { onclick = @message })
+                </li>
+            }
         }
-    }
     </ul>
 
 </div>
@@ -32,20 +32,20 @@
     {
         @Html.ActionLink(Model.Release.ReleaseName, "Details", "Release", new { Id = Model.Release.Id })
     }
-                }
+}
 
 
 @{
     if (!Model.IsBacklog)
     {
-        <br/>
-        <b>Start Date:</b> 
-            @Html.DisplayFor(s => Model.SprintStartDate);
+        <br />
+        <b>Start Date:</b>
+        @Html.DisplayFor(s => Model.SprintStartDate);
 
         <br />
 
-        <b>End Date:</b> 
-            @Html.DisplayFor(s => Model.SprintEndDate);
+        <b>End Date:</b>
+        @Html.DisplayFor(s => Model.SprintEndDate);
     }
 }
 <br />
@@ -83,13 +83,30 @@
     }
     <text style="font-size: 12px; font-weight: bold;"> @Html.ActionLink("+ Add New", "AddTask", "Task") </text>
 </ul>
+
 <br />
 
+<b>Defects:</b>
+<ul>
+    @{
+        if (Model.Defects != null)
+        {
+            foreach (var defect in @Model.Defects)
+            {
+            <li>@Html.ActionLink(defect.DefectName, "Details", "Defect", new {Id = defect.Id})</li>
+            }
+        }
+    }
+    <text style="font-size: 12px; font-weight: bold;"> @Html.ActionLink("+ Add New", "AddDefect", "Defect") </text>
+</ul>
+
+    <br />
 
 
 
-<!--javascript libraries for unobtrusive client-side validation-->
-@section scripts {
-    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
-}
+
+    <!--javascript libraries for unobtrusive client-side validation-->
+    @section scripts {
+        <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+        <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    }

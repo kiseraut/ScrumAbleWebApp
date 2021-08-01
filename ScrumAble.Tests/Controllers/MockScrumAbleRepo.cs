@@ -411,5 +411,38 @@ namespace ScrumAble.Tests.Controllers
 
             return new List<ScrumAbleWorkflowStage>() {mockWorkflowStage1, mockWorkflowStage2, mockWorkflowStage3};
         }
+
+        public ScrumAbleDefect GetDefectById(int id)
+        {
+            return _context.Defects.Where(d => d.Id == id)
+                .FirstOrDefault();
+        }
+
+        public bool IsAuthorized(ScrumAbleDefect defect, string userId)
+        {
+            return IsAuthorized(defect.Sprint, userId);
+        }
+
+        public void SaveToDb(ScrumAbleDefect defect)
+        {
+            if (defect.Id == 0)
+            {
+                _context.Defects.Add(defect);
+                _context.SaveChanges();
+            }
+            else
+            {
+                var dbDefect = _context.Defects.First(d => d.Id == defect.Id);
+                _context.Entry(dbDefect).CurrentValues.SetValues(defect);
+                dbDefect.Sprint = defect.Sprint;
+                _context.SaveChanges();
+            }
+        }
+
+        public void DeleteFromDb(ScrumAbleDefect defect)
+        {
+            _context.Defects.Remove(defect);
+            _context.SaveChanges();
+        }
     }
 }

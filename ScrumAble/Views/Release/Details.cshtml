@@ -38,17 +38,35 @@
 <br />
 
 
-<b>Sprints:</b> @{
-    if (@Model.Sprints != null)
-    {
-        <ul>
+<b>Sprints:</b> 
+<ul>
+    @{
+        if (@Model.Sprints != null)
+        {
             @foreach (var sprint in @Model.Sprints)
             {
                 <li>@Html.ActionLink(sprint.SprintName, "Details", "Sprint", new { Id = sprint.Id })</li>
             }
-        </ul>
+        }
     }
-}
+    <text style="font-size: 12px; font-weight: bold;"> @Html.ActionLink("+ Add New", "AddSprint", "Sprint") </text>
+</ul>
+
+<br />
+
+<b>Defects:</b>
+<ul>
+    @{
+        if (Model.Defects != null)
+        {
+            foreach (var defect in @Model.Defects)
+            {
+                <li>@Html.ActionLink(defect.DefectName, "Details", "Defect", new {Id = defect.Id})</li>
+            }
+        }
+    }
+    <text style="font-size: 12px; font-weight: bold;"> @Html.ActionLink("+ Add New", "AddDefect", "Defect") </text>
+</ul>
 
 <br />
 

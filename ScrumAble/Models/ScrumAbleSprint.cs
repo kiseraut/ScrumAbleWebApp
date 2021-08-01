@@ -32,6 +32,8 @@ namespace ScrumAble.Models
 
         public ICollection<ScrumAbleTask> Tasks { get; set; }
 
+        public ICollection<ScrumAbleDefect> Defects { get; set; }
+
         public bool IsBacklog { get; set; }
 
         [Display(Name = "Release")]

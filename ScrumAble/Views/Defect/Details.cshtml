@@ -1,0 +1,97 @@
+﻿@using System.Diagnostics.CodeAnalysis
+@attribute [ExcludeFromCodeCoverage]
+@model ScrumAble.Models.ScrumAbleDefect
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Defect Details";
+
+}
+
+<div>
+    <ul class="navbar-nav" style="flex-direction: row;">
+        <li class="nav-item" style="margin-right: 15px;">
+            @Html.ActionLink("Edit", "EditDefect", new { Id = Model.Id })
+        </li>
+        <li class="nav-item">
+            @{ var message = "return confirm('Are you sure you want to delete \"" + Model.DefectName + "\"?');";}
+            @Html.ActionLink("Delete", "DeleteDefect", new { Id = Model.Id }, new { onclick = @message })
+        </li>
+    </ul>
+
+</div>
+<h2>@Model.DefectName</h2>
+
+<b>Release:</b> @{
+   if (@Model.Release != null)
+   {
+       @Html.ActionLink(Model.Release.ReleaseName, "Details", "Release", new { Id = Model.Release.Id })
+   }
+}
+
+<br />
+
+<b>Sprint:</b> @{
+    if (@Model.Sprint != null)
+    {
+        @Html.ActionLink(Model.Sprint.SprintName, "Details", "Sprint", new { Id = Model.Sprint.Id })
+    }
+}
+
+<br />
+
+<b>Owner:</b> @{
+    if (@Model.DefectOwner != null)
+    {
+        @Model.DefectOwner.Email
+    }
+}
+
+<br />
+
+<b>Due:</b> @{
+    if (@Model.DefectDueDate != null)
+    {
+        @Html.DisplayFor(d => Model.DefectDueDate);
+
+    }
+}
+
+<br />
+
+
+<b>Workflow Stage:</b> @{
+    if (@Model.WorkflowStage != null)
+    {
+        @Model.WorkflowStage.WorkflowStageName;
+    }
+}
+
+<br />
+
+<b>Points:</b> @{
+    if (@Model.DefectPoints != null)
+    {
+        @Model.DefectPoints;
+    }
+}
+
+<br />
+
+<b>Description:</b> @{
+    if (@Model.DefectDescription != null)
+    {
+        @Model.DefectDescription;
+    }
+}
+
+<br />
+
+
+
+
+<!--javascript libraries for unobtrusive client-side validation-->
+@section scripts {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+}

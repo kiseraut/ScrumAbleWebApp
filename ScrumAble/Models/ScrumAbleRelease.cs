@@ -30,6 +30,8 @@ namespace ScrumAble.Models
 
         public ICollection<ScrumAbleSprint> Sprints { get; set; }
 
+        public ICollection<ScrumAbleDefect> Defects { get; set; }
+
         //The ID of the team this task is in
         [Display(Name = "Add Release To Team")]
         [NotMapped]

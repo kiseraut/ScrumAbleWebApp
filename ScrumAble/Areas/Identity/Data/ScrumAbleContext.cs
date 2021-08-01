@@ -22,6 +22,7 @@ namespace ScrumAble.Data
         public DbSet<ScrumAble.Models.ScrumAbleStory> Stories { get; set; }
         public DbSet<ScrumAble.Models.ScrumAbleTask> Tasks { get; set; }
         public DbSet<ScrumAble.Models.ScrumAbleTeam> Teams { get; set; }
+        public DbSet<ScrumAble.Models.ScrumAbleDefect> Defects { get; set; }
         public DbSet<ScrumAble.Models.ScrumAbleWorkflowStage> WorkflowStages { get; set; }
         public DbSet<ScrumAble.Models.ScrumAbleUserTeamMapping> UserTeamMapping { get; set; }
         public DbSet<Areas.Identity.Data.ScrumAbleUser> User { get; set; }

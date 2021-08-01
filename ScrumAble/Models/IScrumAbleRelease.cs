@@ -11,5 +11,6 @@ namespace ScrumAble.Models
         DateTime ReleaseEndDate { get; set; }
         ScrumAbleTeam Team { get; set; }
         ICollection<ScrumAbleSprint> Sprints { get; set; }
+        ICollection<ScrumAbleDefect> Defects { get; set; }
     }
 }

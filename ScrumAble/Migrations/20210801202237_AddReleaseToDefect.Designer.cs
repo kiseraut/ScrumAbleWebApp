@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ScrumAble.Data;
 
 namespace ScrumAble.Migrations
 {
     [DbContext(typeof(ScrumAbleContext))]
-    partial class ScrumAbleContextModelSnapshot : ModelSnapshot
+    [Migration("20210801202237_AddReleaseToDefect")]
+    partial class AddReleaseToDefect
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -585,11 +587,11 @@ namespace ScrumAble.Migrations
                         .HasForeignKey("DefectOwnerId");
 
                     b.HasOne("ScrumAble.Models.ScrumAbleRelease", "Release")
-                        .WithMany("Defects")
+                        .WithMany()
                         .HasForeignKey("ReleaseId");
 
                     b.HasOne("ScrumAble.Models.ScrumAbleSprint", "Sprint")
-                        .WithMany("Defects")
+                        .WithMany()
                         .HasForeignKey("SprintId");
 
                     b.HasOne("ScrumAble.Models.ScrumAbleWorkflowStage", "WorkflowStage")
@@ -716,15 +718,11 @@ namespace ScrumAble.Migrations
 
             modelBuilder.Entity("ScrumAble.Models.ScrumAbleRelease", b =>
                 {
-                    b.Navigation("Defects");
-
                     b.Navigation("Sprints");
                 });
 
             modelBuilder.Entity("ScrumAble.Models.ScrumAbleSprint", b =>
                 {
-                    b.Navigation("Defects");
-
                     b.Navigation("Stories");
 
                     b.Navigation("Tasks");

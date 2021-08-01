@@ -13,6 +13,7 @@ namespace ScrumAble.Models
         ScrumAbleRelease Release { get; set; }
         ICollection<ScrumAbleStory> Stories { get; set; }
         ICollection<ScrumAbleTask> Tasks { get; set; }
+        public ICollection<ScrumAbleDefect> Defects { get; set; }
         bool IsBacklog { get; set; }
     }
 }

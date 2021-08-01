@@ -62,6 +62,11 @@ namespace ScrumAble.Models
         public void DeleteFromDb(ScrumAbleWorkflowStage workflowStage);
         public List<ScrumAbleWorkflowStage> GetTeamWorkflowStages(ScrumAbleTeam team);
 
+        //Defect methods
+        public ScrumAbleDefect GetDefectById(int id);
+        public bool IsAuthorized(ScrumAbleDefect defect, string userId);
+        public void SaveToDb(ScrumAbleDefect defect);
+        public void DeleteFromDb(ScrumAbleDefect defect);
 
 
     }
