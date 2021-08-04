@@ -46,6 +46,7 @@ namespace ScrumAble.Controllers
             ViewBag.data = _scrumAbleRepo.GetAllUserTeams(User.FindFirstValue(ClaimTypes.NameIdentifier));
             ViewBag.User = user;
             ViewBag.Sprints = _scrumAbleRepo.GetAllSprintsInRelease(user.CurrentWorkingRelease.Id);
+            scrumAbleStory.StorySprintId = user.CurrentWorkingSprint.Id;
 
             return View(scrumAbleStory);
         }

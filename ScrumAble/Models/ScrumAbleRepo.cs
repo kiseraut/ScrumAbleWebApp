@@ -72,6 +72,9 @@ namespace ScrumAble.Models
             if (IsAuthorized(task, user.Id) && IsAuthorized(workflowStage, user.Id))
             {
                 task.WorkflowStage = workflowStage;
+
+                task.TaskCloseDate = IsFinalWorkflowStage(workflowStage) ? DateTime.Now : null;
+
                 SaveToDb(task);
             }
         }
@@ -297,6 +300,8 @@ namespace ScrumAble.Models
                 var dbStory = _context.Stories.First(s => s.Id == story.Id);
                 _context.Entry(dbStory).CurrentValues.SetValues(story);
                 dbStory.WorkflowStage = story.WorkflowStage;
+                dbStory.StoryOwner = story.StoryOwner;
+                dbStory.Sprint = story.Sprint;
                 _context.SaveChanges();
             }
         }
@@ -315,6 +320,8 @@ namespace ScrumAble.Models
             if (IsAuthorized(story, user.Id) && IsAuthorized(workflowStage, user.Id))
             {
                 story.WorkflowStage = workflowStage;
+                story.StoryCloseDate = IsFinalWorkflowStage(workflowStage) ? DateTime.Now : null;
+
                 SaveToDb(story);
             }
 
@@ -552,6 +559,14 @@ namespace ScrumAble.Models
                 .ToList();
         }
 
+        public bool IsFinalWorkflowStage(ScrumAbleWorkflowStage workflowStage)
+        {
+            var wrokflowStages = _context.WorkflowStages.Where(w => w.Team == workflowStage.Team)
+                .ToList().OrderBy(w => w.WorkflowStagePosition);
+
+            return wrokflowStages.Last().Id == workflowStage.Id;
+        }
+
         public ScrumAbleDefect GetDefectById(int id)
         {
             return _context.Defects.Where(d => d.Id == id)
@@ -595,6 +610,8 @@ namespace ScrumAble.Models
             if (IsAuthorized(defect, user.Id) && IsAuthorized(workflowStage, user.Id))
             {
                 defect.WorkflowStage = workflowStage;
+                defect.DefectCloseDate = IsFinalWorkflowStage(workflowStage) ? DateTime.Now : null;
+
                 SaveToDb(defect);
             }
         }

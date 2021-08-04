@@ -29,9 +29,32 @@
             {
                 if (story.Sprint.Id == ViewBag.User.CurrentWorkingSprint.Id)
                 {
-                    <div class="grabable" ondrop="preventDrop(event)" draggable="true" ondragstart="drag(event)" id="story_Card_@story.Id" style="border: solid; width: 250px; height: 250px; margin-left: 20px; margin-bottom: 10px; background-color: white; overflow: hidden;">
-                        <div id="workItemCardHeader" style="width: 100%; height: 55px; background-color: thistle; overflow: hidden;">
+                    <div class="grabable" ondrop="preventDrop(event)" draggable="true" ondragstart="drag(event)" id="story_Card_@story.Id" style="border: solid; width: 250px; height: 175px; margin-left: 20px; margin-bottom: 10px; background-color: white; overflow: hidden;">
+                        <div id="workItemCardHeader" style="width: 100%; height: 45px; background-color: thistle; overflow: hidden; font-size: 14px; padding-left: 5px;">
                             @story.StoryName
+                        </div>
+
+                        <div style="width: 100%; height: 130px; font-size: 12px; padding-left: 5px;">
+
+                            <div style="width: 100%; height: 55px;">
+                                <b>Assigned to: </b> <br />
+                                @if (story.StoryOwner != null)
+                                {@story.StoryOwner.Email} <br />
+                            </div>
+
+                            <div style="width: 100%; height: 40px; display: flex;">
+
+                                <div style="width: 50%; height: 40px;">
+                                    <b>Points:</b> @story.StoryPoints
+                                </div>
+
+                                <div style="width: 50%; height: 40px;">
+                                    <b>Due:</b> @Html.DisplayFor(d => story.StoryDueDate)
+                                </div>
+
+                            </div>
+
+                            @Html.ActionLink("details", "Details", "Story", new { Id = story.Id }) /  @Html.ActionLink("edit", "EditStory", "Story", new { Id = story.Id })
                         </div>
 
                     </div>
@@ -42,9 +65,32 @@
             {
                 if (task.Sprint.Id == ViewBag.User.CurrentWorkingSprint.Id)
                 {
-                    <div class="grabable" ondrop="preventDrop(event)" draggable="true" ondragstart="drag(event)" id="task_Card_@task.Id" style="border: solid; width: 250px; height: 250px; margin-left: 20px; margin-bottom: 10px; background-color: white; overflow: hidden;">
-                        <div id="workItemCardHeader" style="width: 100%; height: 55px; background-color: lightsteelblue; overflow: hidden;">
+                    <div class="grabable" ondrop="preventDrop(event)" draggable="true" ondragstart="drag(event)" id="task_Card_@task.Id" style="border: solid; width: 250px; height: 175px; margin-left: 20px; margin-bottom: 10px; background-color: white; overflow: hidden;">
+                        <div id="workItemCardHeader" style="width: 100%; height: 45px; background-color: lightsteelblue; overflow: hidden; font-size: 14px; padding-left: 5px;">
                             @task.TaskName
+                        </div>
+                        
+                        <div style="width: 100%; height: 130px; font-size: 12px; padding-left: 5px;">
+
+                            <div style="width: 100%; height: 55px;">
+                                <b>Assigned to: </b> <br />
+                                @if (task.TaskOwner != null)
+                                {@task.TaskOwner.Email} <br />
+                            </div>
+
+                            <div style="width: 100%; height: 40px; display: flex;">
+
+                                <div style="width: 50%; height: 40px;">
+                                    <b>Points:</b> @task.TaskPoints
+                                </div>
+
+                                <div style="width: 50%; height: 40px;">
+                                    <b>Due:</b> @Html.DisplayFor(d => task.TaskDueDate)
+                                </div>
+
+                            </div>
+
+                            @Html.ActionLink("details", "Details", "Task", new { Id = task.Id }) /  @Html.ActionLink("edit", "EditTask", "Task", new { Id = task.Id })
                         </div>
 
                     </div>
@@ -55,10 +101,34 @@
             {
                 if (defect.Sprint.Id == ViewBag.User.CurrentWorkingSprint.Id)
                 {
-                    <div class="grabable" ondrop="preventDrop(event)" draggable="true" ondragstart="drag(event)" id="defect_Card_@defect.Id" style="border: solid; width: 250px; height: 250px; margin-left: 20px; margin-bottom: 10px; background-color: white; overflow: hidden;">
-                        <div id="workItemCardHeader" style="width: 100%; height: 55px; background-color: tomato; overflow: hidden;">
+                    <div class="grabable" ondrop="preventDrop(event)" draggable="true" ondragstart="drag(event)" id="defect_Card_@defect.Id" style="border: solid; width: 250px; height: 175px; margin-left: 20px; margin-bottom: 10px; background-color: white; overflow: hidden;">
+                        <div id="workItemCardHeader" style="width: 100%; height: 45px; background-color: tomato; overflow: hidden; font-size: 14px; padding-left: 5px;">
                             @defect.DefectName
                         </div>
+                        
+                        <div style="width: 100%; height: 130px; font-size: 12px; padding-left: 5px;">
+
+                            <div style="width: 100%; height: 55px;">
+                                <b>Assigned to: </b> <br />
+                                @if (defect.DefectOwner != null)
+                                {@defect.DefectOwner.Email} <br />
+                            </div>
+
+                            <div style="width: 100%; height: 40px; display: flex;">
+
+                                <div style="width: 50%; height: 40px;">
+                                    <b>Points:</b> @defect.DefectPoints
+                                </div>
+
+                                <div style="width: 50%; height: 40px;">
+                                    <b>Due:</b> @Html.DisplayFor(d => defect.DefectDueDate)
+                                </div>
+
+                            </div>
+
+                            @Html.ActionLink("details", "Details", "Defect", new { Id = defect.Id }) / @Html.ActionLink("edit", "EditDefect", "Defect", new { Id = defect.Id })
+                        </div>
+
                     </div>
                 }
             }

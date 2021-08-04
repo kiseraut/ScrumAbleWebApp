@@ -64,6 +64,7 @@ namespace ScrumAble.Models
         public bool SaveToDb(ScrumAbleWorkflowStage workflowStage, ScrumAbleUser user);
         public void DeleteFromDb(ScrumAbleWorkflowStage workflowStage);
         public List<ScrumAbleWorkflowStage> GetTeamWorkflowStages(ScrumAbleTeam team);
+        public bool IsFinalWorkflowStage(ScrumAbleWorkflowStage workflowStage);
 
         //Defect methods
         public ScrumAbleDefect GetDefectById(int id);

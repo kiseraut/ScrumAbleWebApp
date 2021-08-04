@@ -69,6 +69,10 @@ namespace ScrumAble.Controllers
                 return View("TaskNotFound");
             }
             scrumAbleTask.ViewModelTaskAggregate = _scrumAbleRepo.GetTaskAggregateData(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            scrumAbleTask.TaskStoryId = scrumAbleTask.Story.Id;
+            scrumAbleTask.TaskSprintId = scrumAbleTask.Sprint.Id;
+            scrumAbleTask.TaskOwnerId = scrumAbleTask.TaskOwner.Email;
+
             return View(scrumAbleTask);
         }
 
