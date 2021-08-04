@@ -41,6 +41,7 @@ namespace ScrumAble.Controllers
 
             var user = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
             scrumAbleStory.Sprint = user.CurrentWorkingSprint;
+            
 
             ViewBag.data = _scrumAbleRepo.GetAllUserTeams(User.FindFirstValue(ClaimTypes.NameIdentifier));
             ViewBag.User = user;
@@ -85,8 +86,11 @@ namespace ScrumAble.Controllers
         {
             if (!ModelState.IsValid) { return View("AddStory", scrumAbleStory); }
 
+            var user = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
             scrumAbleStory.Sprint = _scrumAbleRepo.GetSprintById(scrumAbleStory.StorySprintId);
             scrumAbleStory.StoryOwner = _scrumAbleRepo.GetUserByUsername(scrumAbleStory.StoryOwnerEmail);
+            scrumAbleStory.WorkflowStage = _scrumAbleRepo.GetTeamById(user.CurrentWorkingTeam.Id).WorkFlowStages
+                .SingleOrDefault(w => w.WorkflowStagePosition == 0);
 
             _scrumAbleRepo.SaveToDb(scrumAbleStory);
 

@@ -34,6 +34,9 @@ namespace ScrumAble.Models
 
         public ICollection<ScrumAbleDefect> Defects { get; set; }
 
+        [NotMapped]
+        public List<ScrumAbleWorkflowStage> WorkflowStages { get; set; }
+
         public bool IsBacklog { get; set; }
 
         [Display(Name = "Release")]

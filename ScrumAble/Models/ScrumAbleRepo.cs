@@ -22,6 +22,7 @@ namespace ScrumAble.Models
         public ScrumAbleTask GetTaskById(int id)
         {
             return _context.Tasks.Where(t => t.Id == id)
+                .Include(t => t.Story).ThenInclude(s => s.Sprint)
                 .SingleOrDefault();
         }
 
@@ -43,9 +44,11 @@ namespace ScrumAble.Models
             }
             else
             {
-                _context.Tasks.Update(task);
+                var dbTask = _context.Tasks.First(t => t.Id == task.Id);
+                _context.Entry(dbTask).CurrentValues.SetValues(task);
+                dbTask.WorkflowStage = task.WorkflowStage;
             }
-            
+
             _context.SaveChanges();
         }
 
@@ -57,7 +60,20 @@ namespace ScrumAble.Models
 
         public bool IsAuthorized(ScrumAbleTask task, string userId)
         {
-            return IsAuthorized(task.Story, userId);
+            task = GetTaskById(task.Id);
+            return IsAuthorized(task.Sprint, userId);
+        }
+
+        public void MoveTask(int taskId, int workflowStageId, ScrumAbleUser user)
+        {
+            var task = GetTaskById(taskId);
+            var workflowStage = GetWorkflowStageById(workflowStageId);
+
+            if (IsAuthorized(task, user.Id) && IsAuthorized(workflowStage, user.Id))
+            {
+                task.WorkflowStage = workflowStage;
+                SaveToDb(task);
+            }
         }
 
         public ScrumAbleUser GetUserById(string id)
@@ -201,8 +217,28 @@ namespace ScrumAble.Models
             return sprint;
         }
 
+        public ScrumAbleSprint GetSprintForDashboard(int id)
+        {
+            var sprint = _context.Sprints.Where(s => s.Id == id)
+                .Include(s => s.Stories).ThenInclude(s => s.WorkflowStage)
+                .Include(s => s.Tasks).ThenInclude(t => t.WorkflowStage)
+                .Include(s => s.Defects).ThenInclude(d => d.WorkflowStage)
+                .Include(s => s.Release)
+                .SingleOrDefault();
+
+            sprint.WorkflowStages = _context.WorkflowStages.Where(w => w.Team.Id == sprint.Release.Team.Id)
+                .Include(w => w.Stories).ThenInclude(s => s.StoryOwner)
+                .Include(w => w.Tasks).ThenInclude(t => t.TaskOwner)
+                .Include(w => w.Defects).ThenInclude(d => d.DefectOwner)
+                .ToList();
+            
+
+            return sprint;
+        }
+
         public bool IsAuthorized(ScrumAbleSprint sprint, string userId)
         {
+            sprint = GetSprintById(sprint.Id);
             return IsAuthorized(sprint.Release, userId);
         }
 
@@ -244,6 +280,7 @@ namespace ScrumAble.Models
 
         public bool IsAuthorized(ScrumAbleStory story, string userId)
         {
+            story = GetStoryById(story.Id);
             return IsAuthorized(story.Sprint, userId);
         }
 
@@ -251,6 +288,7 @@ namespace ScrumAble.Models
         {
             if (story.Id == 0)
             {
+                //story.Sprint.Release.Team.WorkFlowStages.Where(w => w.WorkflowStagePosition == 0);
                 _context.Stories.Add(story);
                 _context.SaveChanges();
             }
@@ -258,6 +296,7 @@ namespace ScrumAble.Models
             {
                 var dbStory = _context.Stories.First(s => s.Id == story.Id);
                 _context.Entry(dbStory).CurrentValues.SetValues(story);
+                dbStory.WorkflowStage = story.WorkflowStage;
                 _context.SaveChanges();
             }
         }
@@ -266,6 +305,19 @@ namespace ScrumAble.Models
         {
             _context.Stories.Remove(story);
             _context.SaveChanges();
+        }
+
+        public void MoveStory(int storyId, int workflowStageId, ScrumAbleUser user)
+        {
+            var story = GetStoryById(storyId);
+            var workflowStage = GetWorkflowStageById(workflowStageId);
+
+            if (IsAuthorized(story, user.Id) && IsAuthorized(workflowStage, user.Id))
+            {
+                story.WorkflowStage = workflowStage;
+                SaveToDb(story);
+            }
+
         }
 
         public ViewModelTaskAggregate GetTaskAggregateData(string userId)
@@ -508,6 +560,7 @@ namespace ScrumAble.Models
 
         public bool IsAuthorized(ScrumAbleDefect defect, string userId)
         {
+            defect = GetDefectById(defect.Id);
             return IsAuthorized(defect.Sprint, userId);
         }
 
@@ -523,6 +576,7 @@ namespace ScrumAble.Models
                 var dbDefect = _context.Defects.First(d => d.Id == defect.Id);
                 _context.Entry(dbDefect).CurrentValues.SetValues(defect);
                 dbDefect.Sprint = defect.Sprint;
+                dbDefect.WorkflowStage = defect.WorkflowStage;
                 _context.SaveChanges();
             }
         }
@@ -533,9 +587,23 @@ namespace ScrumAble.Models
             _context.SaveChanges();
         }
 
+        public void MoveDefect(int defectId, int workflowStageId, ScrumAbleUser user)
+        {
+            var defect = GetDefectById(defectId);
+            var workflowStage = GetWorkflowStageById(workflowStageId);
+
+            if (IsAuthorized(defect, user.Id) && IsAuthorized(workflowStage, user.Id))
+            {
+                defect.WorkflowStage = workflowStage;
+                SaveToDb(defect);
+            }
+        }
+
         public bool IsAuthorized(ScrumAbleWorkflowStage workflowStage, string userId)
         {
             if (workflowStage == null) return false;
+
+            workflowStage = GetWorkflowStageById(workflowStage.Id);
             var team = GetTeamById(workflowStage.Team.Id);
             return IsAuthorized(team, userId);
         }

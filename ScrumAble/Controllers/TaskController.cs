@@ -75,7 +75,8 @@ namespace ScrumAble.Controllers
         [HttpPost]
         public IActionResult CreateTask(ScrumAbleTask scrumAbleTask)
         {
-            ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var user = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            ViewBag.User = user;
             if (!ModelState.IsValid)
             {
                 scrumAbleTask.ViewModelTaskAggregate = _scrumAbleRepo.GetTaskAggregateData(User.FindFirstValue(ClaimTypes.NameIdentifier));
@@ -83,6 +84,8 @@ namespace ScrumAble.Controllers
             }
 
             GetExternalObjectsFromIds(scrumAbleTask);
+            scrumAbleTask.WorkflowStage = _scrumAbleRepo.GetTeamById(user.CurrentWorkingTeam.Id).WorkFlowStages
+                .SingleOrDefault(w => w.WorkflowStagePosition == 0);
 
             _scrumAbleRepo.SaveToDb(scrumAbleTask);
             
@@ -91,11 +94,20 @@ namespace ScrumAble.Controllers
 
         public IActionResult UpdateTask(ScrumAbleTask scrumAbleTask)
         {
-            ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var user = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            ViewBag.User = user;
             if (!ModelState.IsValid)
             {
                 scrumAbleTask.ViewModelTaskAggregate = _scrumAbleRepo.GetTaskAggregateData(User.FindFirstValue(ClaimTypes.NameIdentifier));
                 return View("EditTask", scrumAbleTask);
+            }
+
+            var firstWorkflowStage = _scrumAbleRepo.GetTeamWorkflowStages(user.CurrentWorkingTeam)
+                .First(w => w.WorkflowStagePosition == 0);
+
+            if (scrumAbleTask.WorkflowStage == null)
+            {
+                scrumAbleTask.WorkflowStage = firstWorkflowStage;
             }
 
             GetExternalObjectsFromIds(scrumAbleTask);

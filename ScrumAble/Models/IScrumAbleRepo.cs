@@ -13,6 +13,7 @@ namespace ScrumAble.Models
         public void SaveToDb(ScrumAbleTask task);
         public void DeleteFromDb(ScrumAbleTask task);
         public bool IsAuthorized(ScrumAbleTask task, string userId);
+        void MoveTask(int taskId, int workflowStageId, ScrumAbleUser user);
 
         //User methods
         public ScrumAbleUser GetUserById(string id);
@@ -25,6 +26,7 @@ namespace ScrumAble.Models
 
         //Sprint methods
         public ScrumAbleSprint GetSprintById(int id);
+        public ScrumAbleSprint GetSprintForDashboard(int id);
         public bool IsAuthorized(ScrumAbleSprint sprint, string userId);
         public void SaveToDb(ScrumAbleSprint sprint);
         public void DeleteFromDb(ScrumAbleSprint sprint);
@@ -35,6 +37,7 @@ namespace ScrumAble.Models
         public bool IsAuthorized(ScrumAbleStory story, string userId);
         public void SaveToDb(ScrumAbleStory story);
         public void DeleteFromDb(ScrumAbleStory story);
+        void MoveStory(int storyId, int workflowStageId, ScrumAbleUser user);
 
         //ViewModelTaskAggregate methods
         public ViewModelTaskAggregate GetTaskAggregateData(string userId);
@@ -67,7 +70,7 @@ namespace ScrumAble.Models
         public bool IsAuthorized(ScrumAbleDefect defect, string userId);
         public void SaveToDb(ScrumAbleDefect defect);
         public void DeleteFromDb(ScrumAbleDefect defect);
-
+        void MoveDefect(int defectId, int workflowStageId, ScrumAbleUser user);
 
     }
 }

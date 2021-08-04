@@ -11,9 +11,24 @@
     <link rel="stylesheet" href="~/css/site.css" />
     <link href="~/js/BS5/bootstrap-5.0.1/site/content/docs/5.0/examples/sidebars/sidebars.css" rel="stylesheet" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    
+    <style>
+        .grabable:hover {
+            cursor: move; 
+            cursor: grab;
+            cursor: -moz-grab;
+            cursor: -webkit-grab;
+        }
+
+        .grabable:active {
+            cursor: grabbing;
+            cursor: -moz-grabbing;
+            cursor: -webkit-grabbing;
+        }
+    </style>
 
 </head>
-<body style="height: 100%; margin-bottom: 0px;">
+<body style="height: 100%; margin-bottom: 0px; overflow: hidden">
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container" style="margin-left: 0px; margin-right: 0px; max-width: 5000px">
@@ -43,7 +58,7 @@
     <div style="display: flex; height: 100%; margin-top: -73px; padding-top: 57px;">
         @Html.Partial("_LeftControlsPartial.cshtml", (ScrumAbleUser)ViewBag.User)
         <!--<partial name="_LeftControlsPartial.cshtml" view-data="ViewData" />-->
-        <div class="container" style="margin-left: 0px; overflow: auto;">
+        <div id="datacontainer" class="none" style="width: 100%; padding-right: 15px; padding-left: 15px; margin-right: auto; overflow: auto;">
             <main role="main" class="pb-3">
                 @RenderBody()
             </main>

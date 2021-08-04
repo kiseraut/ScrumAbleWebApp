@@ -20,11 +20,11 @@ namespace ScrumAble.Tests.Controllers
     public class DefectConrollerTests
     {
         [Fact]
-        public void UT70_DefectController_Details_ShouldReturnDefectNotFoundViewWhenIdIsNotFound()
+        public void UT69_DefectController_Details_ShouldReturnDefectNotFoundViewWhenIdIsNotFound()
         {
             // Arrange
             var options = new DbContextOptionsBuilder<ScrumAbleContext>()
-                .UseInMemoryDatabase(databaseName: "TestDatabase_UT70")
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT69")
                 .Options;
 
             var context = new ScrumAbleContext(options);
@@ -44,11 +44,11 @@ namespace ScrumAble.Tests.Controllers
         }
         
         [Fact]
-        public void UT71_DefectController_AddDefect_ShouldReturnDefectObject()
+        public void UT70_DefectController_AddDefect_ShouldReturnDefectObject()
         {
             // Arrange
             var options = new DbContextOptionsBuilder<ScrumAbleContext>()
-                .UseInMemoryDatabase(databaseName: "TestDatabase_UT71")
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT70")
                 .Options;
 
             var context = new ScrumAbleContext(options);
@@ -79,11 +79,11 @@ namespace ScrumAble.Tests.Controllers
         }
         
         [Fact]
-        public void UT72_DefectController_EditDefect_ShouldReturnDefectNotFoundViewWhenIdIsNotFound()
+        public void UT71_DefectController_EditDefect_ShouldReturnDefectNotFoundViewWhenIdIsNotFound()
         {
             // Arrange
             var options = new DbContextOptionsBuilder<ScrumAbleContext>()
-                .UseInMemoryDatabase(databaseName: "TestDatabase_UT72")
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT71")
                 .Options;
 
             var context = new ScrumAbleContext(options);
@@ -103,11 +103,11 @@ namespace ScrumAble.Tests.Controllers
         }
         
         [Fact]
-        public void UT73_DefectController_DeleteDefect_ShouldDeleteDefectFromDb()
+        public void UT72_DefectController_DeleteDefect_ShouldDeleteDefectFromDb()
         {
             // Arrange
             var options = new DbContextOptionsBuilder<ScrumAbleContext>()
-                .UseInMemoryDatabase(databaseName: "TestDatabase_UT73")
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT72")
                 .Options;
 
             var context = new ScrumAbleContext(options);
@@ -145,11 +145,11 @@ namespace ScrumAble.Tests.Controllers
         
 
         [Fact]
-        public async void UT74_DefectController_CreateDefect_ShouldAddDefectToDb()
+        public async void UT73_DefectController_CreateDefect_ShouldAddDefectToDb()
         {
             // Arrange
             var options = new DbContextOptionsBuilder<ScrumAbleContext>()
-                .UseInMemoryDatabase(databaseName: "TestDatabase_UT74")
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT73")
                 .Options;
 
             var context = new ScrumAbleContext(options);
@@ -186,11 +186,11 @@ namespace ScrumAble.Tests.Controllers
         }
         
         [Fact]
-        public async void UT75_DefectController_UpdateDefect_ShouldUpdateDefectInDb()
+        public async void UT74_DefectController_UpdateDefect_ShouldUpdateDefectInDb()
         {
             // Arrange
             var options = new DbContextOptionsBuilder<ScrumAbleContext>()
-                .UseInMemoryDatabase(databaseName: "TestDatabase_UT75")
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT74")
                 .Options;
 
             var context = new ScrumAbleContext(options);

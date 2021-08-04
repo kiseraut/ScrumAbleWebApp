@@ -118,6 +118,7 @@
 
         @Html.EditorFor(t => t.ViewModelTaskAggregate)
         @Html.HiddenFor(t => t.Id);
+        @Html.HiddenFor(t => t.WorkflowStage);
         @Html.AntiForgeryToken()
 
         <button type="submit" class="btn btn-primary">Update Task</button>

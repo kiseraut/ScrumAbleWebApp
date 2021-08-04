@@ -1,0 +1,127 @@
+﻿@using System.Diagnostics.CodeAnalysis
+@using ScrumAble.Areas.Identity.Data
+@attribute [ExcludeFromCodeCoverage]
+@model ScrumAble.Models.ScrumAbleSprint
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = @Model.SprintName + " Dashboard";
+
+}
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+
+<h2>Dashboard for @Model.SprintName</h2>
+
+<div style="display: flex;">
+
+    @{
+        var workflowStages = Model.WorkflowStages.OrderBy(w => w.WorkflowStagePosition);
+        
+        foreach (var workflowStage in workflowStages)
+        {
+        <div id="swimlane_@workflowStage.Id" ondragover="allowDrop(event)" ondrop="drop(event)" style=" width: 300px; margin-right: 5px; min-width: 300px; background-color: rgba(52, 58, 64, .1)">
+            <div  style="text-align: center; width: 250px; height: 35px; background-color: #343a40; color: white; margin-block: 10px; margin-left: 20px;">
+                <h4>@workflowStage.WorkflowStageName</h4>
+            </div>
+
+            @foreach (var story in workflowStage.Stories)
+            {
+                if (story.Sprint.Id == ViewBag.User.CurrentWorkingSprint.Id)
+                {
+                    <div class="grabable" ondrop="preventDrop(event)" draggable="true" ondragstart="drag(event)" id="story_Card_@story.Id" style="border: solid; width: 250px; height: 250px; margin-left: 20px; margin-bottom: 10px; background-color: white; overflow: hidden;">
+                        <div id="workItemCardHeader" style="width: 100%; height: 55px; background-color: thistle; overflow: hidden;">
+                            @story.StoryName
+                        </div>
+
+                    </div>
+                }
+            }
+
+            @foreach (var task in workflowStage.Tasks)
+            {
+                if (task.Sprint.Id == ViewBag.User.CurrentWorkingSprint.Id)
+                {
+                    <div class="grabable" ondrop="preventDrop(event)" draggable="true" ondragstart="drag(event)" id="task_Card_@task.Id" style="border: solid; width: 250px; height: 250px; margin-left: 20px; margin-bottom: 10px; background-color: white; overflow: hidden;">
+                        <div id="workItemCardHeader" style="width: 100%; height: 55px; background-color: lightsteelblue; overflow: hidden;">
+                            @task.TaskName
+                        </div>
+
+                    </div>
+                }
+            }
+            
+            @foreach (var defect in workflowStage.Defects)
+            {
+                if (defect.Sprint.Id == ViewBag.User.CurrentWorkingSprint.Id)
+                {
+                    <div class="grabable" ondrop="preventDrop(event)" draggable="true" ondragstart="drag(event)" id="defect_Card_@defect.Id" style="border: solid; width: 250px; height: 250px; margin-left: 20px; margin-bottom: 10px; background-color: white; overflow: hidden;">
+                        <div id="workItemCardHeader" style="width: 100%; height: 55px; background-color: tomato; overflow: hidden;">
+                            @defect.DefectName
+                        </div>
+                    </div>
+                }
+            }
+            
+
+        </div>
+        }
+    }
+</div>
+
+
+<script>
+    function allowDrop(ev) {
+        ev.preventDefault();
+    }
+
+    function drag(ev) {
+        ev.dataTransfer.setData("Text", ev.target.id);
+    }
+
+    function drop(ev) {
+        var data = ev.dataTransfer.getData("Text");
+
+        var swimlane = getSwimlane(ev.target);
+
+        swimlane.appendChild(document.getElementById(data));
+
+        $.ajax({
+            type: 'POST',
+            url: '/Dashboard/MoveWorkItem',
+            data: { workItemDivId: data, workflowStageDivId: swimlane.id}
+        });
+
+
+        ev.preventDefault();
+    }
+
+    function getSwimlane(element) {
+
+        if (element.id == "datacontainer") {
+            return null;
+        }
+
+        if (!element.id.includes("swimlane")) {
+            returnElement = getSwimlane(element.parentNode)
+        } else {
+            return element;
+        }
+
+        return returnElement;
+    }
+
+    function preventDrop(ev) {
+
+    }
+
+    window.addEventListener("dragover",function(e){
+        e = e || event;
+        e.preventDefault();
+    },false);
+    window.addEventListener("drop",function(e){
+        e = e || event;
+        e.preventDefault();
+    },false);
+
+</script>

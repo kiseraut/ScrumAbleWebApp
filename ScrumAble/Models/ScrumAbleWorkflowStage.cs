@@ -28,6 +28,8 @@ namespace ScrumAble.Models
 
         public ICollection<ScrumAbleTask> Tasks { get; set; }
 
+        public ICollection<ScrumAbleDefect> Defects { get; set; }
+
         [NotMapped] 
         public List<ScrumAbleWorkflowStage> AssociatedWorkflowStages { get; set; }
         

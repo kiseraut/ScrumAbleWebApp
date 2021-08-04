@@ -86,9 +86,12 @@ namespace ScrumAble.Controllers
         {
             if (!ModelState.IsValid) { return View("AddDefect", scrumAbleDefect); }
 
+            var user = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
             scrumAbleDefect.Sprint = _scrumAbleRepo.GetSprintById(scrumAbleDefect.DefectSprintId);
             scrumAbleDefect.Release = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier)).CurrentWorkingRelease;
             scrumAbleDefect.DefectOwner = _scrumAbleRepo.GetUserByUsername(scrumAbleDefect.DefectOwnerEmail);
+            scrumAbleDefect.WorkflowStage = _scrumAbleRepo.GetTeamById(user.CurrentWorkingTeam.Id).WorkFlowStages
+                .SingleOrDefault(w => w.WorkflowStagePosition == 0);
 
             _scrumAbleRepo.SaveToDb(scrumAbleDefect);
 

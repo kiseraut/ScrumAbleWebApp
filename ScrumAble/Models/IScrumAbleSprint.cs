@@ -14,6 +14,7 @@ namespace ScrumAble.Models
         ICollection<ScrumAbleStory> Stories { get; set; }
         ICollection<ScrumAbleTask> Tasks { get; set; }
         public ICollection<ScrumAbleDefect> Defects { get; set; }
+        public List<ScrumAbleWorkflowStage> WorkflowStages { get; set; }
         bool IsBacklog { get; set; }
     }
 }

@@ -139,6 +139,11 @@ namespace ScrumAble.Tests.Controllers
                 .SingleOrDefault();
         }
 
+        public ScrumAbleSprint GetSprintForDashboard(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool IsAuthorized(ScrumAbleSprint sprint, string userId)
         {
             return true;

@@ -86,6 +86,9 @@
             @Html.LabelFor(s => s.StorySprintId)<br />
             *only current and future sprints in the current working release <br /><i>@ViewBag.User.CurrentWorkingRelease.ReleaseName</i> are shown
             @Html.DropDownListFor(s => s.StorySprintId, sprintListItems, new { @class = "form-control" })
+            
+            @Html.HiddenFor(s => s.Id)
+            @Html.HiddenFor(s => s.WorkflowStage)
 
         </div>
 
