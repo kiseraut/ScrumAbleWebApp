@@ -160,11 +160,13 @@ namespace ScrumAble.Tests.Controllers
             var story = MockScrumAbleStory.GenerateStory();
             var team = MockScrumAbleTeam.GenerateTeam();
             var defect = MockScrumAbleDefect.GenerateDefect(release, sprint);
+            var workfowStage = MockScrumAbleWorkflowStage.GenerateWorkflowStage(team);
             story.Sprint = sprint;
             user.CurrentWorkingRelease = release;
             user.CurrentWorkingTeam = team;
             user.CurrentWorkingSprint = sprint;
             context.Add(user);
+            context.Add(workfowStage);
             context.Add(release);
             context.Add(team);
             context.Add(sprint);

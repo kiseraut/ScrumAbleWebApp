@@ -12,7 +12,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using ScrumAble.Areas.Identity.Services;
 using ScrumAble.Data;
 using ScrumAble.Models;
 
@@ -38,6 +40,10 @@ namespace ScrumAble
             services.AddHttpContextAccessor();
             services.AddTransient<UserManager<ScrumAbleUser>>();
             services.AddScoped<IScrumAbleRepo, ScrumAbleRepo>();
+            
+            services.AddTransient<IEmailSender, EmailSender>();
+
+            services.Configure<AuthMessageSenderOptions>(Configuration);
 
             services.AddAuthorization(options =>
             {

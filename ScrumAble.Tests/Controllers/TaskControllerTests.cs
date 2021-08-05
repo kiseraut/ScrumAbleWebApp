@@ -55,9 +55,19 @@ namespace ScrumAble.Tests.Controllers
             var scrumAbleRepo = new MockScrumAbleRepo(context);
             var taskController = new TaskController(scrumAbleRepo, null);
             var testTask = MockScrumAbleTask.GenerateTask();
+            var team = MockScrumAbleTeam.GenerateTeam();
+            var user = MockScrumAbleUser.GenerateScrumAbleUser();
+            var workflowStage = MockScrumAbleWorkflowStage.GenerateWorkflowStage(team);
+
+            user.CurrentWorkingTeam = team;
+            context.Add(user);
+            context.Add(team);
+            context.Add(workflowStage);
+            context.SaveChanges();
+
             testTask.TaskSprintId = -1;
 
-            taskController = AddClaimsIdentityToController(taskController);
+            taskController = AddClaimsIdentityToController(taskController, user);
 
             // Act
             IActionResult result = taskController.CreateTask(testTask) as IActionResult;
@@ -180,11 +190,12 @@ namespace ScrumAble.Tests.Controllers
             testTask.TaskStoryId = testStory.Id;
 
             context.Add(testTask);
+            context.Add(testUser);
             context.SaveChanges();
 
             testTask.TaskName = "Updated Test Task";
 
-            taskController = AddClaimsIdentityToController(taskController);
+            taskController = AddClaimsIdentityToController(taskController, testUser);
 
             // Act
             IActionResult result = taskController.UpdateTask(testTask) as IActionResult;
@@ -225,6 +236,25 @@ namespace ScrumAble.Tests.Controllers
             Assert.Equal(0, numRecords);
 
             context.Database.EnsureDeleted();
+        }
+
+        private TaskController AddClaimsIdentityToController(TaskController taskController, MockScrumAbleUser user)
+        {
+            var claimsUser = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+            {
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim("custom-claim", "example claim value"),
+            }, "mock"));
+
+            var controller = taskController;
+            controller.ControllerContext = new ControllerContext()
+            {
+                HttpContext = new DefaultHttpContext() { User = claimsUser }
+            };
+
+            return controller;
         }
 
         private TaskController AddClaimsIdentityToController(TaskController taskController)

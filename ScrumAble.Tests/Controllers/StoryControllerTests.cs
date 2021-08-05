@@ -52,9 +52,14 @@ namespace ScrumAble.Tests.Controllers
             var user = MockScrumAbleUser.GenerateScrumAbleUser();
             var release = MockScrumAbleRelease.GenerateRelease();
             var team = MockScrumAbleTeam.GenerateTeam();
+            var workflowStage = MockScrumAbleWorkflowStage.GenerateWorkflowStage(team);
+            var sprint = MockScrumAbleSprint.GenerateSprint(release);
             user.CurrentWorkingRelease = release;
             user.CurrentWorkingTeam = team;
+            user.CurrentWorkingSprint = sprint;
             context.Add(user);
+            context.Add(sprint);
+            context.Add(workflowStage);
             context.Add(release);
             context.Add(team);
             context.SaveChanges();
@@ -150,10 +155,12 @@ namespace ScrumAble.Tests.Controllers
             var release = MockScrumAbleRelease.GenerateRelease();
             var story = MockScrumAbleStory.GenerateStory();
             var team = MockScrumAbleTeam.GenerateTeam();
+            var workflowStage = MockScrumAbleWorkflowStage.GenerateWorkflowStage(team);
             story.Sprint = sprint;
             user.CurrentWorkingRelease = release;
             user.CurrentWorkingTeam = team;
             context.Add(user);
+            context.Add(workflowStage);
             context.Add(release);
             context.Add(team);
             context.Add(sprint);

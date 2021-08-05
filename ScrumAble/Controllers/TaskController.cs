@@ -63,15 +63,17 @@ namespace ScrumAble.Controllers
             ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
             var scrumAbleTask = _scrumAbleRepo.GetTaskById(id);
             scrumAbleTask = _scrumAbleRepo.PopulateTaskMetadata(scrumAbleTask);
-
-            if (scrumAbleTask == null)
+            
+            if (scrumAbleTask == null || !_scrumAbleRepo.IsAuthorized(scrumAbleTask, User.FindFirstValue(ClaimTypes.NameIdentifier)))
             {
                 return View("TaskNotFound");
             }
+
             scrumAbleTask.ViewModelTaskAggregate = _scrumAbleRepo.GetTaskAggregateData(User.FindFirstValue(ClaimTypes.NameIdentifier));
             scrumAbleTask.TaskStoryId = scrumAbleTask.Story.Id;
             scrumAbleTask.TaskSprintId = scrumAbleTask.Sprint.Id;
             scrumAbleTask.TaskOwnerId = scrumAbleTask.TaskOwner.Email;
+
 
             return View(scrumAbleTask);
         }

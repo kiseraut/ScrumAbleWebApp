@@ -58,6 +58,11 @@ namespace ScrumAble.Tests.Controllers
             throw new NotImplementedException();
         }
 
+        public void MoveTask(int taskId, int workflowStageId, ScrumAbleUser user)
+        {
+            //move task
+        }
+
         public ScrumAbleUser GetUserById(string id)
         {
             var user = _context.User.Where(u => u.Id == id)
@@ -141,7 +146,21 @@ namespace ScrumAble.Tests.Controllers
 
         public ScrumAbleSprint GetSprintForDashboard(int id)
         {
-            throw new NotImplementedException();
+            var sprint = _context.Sprints.Where(s => s.Id == id)
+                .Include(s => s.Stories).ThenInclude(s => s.WorkflowStage)
+                .Include(s => s.Tasks).ThenInclude(t => t.WorkflowStage)
+                .Include(s => s.Defects).ThenInclude(d => d.WorkflowStage)
+                .Include(s => s.Release)
+                .SingleOrDefault();
+
+            sprint.WorkflowStages = _context.WorkflowStages.Where(w => w.Team.Id == sprint.Release.Team.Id)
+                .Include(w => w.Stories).ThenInclude(s => s.StoryOwner)
+                .Include(w => w.Tasks).ThenInclude(t => t.TaskOwner)
+                .Include(w => w.Defects).ThenInclude(d => d.DefectOwner)
+                .ToList();
+
+
+            return sprint;
         }
 
         public bool IsAuthorized(ScrumAbleSprint sprint, string userId)
@@ -207,6 +226,11 @@ namespace ScrumAble.Tests.Controllers
         {
             _context.Stories.Remove(story);
             _context.SaveChanges();
+        }
+
+        public void MoveStory(int storyId, int workflowStageId, ScrumAbleUser user)
+        {
+            //move story
         }
 
         public ViewModelTaskAggregate GetTaskAggregateData(string userId)
@@ -417,6 +441,11 @@ namespace ScrumAble.Tests.Controllers
             return new List<ScrumAbleWorkflowStage>() {mockWorkflowStage1, mockWorkflowStage2, mockWorkflowStage3};
         }
 
+        public bool IsFinalWorkflowStage(ScrumAbleWorkflowStage workflowStage)
+        {
+            throw new NotImplementedException();
+        }
+
         public ScrumAbleDefect GetDefectById(int id)
         {
             return _context.Defects.Where(d => d.Id == id)
@@ -448,6 +477,11 @@ namespace ScrumAble.Tests.Controllers
         {
             _context.Defects.Remove(defect);
             _context.SaveChanges();
+        }
+
+        public void MoveDefect(int defectId, int workflowStageId, ScrumAbleUser user)
+        {
+            //move defect
         }
     }
 }
