@@ -182,6 +182,8 @@ namespace ScrumAble.Controllers
 
             _scrumAbleRepo.SaveToDb(ClosedWFStage, user);
 
+            user.CurrentWorkingTeam = team;
+
             return RedirectToAction("Details", "Team", new { id = team.Id });
         }
 
