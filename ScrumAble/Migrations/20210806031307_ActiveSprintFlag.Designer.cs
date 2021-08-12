@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ScrumAble.Data;
 
 namespace ScrumAble.Migrations
 {
     [DbContext(typeof(ScrumAbleContext))]
-    partial class ScrumAbleContextModelSnapshot : ModelSnapshot
+    [Migration("20210806031307_ActiveSprintFlag")]
+    partial class ActiveSprintFlag
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -322,23 +324,13 @@ namespace ScrumAble.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("GraphData")
-                        .HasMaxLength(1000)
-                        .HasColumnType("VARCHAR(1000)");
-
                     b.Property<bool>("IsActiveSprint")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsBacklog")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsCompleted")
-                        .HasColumnType("bit");
-
                     b.Property<int>("ReleaseId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SprintActual")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("SprintEndDate")
@@ -347,9 +339,6 @@ namespace ScrumAble.Migrations
                     b.Property<string>("SprintName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("SprintPlanned")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("SprintStartDate")
                         .HasColumnType("datetime2");

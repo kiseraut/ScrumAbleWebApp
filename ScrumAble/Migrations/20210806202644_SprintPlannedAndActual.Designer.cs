@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ScrumAble.Data;
 
 namespace ScrumAble.Migrations
 {
     [DbContext(typeof(ScrumAbleContext))]
-    partial class ScrumAbleContextModelSnapshot : ModelSnapshot
+    [Migration("20210806202644_SprintPlannedAndActual")]
+    partial class SprintPlannedAndActual
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

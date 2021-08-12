@@ -1,0 +1,16 @@
+﻿@using System.Diagnostics.CodeAnalysis
+@using ScrumAble.Areas.Identity.Data
+@attribute [ExcludeFromCodeCoverage]
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "User Not Initialized";
+
+}
+
+<h3>
+    Dashboard cannot be viewed. <br /><br />Please create and / or select a
+    @Html.ActionLink("Team", "AddTeam", "Team"),
+    @Html.ActionLink("Release", "AddRelease", "Release"), and
+    @Html.ActionLink("Sprint", "AddSprint", "Sprint") in order to view the dashboard.
+</h3>

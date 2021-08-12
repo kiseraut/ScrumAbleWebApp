@@ -85,15 +85,16 @@ namespace ScrumAble.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult CreateStory(ScrumAbleStory scrumAbleStory)
         {
+            var user = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            ViewBag.User = user;
             if (!ModelState.IsValid) { return View("AddStory", scrumAbleStory); }
 
-            var user = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            
             scrumAbleStory.Sprint = _scrumAbleRepo.GetSprintById(scrumAbleStory.StorySprintId);
             scrumAbleStory.StoryOwner = _scrumAbleRepo.GetUserByUsername(scrumAbleStory.StoryOwnerEmail);
-            scrumAbleStory.WorkflowStage = _scrumAbleRepo.GetTeamById(user.CurrentWorkingTeam.Id).WorkFlowStages
-                .SingleOrDefault(w => w.WorkflowStagePosition == 0);
+            scrumAbleStory.WorkflowStage = _scrumAbleRepo.GetTeamById(user.CurrentWorkingTeam.Id).WorkFlowStages.Where(w => w.WorkflowStagePosition == 0).SingleOrDefault();
 
-            _scrumAbleRepo.SaveToDb(scrumAbleStory);
+            _scrumAbleRepo.SaveToDb(scrumAbleStory, user);
 
             return RedirectToAction("Details", "Story", new { id = scrumAbleStory.Id });
         }
@@ -102,12 +103,17 @@ namespace ScrumAble.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult UpdateStory(ScrumAbleStory scrumAbleStory)
         {
-            if (!ModelState.IsValid) { return View("EditStory", scrumAbleStory); }
-
+            var user = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            ViewBag.User = user;
+            ViewBag.data = _scrumAbleRepo.GetAllUserTeams(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            ViewBag.Sprints = _scrumAbleRepo.GetAllSprintsInRelease(user.CurrentWorkingRelease.Id);
             scrumAbleStory.Sprint = _scrumAbleRepo.GetSprintById(scrumAbleStory.StorySprintId);
             scrumAbleStory.StoryOwner = _scrumAbleRepo.GetUserByUsername(scrumAbleStory.StoryOwnerEmail);
+            scrumAbleStory.StorySprintId = scrumAbleStory.Sprint.Id;
 
-            _scrumAbleRepo.SaveToDb(scrumAbleStory);
+            if (!ModelState.IsValid) { return View("EditStory", scrumAbleStory); }
+
+            _scrumAbleRepo.SaveToDb(scrumAbleStory, user);
 
             return RedirectToAction("Details", "Story", new { id = scrumAbleStory.Id });
         }

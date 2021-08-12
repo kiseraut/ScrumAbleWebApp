@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ScrumAble.Data;
 
 namespace ScrumAble.Migrations
 {
     [DbContext(typeof(ScrumAbleContext))]
-    partial class ScrumAbleContextModelSnapshot : ModelSnapshot
+    [Migration("20210806165430_SprintIsCompletedAndGraphData")]
+    partial class SprintIsCompletedAndGraphData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -338,18 +340,12 @@ namespace ScrumAble.Migrations
                     b.Property<int>("ReleaseId")
                         .HasColumnType("int");
 
-                    b.Property<int>("SprintActual")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("SprintEndDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("SprintName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("SprintPlanned")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("SprintStartDate")
                         .HasColumnType("datetime2");

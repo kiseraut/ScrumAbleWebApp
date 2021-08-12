@@ -32,8 +32,9 @@ namespace ScrumAble.Models
         [DataType(DataType.Date)]
         public DateTime? StoryCloseDate { get; set; }
 
-        //The number of points assgned to this story
+        //The number of points assigned to this story
         [Required(AllowEmptyStrings = false), Display(Name = "Sprint Points For This Story")]
+        [RegularExpression(@"^[0-9]+$",ErrorMessage = "Story points must be a positive whole number.")]
         public int StoryPoints { get; set; }
 
         //The description of the story

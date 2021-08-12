@@ -93,7 +93,7 @@ namespace ScrumAble.Controllers
             scrumAbleDefect.WorkflowStage = _scrumAbleRepo.GetTeamById(user.CurrentWorkingTeam.Id).WorkFlowStages
                 .SingleOrDefault(w => w.WorkflowStagePosition == 0);
 
-            _scrumAbleRepo.SaveToDb(scrumAbleDefect);
+            _scrumAbleRepo.SaveToDb(scrumAbleDefect, user);
 
             return RedirectToAction("Details", "Defect", new { id = scrumAbleDefect.Id });
         }
@@ -102,13 +102,24 @@ namespace ScrumAble.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult UpdateDefect(ScrumAbleDefect scrumAbleDefect)
         {
-            if (!ModelState.IsValid) { return View("EditDefect", scrumAbleDefect); }
-
+            var user = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            ViewBag.User = user;
+            ViewBag.data = _scrumAbleRepo.GetAllUserTeams(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            ViewBag.Sprints = _scrumAbleRepo.GetAllSprintsInRelease(user.CurrentWorkingRelease.Id);
             scrumAbleDefect.Sprint = _scrumAbleRepo.GetSprintById(scrumAbleDefect.DefectSprintId);
             scrumAbleDefect.Release = _scrumAbleRepo.GetReleaseById(scrumAbleDefect.DefectReleaseId);
             scrumAbleDefect.DefectOwner = _scrumAbleRepo.GetUserByUsername(scrumAbleDefect.DefectOwnerEmail);
 
-            _scrumAbleRepo.SaveToDb(scrumAbleDefect);
+            scrumAbleDefect.DefectOwnerEmail = (scrumAbleDefect.DefectOwner == null) ? "-1" : scrumAbleDefect.DefectOwner.Email;
+            scrumAbleDefect.DefectSprintId = scrumAbleDefect.Sprint.Id;
+            scrumAbleDefect.DefectReleaseId = scrumAbleDefect.Release.Id;
+
+
+            if (!ModelState.IsValid) { return View("EditDefect", scrumAbleDefect); }
+
+            
+
+            _scrumAbleRepo.SaveToDb(scrumAbleDefect, user);
 
             return RedirectToAction("Details", "Defect", new { id = scrumAbleDefect.Id });
         }

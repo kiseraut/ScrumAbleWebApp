@@ -6,6 +6,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Areas\Identity\Pages\Account\Manage\_Layout.cshtml.old" />
+    <None Remove="Views\Home\_Layout.cshtml.old" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Views\Home\_Layout.cshtml.old" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="bootstrap" Version="5.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.6" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.6" />

@@ -29,11 +29,11 @@
 <br/>
 
 <b>Release Start Date:</b>
-@Html.DisplayFor(d => Model.ReleaseStartDate)
+@Model.ReleaseStartDate.ToString("d")
 <br />
 
 <b>Release End Date:</b>
-@Html.DisplayFor(d => Model.ReleaseEndDate)
+@Model.ReleaseEndDate.Date.ToString("d")
 <br />
 <br />
 

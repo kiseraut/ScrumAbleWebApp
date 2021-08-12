@@ -34,6 +34,7 @@ namespace ScrumAble.Models
 
         //The number of points assgned to this task
         [Required(AllowEmptyStrings = false), Display(Name = "Sprint Points For This Task")]
+        [RegularExpression(@"^[0-9]+$", ErrorMessage = "Task points must be a positive whole number.")]
         public int? TaskPoints { get; set; }
 
         //The description of the task

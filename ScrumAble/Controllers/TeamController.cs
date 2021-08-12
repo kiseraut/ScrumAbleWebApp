@@ -107,7 +107,8 @@ namespace ScrumAble.Controllers
         [HttpPost]
         public IActionResult CreateTeam(ScrumAbleTeam team)
         {
-            ViewBag.User = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var user = _scrumAbleRepo.GetUserById(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            ViewBag.User = user;
             var badUsers = new List<string>();
             var goodUsers = new List<IScrumAbleUser>();
             team.TeammatesText += "\r\n" + User.FindFirstValue(ClaimTypes.Email);
@@ -119,12 +120,12 @@ namespace ScrumAble.Controllers
                     StringSplitOptions.RemoveEmptyEntries);
                 var addedUsers = addedUsersWithDups.Distinct();
 
-                foreach (var user in addedUsers)
+                foreach (var teammate in addedUsers)
                 {
-                    var foundUser = _scrumAbleRepo.GetUserByUsername(user);
+                    var foundUser = _scrumAbleRepo.GetUserByUsername(teammate);
                     if (foundUser == null)
                     {
-                        badUsers.Add(user);
+                        badUsers.Add(teammate);
                         ModelState.AddModelError("Teammates", "Teammates are invalid");
                     }
                     else
@@ -141,6 +142,32 @@ namespace ScrumAble.Controllers
             }
 
             _scrumAbleRepo.SaveToDb(team, goodUsers);
+
+            var openWFStage = new ScrumAbleWorkflowStage
+            {
+                WorkflowStageName = "Planned",
+                Team = team,
+                WorkflowStagePosition = 0
+            };
+
+            var inProgressWFStage = new ScrumAbleWorkflowStage
+            {
+                WorkflowStageName = "In Progress",
+                Team = team,
+                WorkflowStagePosition = 1
+            };
+
+            var ClosedWFStage = new ScrumAbleWorkflowStage
+            {
+                WorkflowStageName = "Closed",
+                Team = team,
+                WorkflowStagePosition = 2
+            };
+
+            _scrumAbleRepo.SaveToDb(openWFStage, user);
+            _scrumAbleRepo.SaveToDb(inProgressWFStage, user);
+            _scrumAbleRepo.SaveToDb(ClosedWFStage, user);
+
             return RedirectToAction("Details", "Team", new { id = team.Id });
         }
 

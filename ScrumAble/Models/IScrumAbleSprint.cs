@@ -16,5 +16,10 @@ namespace ScrumAble.Models
         public ICollection<ScrumAbleDefect> Defects { get; set; }
         public List<ScrumAbleWorkflowStage> WorkflowStages { get; set; }
         bool IsBacklog { get; set; }
+        bool IsActiveSprint { get; set; }
+        bool IsCompleted { get; set; }
+        int SprintPlanned { get; set; }
+        int SprintActual { get; set; }
+        string GraphData { get; set; }
     }
 }

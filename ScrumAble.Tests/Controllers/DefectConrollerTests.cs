@@ -207,10 +207,18 @@ namespace ScrumAble.Tests.Controllers
             user.CurrentWorkingRelease = release;
             user.CurrentWorkingTeam = team;
             user.CurrentWorkingSprint = sprint;
+            defect.Sprint = sprint;
+            defect.Release = release;
+            
+
             context.Add(user);
             context.Add(release);
             context.Add(team);
             context.Add(sprint);
+            context.SaveChanges();
+
+            defect.DefectSprintId = sprint.Id;
+            defect.DefectReleaseId = release.Id;
             context.Add(defect);
             context.SaveChanges();
 

@@ -1,0 +1,15 @@
+﻿@using System.Diagnostics.CodeAnalysis
+@using ScrumAble.Areas.Identity.Data
+@attribute [ExcludeFromCodeCoverage]
+@model ScrumAble.Models.ScrumAbleSprint
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Backlog";
+}
+
+<h3>
+    A Dashboard is not available for a Sprint Backlog. <br /> <br />
+    Please visit the @Html.ActionLink("Sprint Backlog", "Details", "Sprint", new { Id = Model.Id }) page to view work items in the backlog.
+    
+</h3>

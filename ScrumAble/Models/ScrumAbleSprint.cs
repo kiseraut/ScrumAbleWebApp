@@ -39,6 +39,16 @@ namespace ScrumAble.Models
 
         public bool IsBacklog { get; set; }
 
+        public bool IsActiveSprint { get; set; }
+
+        public bool IsCompleted { get; set; }
+        public int SprintPlanned { get; set; }
+        public int SprintActual { get; set; }
+
+        [Column(TypeName = "VARCHAR")]
+        [StringLength(1000)]
+        public string GraphData { get; set; }
+
         [Display(Name = "Release")]
         [NotMapped]
         public int SprintReleaseId { get; set; }

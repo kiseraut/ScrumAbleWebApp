@@ -87,9 +87,23 @@ namespace ScrumAble.Tests.Models
             var context = new ScrumAbleContext(options);
             var scrumAbleRepo = new ScrumAbleRepo(context);
             var testTask = MockScrumAbleTask.GenerateTask();
+            var testUser = MockScrumAbleUser.GenerateScrumAbleUser();
+            var testSprint = MockScrumAbleSprint.GenerateSprint();
+            var testRelease = MockScrumAbleRelease.GenerateRelease();
+
+            testSprint.IsActiveSprint = true;
+            testSprint.Release = testRelease;
+            testTask.TaskPoints = 5;
+            testTask.Sprint = testSprint;
+
+
+            context.Add(testSprint);
+            context.Add(testRelease);
+            context.Add(testUser);
+            context.SaveChanges();
 
             // Act
-            scrumAbleRepo.SaveToDb(testTask);
+            scrumAbleRepo.SaveToDb(testTask, testUser);
             MockScrumAbleTask taskDbItems = (MockScrumAbleTask) await context.Tasks.SingleAsync();
 
             // Assert
@@ -110,13 +124,16 @@ namespace ScrumAble.Tests.Models
             var context = new ScrumAbleContext(options);
             var scrumAbleRepo = new ScrumAbleRepo(context);
             var testTask = MockScrumAbleTask.GenerateTask();
+            var testUser = MockScrumAbleUser.GenerateScrumAbleUser();
+
+            context.Add(testUser);
             context.Add(testTask);
             context.SaveChanges();
 
             testTask.TaskName = "Updated Name";
 
             // Act
-            scrumAbleRepo.SaveToDb(testTask);
+            scrumAbleRepo.SaveToDb(testTask, testUser);
             MockScrumAbleTask taskDbItems = (MockScrumAbleTask)await context.Tasks.SingleAsync();
 
             // Assert
@@ -1004,6 +1021,13 @@ namespace ScrumAble.Tests.Models
             testWorkflowStage2.Team = testTeam;
             testStory.WorkflowStage = testWorkflowStage1;
             testStory.Sprint = testSprint;
+            testSprint.IsActiveSprint = true;
+            testStory.StoryCloseDate = DateTime.Today;
+            testStory.StoryPoints = 5;
+            testUser.CurrentWorkingSprint = testSprint;
+
+            var graphData = string.Format("{0},26,26#{1},25.1,26#{2},24.1,23", DateTime.Today.AddDays(-2).ToString("d"), DateTime.Today.AddDays(-1).ToString("d"), DateTime.Today.ToString("d"));
+            testSprint.GraphData = graphData;
 
             context.Add(testWorkflowStage1);
             context.Add(testWorkflowStage2);
@@ -1136,6 +1160,194 @@ namespace ScrumAble.Tests.Models
             Assert.Equal(testUser2, resultSprint.WorkflowStages[0].Stories.First().StoryOwner);
             Assert.Equal(testUser1, resultSprint.WorkflowStages[0].Defects.First().DefectOwner);
             Assert.Equal(testUser1, resultSprint.WorkflowStages[1].Tasks.First().TaskOwner);
+
+            context.Database.EnsureDeleted();
+        }
+
+        [Fact]
+        public void UT85_ScrumAbleRepo_PrepareUserForDashboard_ShouldSetWorkingSprintReleaseAndTeam()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<ScrumAbleContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT85")
+                .Options;
+
+            var context = new ScrumAbleContext(options);
+            var scrumAbleRepo = new ScrumAbleRepo(context);
+            var testUser1 = MockScrumAbleUser.GenerateScrumAbleUser();
+            var testUser2 = MockScrumAbleUser.GenerateScrumAbleUser();
+            var testUser3 = MockScrumAbleUser.GenerateScrumAbleUser();
+            var testUser4 = MockScrumAbleUser.GenerateScrumAbleUser();
+            var testTeam = MockScrumAbleTeam.GenerateTeam();
+            var testUserTeamMapping1 = MockScrumAbleUserTeamMapping.GenerateScrumAbleUserTeamMapping(testUser1, testTeam);
+            var testUserTeamMapping2 = MockScrumAbleUserTeamMapping.GenerateScrumAbleUserTeamMapping(testUser2, testTeam);
+            var testUserTeamMapping3 = MockScrumAbleUserTeamMapping.GenerateScrumAbleUserTeamMapping(testUser3, testTeam);
+            var testUserTeamMapping4 = MockScrumAbleUserTeamMapping.GenerateScrumAbleUserTeamMapping(testUser4, testTeam);
+            var testRelease = MockScrumAbleRelease.GenerateRelease(testTeam);
+            var testSprint = MockScrumAbleSprint.GenerateSprint(testRelease);
+
+            testSprint.SprintEndDate = DateTime.Today;
+
+            testUser1.CurrentWorkingSprint = testSprint;
+            testUser1.CurrentWorkingRelease = testRelease;
+            testUser1.CurrentWorkingTeam = testTeam;
+
+            testUser3.CurrentWorkingTeam = testTeam;
+
+            testUser4.CurrentWorkingTeam = testTeam;
+            testUser4.CurrentWorkingRelease = testRelease;
+
+            context.Add(testUser1);
+            context.Add(testUser2);
+            context.Add(testUserTeamMapping1);
+            context.Add(testUserTeamMapping2);
+            context.Add(testUserTeamMapping3);
+            context.Add(testUserTeamMapping4);
+            context.Add(testRelease);
+            context.Add(testSprint);
+            context.SaveChanges();
+
+            // Act
+            var resultUser1 = scrumAbleRepo.PrepareUserForDashboard(testUser1);
+            var resultUser2 = scrumAbleRepo.PrepareUserForDashboard(testUser2);
+            var resultUser3 = scrumAbleRepo.PrepareUserForDashboard(testUser3);
+            var resultUser4 = scrumAbleRepo.PrepareUserForDashboard(testUser4);
+
+            // Assert
+            Assert.Equal(testTeam, testUser1.CurrentWorkingTeam);
+            Assert.Equal(testRelease, testUser1.CurrentWorkingRelease);
+            Assert.Equal(testSprint, testUser1.CurrentWorkingSprint);
+            
+            Assert.Equal(testTeam, testUser2.CurrentWorkingTeam);
+            Assert.Equal(testRelease, testUser2.CurrentWorkingRelease);
+            Assert.Equal(testSprint, testUser2.CurrentWorkingSprint);
+            
+            Assert.Equal(testTeam, testUser3.CurrentWorkingTeam);
+            Assert.Equal(testRelease, testUser3.CurrentWorkingRelease);
+            Assert.Equal(testSprint, testUser3.CurrentWorkingSprint);
+            
+            Assert.Equal(testTeam, testUser4.CurrentWorkingTeam);
+            Assert.Equal(testRelease, testUser4.CurrentWorkingRelease);
+            Assert.Equal(testSprint, testUser4.CurrentWorkingSprint);
+
+            context.Database.EnsureDeleted();
+        }
+
+        [Fact]
+        public void UT86_ScrumAbleRepo_UpdateGraphDataActualPoints_ShouldUpdateTheGraphData()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<ScrumAbleContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT86")
+                .Options;
+
+            var context = new ScrumAbleContext(options);
+            var scrumAbleRepo = new ScrumAbleRepo(context);
+            var testUser1 = MockScrumAbleUser.GenerateScrumAbleUser();
+            var testUser2 = MockScrumAbleUser.GenerateScrumAbleUser();
+            var testTeam = MockScrumAbleTeam.GenerateTeam();
+            var testUserTeamMapping1 = MockScrumAbleUserTeamMapping.GenerateScrumAbleUserTeamMapping(testUser1, testTeam);
+            var testUserTeamMapping2 = MockScrumAbleUserTeamMapping.GenerateScrumAbleUserTeamMapping(testUser2, testTeam);
+            var testRelease = MockScrumAbleRelease.GenerateRelease(testTeam);
+            var testSprint1 = MockScrumAbleSprint.GenerateSprint(testRelease);
+            var testSprint2 = MockScrumAbleSprint.GenerateSprint(testRelease);
+
+            testSprint1.GraphData = "6/21/2021,26,26#6/22/2021,25.1,26#6/23/2021,24.1,23";
+            testSprint1.SprintEndDate = DateTime.Today;
+
+
+            var graphData = string.Format("{0},26,26#{1},25.1,26#{2},24.1,23", DateTime.Today.AddDays(-2).ToString("d"), DateTime.Today.AddDays(-1).ToString("d"), DateTime.Today.ToString("d"));
+            var graphDataUpdated = string.Format("{0},26,26#{1},25.1,26#{2},24.1,21", DateTime.Today.AddDays(-2).ToString("d"), DateTime.Today.AddDays(-1).ToString("d"), DateTime.Today.ToString("d"));
+            testSprint2.GraphData = graphData;
+            testSprint2.SprintEndDate = DateTime.Today;
+
+            testUser1.CurrentWorkingSprint = testSprint1;
+            testUser1.CurrentWorkingRelease = testRelease;
+            testUser1.CurrentWorkingTeam = testTeam;
+            
+            testUser2.CurrentWorkingSprint = testSprint2;
+            testUser2.CurrentWorkingRelease = testRelease;
+            testUser2.CurrentWorkingTeam = testTeam;
+
+            context.Add(testUser1);
+            context.Add(testUser2);
+            context.Add(testUserTeamMapping1);
+            context.Add(testUserTeamMapping2);
+            context.Add(testRelease);
+            context.Add(testSprint1);
+            context.Add(testSprint2);
+            context.SaveChanges();
+
+            // Act
+            scrumAbleRepo.UpdateGraphDataActualPoints(2,DateTime.Parse("06/22/2021"),testUser1);
+            scrumAbleRepo.UpdateGraphDataActualPoints(-2,DateTime.Today,testUser2);
+
+            // Assert
+            Assert.Equal("6/21/2021,26,26#6/22/2021,25.1,28#6/23/2021,24.1,25", testSprint1.GraphData);
+            Assert.Equal(graphDataUpdated, testSprint2.GraphData);
+
+            context.Database.EnsureDeleted();
+        }
+
+        [Fact]
+        public void UT87_ScrumAbleRepo_GetVelocityData_ShouldReturnCorrectSprintData()
+        {
+            // Arrange
+            var options = new DbContextOptionsBuilder<ScrumAbleContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UT87")
+                .Options;
+
+            var context = new ScrumAbleContext(options);
+            var scrumAbleRepo = new ScrumAbleRepo(context);
+            var testUser1 = MockScrumAbleUser.GenerateScrumAbleUser();
+            var testTeam = MockScrumAbleTeam.GenerateTeam();
+            var testUserTeamMapping1 = MockScrumAbleUserTeamMapping.GenerateScrumAbleUserTeamMapping(testUser1, testTeam);
+            var testRelease = MockScrumAbleRelease.GenerateRelease(testTeam);
+            var testSprint1 = MockScrumAbleSprint.GenerateSprint(testRelease);
+            var testSprint2 = MockScrumAbleSprint.GenerateSprint(testRelease);
+            var testSprint3 = MockScrumAbleSprint.GenerateSprint(testRelease);
+            
+            var today = DateTime.Today;
+            var twoWeeksAgo = DateTime.Today.AddDays(-14);
+
+            
+            testSprint1.SprintPlanned = 25;
+            testSprint1.SprintActual = 20;
+            testSprint1.IsActiveSprint = true;
+
+            testSprint2.SprintPlanned = 35;
+            testSprint2.SprintActual = 30;
+            testSprint2.IsCompleted = true;
+
+            testSprint3.SprintPlanned = 45;
+            testSprint3.SprintActual = 40;
+            testSprint3.IsCompleted = false;
+
+            testUser1.CurrentWorkingSprint = testSprint1;
+            testUser1.CurrentWorkingRelease = testRelease;
+            testUser1.CurrentWorkingTeam = testTeam;
+
+            context.Add(testUser1);
+            context.Add(testUserTeamMapping1);
+            context.Add(testRelease);
+            context.Add(testSprint1);
+            context.Add(testSprint2);
+            context.Add(testSprint3);
+            context.SaveChanges();
+
+            // Act
+            var result = scrumAbleRepo.GetVelocityData(testUser1);
+
+            // Assert
+            Assert.Equal(testSprint1.SprintName, result[0]["sprintName"]);
+            Assert.Equal(testSprint1.SprintPlanned.ToString(), result[0]["planned"]);
+            Assert.Equal(testSprint1.SprintActual.ToString(), result[0]["actual"]);
+            
+            Assert.Equal(testSprint2.SprintName, result[1]["sprintName"]);
+            Assert.Equal(testSprint2.SprintPlanned.ToString(), result[1]["planned"]);
+            Assert.Equal(testSprint2.SprintActual.ToString(), result[1]["actual"]);
+
+            Assert.Equal(2, result.Count);
 
             context.Database.EnsureDeleted();
         }

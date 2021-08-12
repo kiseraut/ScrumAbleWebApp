@@ -199,11 +199,15 @@ namespace ScrumAble.Tests.Controllers
             story.Sprint = sprint;
             user.CurrentWorkingRelease = release;
             user.CurrentWorkingTeam = team;
-            context.Add(story);
+            
             context.Add(sprint);
             context.Add(user);
             context.Add(release);
             context.Add(team);
+            context.SaveChanges();
+
+            story.StorySprintId = sprint.Id;
+            context.Add(story);
             context.SaveChanges();
 
             story.StoryName = "Updated Test Story";

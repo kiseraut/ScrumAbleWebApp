@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -33,7 +34,7 @@ namespace ScrumAble.Tests.Controllers
             return task;
         }
 
-        public void SaveToDb(ScrumAbleTask task)
+        public void SaveToDb(ScrumAbleTask task, ScrumAbleUser user)
         {
             if (task.Id == 0)
             {
@@ -138,6 +139,11 @@ namespace ScrumAble.Tests.Controllers
             //do nothing in mock
         }
 
+        public bool PrepareUserForDashboard(ScrumAbleUser user)
+        {
+            return true;
+        }
+
         public ScrumAbleSprint GetSprintById(int id)
         {
             return _context.Sprints.Where(s => s.Id == id)
@@ -196,6 +202,59 @@ namespace ScrumAble.Tests.Controllers
                 .ToList();
         }
 
+        public ScrumAbleSprint GetActiveSprint(ScrumAbleRelease release)
+        {
+            var sprints = GetAllSprintsInRelease(release.Id);
+            ScrumAbleSprint activeSprint = null;
+
+            //find the active sprint
+            foreach (var sprint in sprints)
+            {
+                if (sprint.IsActiveSprint)
+                {
+                    return sprint;
+                }
+            }
+
+            //if no active sprint was found, return null
+            return null;
+        }
+
+        public int GetActiveSprintPoints(IScrumAbleSprint sprint)
+        {
+            var stories = _context.Stories.Where(s => s.Sprint.Id == sprint.Id).ToList();
+            var tasks = _context.Tasks.Where(t => t.Sprint.Id == sprint.Id).ToList();
+            var defects = _context.Defects.Where(d => d.Sprint.Id == sprint.Id).ToList();
+            var points = 0;
+
+            foreach (var story in stories)
+            {
+                points += story.StoryPoints;
+            }
+
+            foreach (var task in tasks)
+            {
+                points += task.TaskPoints ?? default(int);
+            }
+
+            foreach (var defect in defects)
+            {
+                points += defect.DefectPoints;
+            }
+
+            return points;
+        }
+
+        public void UpdateGraphDataActualPoints(int newActualPoints, DateTime closeDate, ScrumAbleUser user)
+        {
+            //nothing to do
+        }
+
+        public void UpdateGraphDataForViewing(ScrumAbleUser user)
+        {
+            //nothing to do
+        }
+
         public ScrumAbleStory GetStoryById(int id)
         {
             return _context.Stories.Where(s => s.Id == id)
@@ -207,7 +266,7 @@ namespace ScrumAble.Tests.Controllers
             return true;
         }
 
-        public void SaveToDb(ScrumAbleStory story)
+        public void SaveToDb(ScrumAbleStory story, ScrumAbleUser user)
         {
             if (story.Id == 0)
             {
@@ -457,7 +516,7 @@ namespace ScrumAble.Tests.Controllers
             return IsAuthorized(defect.Sprint, userId);
         }
 
-        public void SaveToDb(ScrumAbleDefect defect)
+        public void SaveToDb(ScrumAbleDefect defect, ScrumAbleUser user)
         {
             if (defect.Id == 0)
             {
@@ -482,6 +541,51 @@ namespace ScrumAble.Tests.Controllers
         public void MoveDefect(int defectId, int workflowStageId, ScrumAbleUser user)
         {
             //move defect
+        }
+
+        public List<Hashtable> GetBurndownData(ScrumAbleUser user)
+        {
+            //var activeSprint = GetActiveSprint(user.CurrentWorkingRelease);
+            var activeSprint = user.CurrentWorkingSprint;
+
+            //if no active sprint was found, return null
+            if (activeSprint == null || activeSprint.GraphData == null)
+            {
+                return null;
+            }
+
+            List<Hashtable> graphData = new List<Hashtable>();
+            Hashtable tempHashtable = new Hashtable();
+
+            var graphDataString = activeSprint.GraphData;
+            var dataPoints = graphDataString.Split('#');
+
+            foreach (var datapoint in dataPoints)
+            {
+                tempHashtable = new Hashtable();
+                var dataColumns = datapoint.Split(",");
+                tempHashtable.Add("date", dataColumns[0]);
+                tempHashtable.Add("planned", dataColumns[1]);
+                tempHashtable.Add("actual", dataColumns[2]);
+                graphData.Add(tempHashtable);
+            }
+
+            return graphData;
+        }
+
+        public List<Hashtable> GetVelocityData(ScrumAbleUser user)
+        {
+            return null;
+        }
+
+        public List<Hashtable> GetBurndownData(ScrumAbleTeam team, ScrumAbleUser user)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<Hashtable> GetVelocityData(ScrumAbleTeam team, ScrumAbleUser user)
+        {
+            throw new NotImplementedException();
         }
     }
 }

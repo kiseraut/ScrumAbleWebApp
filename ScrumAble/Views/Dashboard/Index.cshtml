@@ -13,15 +13,50 @@
 
 <h2>Dashboard for @Model.SprintName</h2>
 
+@{
+
+    if (Model.IsCompleted)
+    {
+        <text>This sprint ended on @Model.SprintEndDate.ToString("d")</text>
+    }
+
+    if (ViewBag.ActiveSprint == null && !Model.IsCompleted)
+    {
+        <br />
+        <button class="btn btn-primary" onclick="pickSrintEndDate()">Start Sprint</button>
+    }
+    else if (Model.IsActiveSprint)
+    {
+        <text>@Model.SprintStartDate.ToString("d") - @Model.SprintEndDate.ToString("d")</text><br /><br />
+        <button class="btn btn-primary" onclick="ToggleSprint()">End Sprint</button>
+    }
+    else if (ViewBag.ActiveSprint != null)
+    {
+        <br />
+        <button class="btn btn-primary" onclick="goToActiveSprint()">Go To Active Sprint</button>
+    }
+}
+
+
+<br />
+<br />
+
 <div style="display: flex;">
 
     @{
         var workflowStages = Model.WorkflowStages.OrderBy(w => w.WorkflowStagePosition);
-        
+        var lastWorkflowStage = workflowStages.Last();
+        var onDrop = "drop(event)";
+
         foreach (var workflowStage in workflowStages)
         {
-        <div id="swimlane_@workflowStage.Id" ondragover="allowDrop(event)" ondrop="drop(event)" style=" width: 300px; margin-right: 5px; min-width: 300px; background-color: rgba(52, 58, 64, .1)">
-            <div  style="text-align: center; width: 250px; height: 35px; background-color: #343a40; color: white; margin-block: 10px; margin-left: 20px;">
+        @if (!Model.IsActiveSprint && workflowStage == lastWorkflowStage)
+            {
+                onDrop = "noDrop()";
+            }
+
+        <div id="swimlane_@workflowStage.Id" ondragover="allowDrop(event)" ondrop="@onDrop" style=" width: 300px; margin-right: 5px; min-width: 300px; background-color: rgba(52, 58, 64, .1)">
+            <div style="text-align: center; width: 250px; height: 35px; background-color: #343a40; color: white; margin-block: 10px; margin-left: 20px;">
                 <h4>@workflowStage.WorkflowStageName</h4>
             </div>
 
@@ -29,35 +64,35 @@
             {
                 if (story.Sprint.Id == ViewBag.User.CurrentWorkingSprint.Id)
                 {
-                    <div class="grabable" ondrop="preventDrop(event)" draggable="true" ondragstart="drag(event)" id="story_Card_@story.Id" style="border: solid; width: 250px; height: 175px; margin-left: 20px; margin-bottom: 10px; background-color: white; overflow: hidden;">
-                        <div id="workItemCardHeader" style="width: 100%; height: 45px; background-color: thistle; overflow: hidden; font-size: 14px; padding-left: 5px;">
-                            @story.StoryName
+            <div class="grabable" ondrop="preventDrop(event)" draggable="true" ondragstart="drag(event)" id="story_Card_@story.Id" style="border: solid; width: 250px; height: 175px; margin-left: 20px; margin-bottom: 10px; background-color: white; overflow: hidden;">
+                <div id="workItemCardHeader" style="width: 100%; height: 45px; background-color: thistle; overflow: hidden; font-size: 14px; padding-left: 5px;">
+                    @story.StoryName
+                </div>
+
+                <div style="width: 100%; height: 130px; font-size: 12px; padding-left: 5px;">
+
+                    <div style="width: 100%; height: 55px;">
+                        <b>Assigned to: </b> <br />
+                        @if (story.StoryOwner != null)
+                                {@story.StoryOwner.Email} <br />
+                    </div>
+
+                    <div style="width: 100%; height: 40px; display: flex;">
+
+                        <div style="width: 50%; height: 40px;">
+                            <b>Points:</b> @story.StoryPoints
                         </div>
 
-                        <div style="width: 100%; height: 130px; font-size: 12px; padding-left: 5px;">
-
-                            <div style="width: 100%; height: 55px;">
-                                <b>Assigned to: </b> <br />
-                                @if (story.StoryOwner != null)
-                                {@story.StoryOwner.Email} <br />
-                            </div>
-
-                            <div style="width: 100%; height: 40px; display: flex;">
-
-                                <div style="width: 50%; height: 40px;">
-                                    <b>Points:</b> @story.StoryPoints
-                                </div>
-
-                                <div style="width: 50%; height: 40px;">
-                                    <b>Due:</b> @Html.DisplayFor(d => story.StoryDueDate)
-                                </div>
-
-                            </div>
-
-                            @Html.ActionLink("details", "Details", "Story", new { Id = story.Id }) /  @Html.ActionLink("edit", "EditStory", "Story", new { Id = story.Id })
+                        <div style="width: 50%; height: 40px;">
+                            <b>Due:</b> @Html.DisplayFor(d => story.StoryDueDate)
                         </div>
 
                     </div>
+
+                    @Html.ActionLink("details", "Details", "Story", new { Id = story.Id }) /  @Html.ActionLink("edit", "EditStory", "Story", new { Id = story.Id })
+                </div>
+
+            </div>
                 }
             }
 
@@ -65,74 +100,74 @@
             {
                 if (task.Sprint.Id == ViewBag.User.CurrentWorkingSprint.Id)
                 {
-                    <div class="grabable" ondrop="preventDrop(event)" draggable="true" ondragstart="drag(event)" id="task_Card_@task.Id" style="border: solid; width: 250px; height: 175px; margin-left: 20px; margin-bottom: 10px; background-color: white; overflow: hidden;">
-                        <div id="workItemCardHeader" style="width: 100%; height: 45px; background-color: lightsteelblue; overflow: hidden; font-size: 14px; padding-left: 5px;">
-                            @task.TaskName
-                        </div>
-                        
-                        <div style="width: 100%; height: 130px; font-size: 12px; padding-left: 5px;">
+            <div class="grabable" ondrop="preventDrop(event)" draggable="true" ondragstart="drag(event)" id="task_Card_@task.Id" style="border: solid; width: 250px; height: 175px; margin-left: 20px; margin-bottom: 10px; background-color: white; overflow: hidden;">
+                <div id="workItemCardHeader" style="width: 100%; height: 45px; background-color: lightsteelblue; overflow: hidden; font-size: 14px; padding-left: 5px;">
+                    @task.TaskName
+                </div>
 
-                            <div style="width: 100%; height: 55px;">
-                                <b>Assigned to: </b> <br />
-                                @if (task.TaskOwner != null)
+                <div style="width: 100%; height: 130px; font-size: 12px; padding-left: 5px;">
+
+                    <div style="width: 100%; height: 55px;">
+                        <b>Assigned to: </b> <br />
+                        @if (task.TaskOwner != null)
                                 {@task.TaskOwner.Email} <br />
-                            </div>
+                    </div>
 
-                            <div style="width: 100%; height: 40px; display: flex;">
+                    <div style="width: 100%; height: 40px; display: flex;">
 
-                                <div style="width: 50%; height: 40px;">
-                                    <b>Points:</b> @task.TaskPoints
-                                </div>
+                        <div style="width: 50%; height: 40px;">
+                            <b>Points:</b> @task.TaskPoints
+                        </div>
 
-                                <div style="width: 50%; height: 40px;">
-                                    <b>Due:</b> @Html.DisplayFor(d => task.TaskDueDate)
-                                </div>
-
-                            </div>
-
-                            @Html.ActionLink("details", "Details", "Task", new { Id = task.Id }) /  @Html.ActionLink("edit", "EditTask", "Task", new { Id = task.Id })
+                        <div style="width: 50%; height: 40px;">
+                            <b>Due:</b> @Html.DisplayFor(d => task.TaskDueDate)
                         </div>
 
                     </div>
+
+                    @Html.ActionLink("details", "Details", "Task", new { Id = task.Id }) /  @Html.ActionLink("edit", "EditTask", "Task", new { Id = task.Id })
+                </div>
+
+            </div>
                 }
             }
-            
+
             @foreach (var defect in workflowStage.Defects)
             {
                 if (defect.Sprint.Id == ViewBag.User.CurrentWorkingSprint.Id)
                 {
-                    <div class="grabable" ondrop="preventDrop(event)" draggable="true" ondragstart="drag(event)" id="defect_Card_@defect.Id" style="border: solid; width: 250px; height: 175px; margin-left: 20px; margin-bottom: 10px; background-color: white; overflow: hidden;">
-                        <div id="workItemCardHeader" style="width: 100%; height: 45px; background-color: tomato; overflow: hidden; font-size: 14px; padding-left: 5px;">
-                            @defect.DefectName
-                        </div>
-                        
-                        <div style="width: 100%; height: 130px; font-size: 12px; padding-left: 5px;">
+            <div class="grabable" ondrop="preventDrop(event)" draggable="true" ondragstart="drag(event)" id="defect_Card_@defect.Id" style="border: solid; width: 250px; height: 175px; margin-left: 20px; margin-bottom: 10px; background-color: white; overflow: hidden;">
+                <div id="workItemCardHeader" style="width: 100%; height: 45px; background-color: tomato; overflow: hidden; font-size: 14px; padding-left: 5px;">
+                    @defect.DefectName
+                </div>
 
-                            <div style="width: 100%; height: 55px;">
-                                <b>Assigned to: </b> <br />
-                                @if (defect.DefectOwner != null)
+                <div style="width: 100%; height: 130px; font-size: 12px; padding-left: 5px;">
+
+                    <div style="width: 100%; height: 55px;">
+                        <b>Assigned to: </b> <br />
+                        @if (defect.DefectOwner != null)
                                 {@defect.DefectOwner.Email} <br />
-                            </div>
+                    </div>
 
-                            <div style="width: 100%; height: 40px; display: flex;">
+                    <div style="width: 100%; height: 40px; display: flex;">
 
-                                <div style="width: 50%; height: 40px;">
-                                    <b>Points:</b> @defect.DefectPoints
-                                </div>
+                        <div style="width: 50%; height: 40px;">
+                            <b>Points:</b> @defect.DefectPoints
+                        </div>
 
-                                <div style="width: 50%; height: 40px;">
-                                    <b>Due:</b> @Html.DisplayFor(d => defect.DefectDueDate)
-                                </div>
-
-                            </div>
-
-                            @Html.ActionLink("details", "Details", "Defect", new { Id = defect.Id }) / @Html.ActionLink("edit", "EditDefect", "Defect", new { Id = defect.Id })
+                        <div style="width: 50%; height: 40px;">
+                            <b>Due:</b> @Html.DisplayFor(d => defect.DefectDueDate)
                         </div>
 
                     </div>
+
+                    @Html.ActionLink("details", "Details", "Defect", new { Id = defect.Id }) / @Html.ActionLink("edit", "EditDefect", "Defect", new { Id = defect.Id })
+                </div>
+
+            </div>
                 }
             }
-            
+
 
         </div>
         }
@@ -140,7 +175,38 @@
 </div>
 
 
+<div id="SprintEndDatePicker" style="display: none; border: solid; width: 300px; height: 150px; position: fixed; top: 130px; left: 450px; background-color: white;">
+    <p>Select the Sprint end date: </p>
+    <input id="SprintEndDate"class="form-control" asp-for="SprintEndDate" />
+    @Html.ValidationMessageFor(s => s.SprintEndDate) <br/>
+    <button class="btn btn-primary" style="position: absolute; left: 50%; transform: translate(-50%, -25%);" onclick="ToggleSprint()">Start</button>
+</div>
+
+
 <script>
+
+    function ToggleSprint() {
+        $.ajax({
+            type: 'POST',
+            url: '/Dashboard/ToggleSprint',
+            data: { sprintId: @Model.Id, sprintEndDate: document.getElementById("SprintEndDate").value },
+            success: function() {window.location.reload();}
+        });
+    }
+
+    function pickSrintEndDate() {
+        var element = document.getElementById("SprintEndDatePicker");
+        element.style.display = "block";
+    }
+
+    function goToActiveSprint() {
+        $.ajax({
+            type: 'POST',
+            url: '/Dashboard/GoToActiveSprint',
+            success: function () { window.location.reload(); }
+        });
+    }
+
     function allowDrop(ev) {
         ev.preventDefault();
     }
@@ -181,8 +247,8 @@
         return returnElement;
     }
 
-    function preventDrop(ev) {
-
+    function noDrop() {
+        alert("Work Items cannot be moved to or from the final stage of a sprint which is not active.");
     }
 
     window.addEventListener("dragover",function(e){
@@ -192,6 +258,7 @@
     window.addEventListener("drop",function(e){
         e = e || event;
         e.preventDefault();
-    },false);
+    }, false);
+
 
 </script>

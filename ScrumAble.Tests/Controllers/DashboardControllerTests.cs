@@ -39,6 +39,7 @@ namespace ScrumAble.Tests.Controllers
             context.Add(user);
             context.Add(release);
             context.Add(team);
+            context.Add(sprint);
             context.SaveChanges();
 
             var dashboardController = new DashboardController(scrumAbleRepo, null);
@@ -55,7 +56,7 @@ namespace ScrumAble.Tests.Controllers
         }
 
         [Fact]
-        public void UT76_DashboardController_MoveWOrkItem_ShouldReturnFalseIfWorkflowStageIdIsInvalid()
+        public void UT76_DashboardController_MoveWorkItem_ShouldReturnFalseIfWorkflowStageIdIsInvalid()
         {
             // Arrange
             var options = new DbContextOptionsBuilder<ScrumAbleContext>()

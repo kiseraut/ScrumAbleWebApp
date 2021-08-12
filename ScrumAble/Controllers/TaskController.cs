@@ -70,9 +70,9 @@ namespace ScrumAble.Controllers
             }
 
             scrumAbleTask.ViewModelTaskAggregate = _scrumAbleRepo.GetTaskAggregateData(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            scrumAbleTask.TaskStoryId = scrumAbleTask.Story.Id;
+            scrumAbleTask.TaskStoryId = scrumAbleTask.Story == null ? -1 : scrumAbleTask.Story.Id;
             scrumAbleTask.TaskSprintId = scrumAbleTask.Sprint.Id;
-            scrumAbleTask.TaskOwnerId = scrumAbleTask.TaskOwner.Email;
+            scrumAbleTask.TaskOwnerId = scrumAbleTask.TaskOwner == null ? "-1" : scrumAbleTask.TaskOwner.Email;
 
 
             return View(scrumAbleTask);
@@ -93,7 +93,7 @@ namespace ScrumAble.Controllers
             scrumAbleTask.WorkflowStage = _scrumAbleRepo.GetTeamById(user.CurrentWorkingTeam.Id).WorkFlowStages
                 .SingleOrDefault(w => w.WorkflowStagePosition == 0);
 
-            _scrumAbleRepo.SaveToDb(scrumAbleTask);
+            _scrumAbleRepo.SaveToDb(scrumAbleTask, user);
             
             return RedirectToAction("Details", "Task", new {id = scrumAbleTask.Id});
         }
@@ -118,7 +118,7 @@ namespace ScrumAble.Controllers
 
             GetExternalObjectsFromIds(scrumAbleTask);
 
-            _scrumAbleRepo.SaveToDb(scrumAbleTask);
+            _scrumAbleRepo.SaveToDb(scrumAbleTask, user);
 
             return RedirectToAction("Details", "Task", new { scrumAbleTask.Id });
         }

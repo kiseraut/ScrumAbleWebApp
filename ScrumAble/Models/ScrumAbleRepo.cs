@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -6,6 +7,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using ScrumAble.Areas.Identity.Data;
 using ScrumAble.Data;
+using ScrumAble.Migrations;
 
 namespace ScrumAble.Models
 {
@@ -23,6 +25,9 @@ namespace ScrumAble.Models
         {
             return _context.Tasks.Where(t => t.Id == id)
                 .Include(t => t.Story).ThenInclude(s => s.Sprint)
+                .Include(t => t.TaskOwner)
+                .Include(t => t.Sprint)
+                .Include(t => t.WorkflowStage)
                 .SingleOrDefault();
         }
 
@@ -36,17 +41,24 @@ namespace ScrumAble.Models
                 .SingleOrDefault();
         }
 
-        public void SaveToDb(ScrumAbleTask task)
+        public void SaveToDb(ScrumAbleTask task, ScrumAbleUser user)
         {
             if (task.Id == 0)
             {
                 _context.Tasks.Add(task);
+                if (task.TaskPoints != null && task.Sprint == GetActiveSprint(task.Sprint.Release))
+                {
+                    UpdateGraphDataActualPoints((int) (task.TaskPoints), DateTime.Today, user);
+                }
             }
             else
             {
                 var dbTask = _context.Tasks.First(t => t.Id == task.Id);
                 _context.Entry(dbTask).CurrentValues.SetValues(task);
                 dbTask.WorkflowStage = task.WorkflowStage;
+                dbTask.TaskOwner = task.TaskOwner;
+                dbTask.Sprint = task.Sprint;
+                dbTask.Story = task.Story;
             }
 
             _context.SaveChanges();
@@ -71,11 +83,31 @@ namespace ScrumAble.Models
 
             if (IsAuthorized(task, user.Id) && IsAuthorized(workflowStage, user.Id))
             {
+                var fromWorkflowStage = task.WorkflowStage;
                 task.WorkflowStage = workflowStage;
 
-                task.TaskCloseDate = IsFinalWorkflowStage(workflowStage) ? DateTime.Now : null;
 
-                SaveToDb(task);
+                // if moving task to final stage of active sprint, else if moving task from final stage of active sprint
+                if (IsFinalWorkflowStage(workflowStage) && task.Sprint.IsActiveSprint && task.TaskPoints != null)
+                {
+                    var sprint = GetSprintById(task.Sprint.Id);
+                    sprint.SprintActual = (int)(sprint.SprintActual + task.TaskPoints);
+                    UpdateGraphDataActualPoints((0-(int)(task.TaskPoints)), DateTime.Today, user);
+                    SaveToDb(sprint);
+                    task.TaskCloseDate = DateTime.Now;
+                }
+                else if (IsFinalWorkflowStage(fromWorkflowStage) && task.Sprint.IsActiveSprint && task.TaskPoints != null)
+                {
+                    var sprint = GetSprintById(task.Sprint.Id);
+                    sprint.SprintActual = (int)(sprint.SprintActual - task.TaskPoints);
+                    UpdateGraphDataActualPoints((int)(task.TaskPoints), (DateTime)(task.TaskCloseDate), user);
+                    SaveToDb(sprint);
+                    task.TaskCloseDate = null;
+                }
+
+                
+
+                SaveToDb(task, user);
             }
         }
 
@@ -208,6 +240,62 @@ namespace ScrumAble.Models
             SaveToDb(user);
         }
 
+        public bool PrepareUserForDashboard(ScrumAbleUser user)
+        {
+            if (user.CurrentWorkingTeam != null && 
+                user.CurrentWorkingRelease != null &&
+                user.CurrentWorkingSprint != null)
+            {
+                return true;
+            }
+
+            if (user.CurrentWorkingTeam == null)
+            {
+                var userTeams = GetAllUserTeams(user.Id);
+                foreach (var team in userTeams)
+                {
+                    var userReleases = GetAllTeamReleases(team.Id);
+                    foreach (var release in userReleases)
+                    {
+                        var userSprints = GetAllSprintsInRelease(release.Id);
+                        if (userSprints != null)
+                        {
+                            user.CurrentWorkingTeam = team;
+                            user.CurrentWorkingRelease = release;
+                            user.CurrentWorkingSprint = userSprints[0];
+                            return true;
+                        }
+                    }
+                }
+            }
+            else if (user.CurrentWorkingRelease == null)
+            {
+                var userReleases = GetAllTeamReleases(user.CurrentWorkingTeam.Id);
+                foreach (var release in userReleases)
+                {
+                    var userSprints = GetAllSprintsInRelease(release.Id);
+                    if (userSprints != null)
+                    {
+                        user.CurrentWorkingRelease = release;
+                        user.CurrentWorkingSprint = userSprints[0];
+                        return true;
+                    }
+                }
+            }
+            else if (user.CurrentWorkingSprint == null)
+            {
+                var userSprints = GetAllSprintsInRelease(user.CurrentWorkingRelease.Id);
+                if (userSprints != null)
+                {
+                    user.CurrentWorkingSprint = userSprints[0];
+                    return true;
+                }
+                
+            }
+
+            return false;
+        }
+
         public ScrumAbleSprint GetSprintById(int id)
         {
             var sprint = _context.Sprints.Where(s => s.Id == id)
@@ -263,6 +351,14 @@ namespace ScrumAble.Models
 
         public void DeleteFromDb(ScrumAbleSprint sprint)
         {
+            var stories = _context.Stories.Where(s => s.Sprint == sprint).ToList();
+            var tasks = _context.Tasks.Where(t => t.Sprint == sprint).ToList();
+            var defects = _context.Defects.Where(d => d.Sprint == sprint).ToList();
+
+            foreach(var task in tasks.ToList()) { DeleteFromDb(task); }
+            foreach(var defect in defects.ToList()) { DeleteFromDb(defect); }
+            foreach (var story in stories.ToList()) { DeleteFromDb(story); }
+
             _context.Sprints.Remove(sprint);
             _context.SaveChanges();
         }
@@ -273,6 +369,143 @@ namespace ScrumAble.Models
                 .Where(s => s.SprintEndDate >= DateTime.Today)
                 .ToList();
         }
+
+        public ScrumAbleSprint GetActiveSprint(ScrumAbleRelease release)
+        {
+            var sprints = GetAllSprintsInRelease(release.Id);
+            ScrumAbleSprint activeSprint = null;
+
+            //find the active sprint
+            foreach (var sprint in sprints)
+            {
+                if (sprint.IsActiveSprint)
+                {
+                    return sprint;
+                }
+            }
+
+            //if no active sprint was found, return null
+            return null;
+        }
+
+        public int GetActiveSprintPoints(IScrumAbleSprint sprint)
+        {
+            var stories = _context.Stories.Where(s => s.Sprint.Id == sprint.Id).ToList();
+            var tasks = _context.Tasks.Where(t => t.Sprint.Id == sprint.Id).ToList();
+            var defects = _context.Defects.Where(d => d.Sprint.Id == sprint.Id).ToList();
+            var points = 0;
+
+            foreach (var story in stories)
+            {
+                points += story.StoryPoints;
+            }
+
+            foreach (var task in tasks)
+            {
+                points += task.TaskPoints ?? default(int);
+            }
+
+            foreach (var defect in defects)
+            {
+                points += defect.DefectPoints;
+            }
+
+            return points;
+
+        }
+
+        public void UpdateGraphDataActualPoints(int workItemPoints, DateTime closeDate, ScrumAbleUser user)
+        {
+            // first make sure the graph data is up to date
+            UpdateGraphDataForViewing(user);
+
+            var graphData = GetBurndownData(user);
+            var lastActual = graphData[0]["actual"].ToString();
+            var newGraphData = "";
+            var isFirstDataPoint = true;
+
+            // if workitemPoints is negative, we are moving the worklist item to the final stage
+            if (workItemPoints < 0)
+            {
+                // find today's entry and add the negative new sprint points to the actual (points + (neg number))
+                foreach (var datapoint in graphData)
+                {
+                    var separator = isFirstDataPoint ? "" : "#";
+                    isFirstDataPoint = false;
+
+                    if (DateTime.Parse(datapoint["date"].ToString()).Date == DateTime.Today.Date)
+                    {
+                        datapoint["actual"] = (float.Parse(datapoint["actual"].ToString()) + workItemPoints).ToString();
+                    }
+
+                    newGraphData += string.Format("{0}{1},{2},{3}", separator, datapoint["date"], datapoint["planned"], datapoint["actual"]);
+                }
+            }
+            // else if workitemPoints is positve, we are moving the worklist item from the final stage back into an open state
+            else if (workItemPoints > 0)
+            {
+                //for every entry that is between the original close date of the worklist item and today, add the points back on to the actual
+                foreach (var datapoint in graphData)
+                {
+                    var separator = isFirstDataPoint ? "" : "#";
+                    isFirstDataPoint = false;
+
+                    if (DateTime.Parse(datapoint["date"].ToString()).Date >= closeDate.Date && DateTime.Parse(datapoint["date"].ToString()).Date <= DateTime.Today.Date)
+                    {
+                        datapoint["actual"] = (float.Parse(datapoint["actual"].ToString()) + workItemPoints).ToString();
+                    }
+
+                    newGraphData += string.Format("{0}{1},{2},{3}", separator, datapoint["date"], datapoint["planned"], datapoint["actual"]);
+                }
+            }
+
+            var sprint = user.CurrentWorkingSprint;
+            sprint.GraphData = newGraphData;
+            SaveToDb(sprint);
+        }
+
+        public void UpdateGraphDataForViewing(ScrumAbleUser user)
+        {
+            var graphData = GetBurndownData(user);
+
+            if (graphData == null)
+            {
+                return;
+            }
+
+            var lastActual = graphData[0]["actual"].ToString();
+            var newGraphData = "";
+            var isFirstDataPoint = true;
+
+            foreach (var datapoint in graphData)
+            {
+                var separator = isFirstDataPoint ? "" : "#";
+                isFirstDataPoint = false;
+
+                if (datapoint["actual"].ToString() != "null" &&
+                    DateTime.Parse(datapoint["date"].ToString()) <= DateTime.Today)
+                {
+                    lastActual = datapoint["actual"].ToString();
+                }
+                else if (datapoint["actual"].ToString() == "null" &&
+                         DateTime.Parse(datapoint["date"].ToString()) <= DateTime.Today)
+                {
+                    datapoint["actual"] = lastActual;
+                }
+                else
+                {
+                    datapoint["actual"] = "null";
+                }
+
+                newGraphData += string.Format("{0}{1},{2},{3}", separator, datapoint["date"], datapoint["planned"], datapoint["actual"]);
+            }
+
+            var sprint = user.CurrentWorkingSprint;
+            sprint.GraphData = newGraphData;
+            SaveToDb(sprint);
+
+        }
+
 
         public ScrumAbleStory GetStoryById(int id)
         {
@@ -287,11 +520,15 @@ namespace ScrumAble.Models
             return IsAuthorized(story.Sprint, userId);
         }
 
-        public void SaveToDb(ScrumAbleStory story)
+        public void SaveToDb(ScrumAbleStory story, ScrumAbleUser user)
         {
             if (story.Id == 0)
             {
-                //story.Sprint.Release.Team.WorkFlowStages.Where(w => w.WorkflowStagePosition == 0);
+                if (story.StoryPoints != null && story.Sprint == GetActiveSprint(story.Sprint.Release))
+                {
+                    UpdateGraphDataActualPoints((int)(story.StoryPoints), DateTime.Today, user);
+                }
+            
                 _context.Stories.Add(story);
                 _context.SaveChanges();
             }
@@ -308,6 +545,9 @@ namespace ScrumAble.Models
 
         public void DeleteFromDb(ScrumAbleStory story)
         {
+            var tasks = _context.Tasks.Where(t => t.Story == story).ToList();
+            foreach (var task in tasks.ToList()) { DeleteFromDb(task); }
+
             _context.Stories.Remove(story);
             _context.SaveChanges();
         }
@@ -319,10 +559,30 @@ namespace ScrumAble.Models
 
             if (IsAuthorized(story, user.Id) && IsAuthorized(workflowStage, user.Id))
             {
-                story.WorkflowStage = workflowStage;
-                story.StoryCloseDate = IsFinalWorkflowStage(workflowStage) ? DateTime.Now : null;
 
-                SaveToDb(story);
+                var fromWorkflowStage = story.WorkflowStage;
+                story.WorkflowStage = workflowStage;
+
+
+                // if moving story to final stage of active sprint, else if moving story from final stage of active sprint
+                if (IsFinalWorkflowStage(workflowStage) && story.Sprint.IsActiveSprint && story.StoryPoints != null)
+                {
+                    var sprint = GetSprintById(story.Sprint.Id);
+                    sprint.SprintActual = (int)(sprint.SprintActual + story.StoryPoints);
+                    UpdateGraphDataActualPoints((0 - (int)(story.StoryPoints)), DateTime.Today, user);
+                    SaveToDb(sprint);
+                    story.StoryCloseDate = DateTime.Now;
+                }
+                else if (IsFinalWorkflowStage(fromWorkflowStage) && story.Sprint.IsActiveSprint && story.StoryPoints != null)
+                {
+                    var sprint = GetSprintById(story.Sprint.Id);
+                    sprint.SprintActual = (int)(sprint.SprintActual - story.StoryPoints);
+                    UpdateGraphDataActualPoints((int)(story.StoryPoints), (DateTime)(story.StoryCloseDate), user);
+                    SaveToDb(sprint);
+                    story.StoryCloseDate = null;
+                }
+
+                SaveToDb(story, user);
             }
 
         }
@@ -408,6 +668,13 @@ namespace ScrumAble.Models
 
         public void DeleteFromDb(ScrumAbleRelease release)
         {
+            var sprints = _context.Sprints.Where(s => s.Release == release).ToList();
+            var stories = new List<ScrumAbleStory>();
+            var tasks = new List<ScrumAbleTask>();
+            var defects = new List<ScrumAbleDefect>();
+
+            foreach (var sprint in sprints.ToList()) { DeleteFromDb(sprint); }
+
             _context.Releases.Remove(release);
             _context.SaveChanges();
         }
@@ -532,6 +799,12 @@ namespace ScrumAble.Models
 
         public void DeleteFromDb(ScrumAbleTeam team)
         {
+            var releases = _context.Releases.Where(r => r.Team == team);
+            var workflowStages = _context.WorkflowStages.Where(w => w.Team == team);
+            
+            foreach (var release in releases.ToList()) { DeleteFromDb(release); }
+            foreach (var workflowStage in workflowStages.ToList()) { DeleteFromDb(workflowStage); }
+
             _context.Teams.Remove(team);
             _context.SaveChanges();
         }
@@ -579,10 +852,15 @@ namespace ScrumAble.Models
             return IsAuthorized(defect.Sprint, userId);
         }
 
-        public void SaveToDb(ScrumAbleDefect defect)
+        public void SaveToDb(ScrumAbleDefect defect, ScrumAbleUser user)
         {
             if (defect.Id == 0)
             {
+                if (defect.DefectPoints != null && defect.Sprint == GetActiveSprint(defect.Sprint.Release))
+                {
+                    UpdateGraphDataActualPoints((int)(defect.DefectPoints), DateTime.Today, user);
+                }
+            
                 _context.Defects.Add(defect);
                 _context.SaveChanges();
             }
@@ -592,6 +870,8 @@ namespace ScrumAble.Models
                 _context.Entry(dbDefect).CurrentValues.SetValues(defect);
                 dbDefect.Sprint = defect.Sprint;
                 dbDefect.WorkflowStage = defect.WorkflowStage;
+                dbDefect.DefectOwner = defect.DefectOwner;
+
                 _context.SaveChanges();
             }
         }
@@ -604,16 +884,89 @@ namespace ScrumAble.Models
 
         public void MoveDefect(int defectId, int workflowStageId, ScrumAbleUser user)
         {
+
             var defect = GetDefectById(defectId);
             var workflowStage = GetWorkflowStageById(workflowStageId);
 
             if (IsAuthorized(defect, user.Id) && IsAuthorized(workflowStage, user.Id))
             {
-                defect.WorkflowStage = workflowStage;
-                defect.DefectCloseDate = IsFinalWorkflowStage(workflowStage) ? DateTime.Now : null;
 
-                SaveToDb(defect);
+                var fromWorkflowStage = defect.WorkflowStage;
+                defect.WorkflowStage = workflowStage;
+
+
+                // if moving story to final stage of active sprint, else if moving story from final stage of active sprint
+                if (IsFinalWorkflowStage(workflowStage) && defect.Sprint.IsActiveSprint && defect.DefectPoints != null)
+                {
+                    var sprint = GetSprintById(defect.Sprint.Id);
+                    sprint.SprintActual = (int)(sprint.SprintActual + defect.DefectPoints);
+                    UpdateGraphDataActualPoints((0 - (int)(defect.DefectPoints)), DateTime.Today, user);
+                    SaveToDb(sprint);
+                    defect.DefectCloseDate = DateTime.Now;
+                }
+                else if (IsFinalWorkflowStage(fromWorkflowStage) && defect.Sprint.IsActiveSprint && defect.DefectPoints != null)
+                {
+                    var sprint = GetSprintById(defect.Sprint.Id);
+                    sprint.SprintActual = (int)(sprint.SprintActual - defect.DefectPoints);
+                    UpdateGraphDataActualPoints((int)(defect.DefectPoints), (DateTime)(defect.DefectCloseDate), user);
+                    SaveToDb(sprint);
+                    defect.DefectCloseDate = null;
+                }
+
+                SaveToDb(defect, user);
             }
+        }
+
+        public List<Hashtable> GetBurndownData(ScrumAbleUser user)
+        {
+            //var activeSprint = GetActiveSprint(user.CurrentWorkingRelease);
+            var activeSprint = user.CurrentWorkingSprint;
+
+            //if no active sprint was found, return null
+            if (activeSprint == null || activeSprint.GraphData == null)
+            {
+                return null;
+            }
+
+            List<Hashtable> graphData = new List<Hashtable>();
+            Hashtable tempHashtable = new Hashtable();
+
+            var graphDataString = activeSprint.GraphData;
+            var dataPoints = graphDataString.Split('#');
+
+            foreach (var datapoint in dataPoints)
+            {
+                tempHashtable = new Hashtable();
+                var dataColumns = datapoint.Split(",");
+                tempHashtable.Add("date",dataColumns[0]);
+                tempHashtable.Add("planned",dataColumns[1]);
+                tempHashtable.Add("actual",dataColumns[2]);
+                graphData.Add(tempHashtable);
+            }
+
+            return graphData;
+
+        }
+
+        public List<Hashtable> GetVelocityData(ScrumAbleUser user)
+        {
+            var sprints = _context.Sprints.Where(s => (s.Release == user.CurrentWorkingRelease && !s.IsBacklog) && (s.IsCompleted || s.IsActiveSprint)).ToList();
+            sprints.OrderBy(s => s.SprintStartDate);
+
+            List<Hashtable> graphData = new List<Hashtable>();
+            Hashtable tempHashtable = new Hashtable();
+
+            foreach (var sprint in sprints)
+            {
+                tempHashtable = new Hashtable();
+                tempHashtable.Add("sprintName", sprint.SprintName);
+                tempHashtable.Add("planned", sprint.SprintPlanned.ToString());
+                tempHashtable.Add("actual", sprint.SprintActual.ToString());
+                graphData.Add(tempHashtable);
+            }
+
+            return graphData;
+
         }
 
         public bool IsAuthorized(ScrumAbleWorkflowStage workflowStage, string userId)
@@ -628,7 +981,12 @@ namespace ScrumAble.Models
         public bool SaveToDb(ScrumAbleWorkflowStage workflowStage, ScrumAbleUser user)
         {
 
-            if (!IsAuthorized(workflowStage.Team, user.Id)) { return false; }
+            var team = _context.Teams.Where(t => t == workflowStage.Team)
+                .Include( t => t.UserTeamMappings)
+                .FirstOrDefault();
+            
+
+            if (!IsAuthorized(team, user.Id)) { return false; }
 
             //first set the positions for all workflow stages in this team
             var i = 0;
@@ -640,7 +998,7 @@ namespace ScrumAble.Models
                 }
                 else
                 {
-                    
+
                     var currentWorkflowStage = GetWorkflowStageById(workflowStageId);
                     if (!IsAuthorized(currentWorkflowStage.Team, user.Id) || currentWorkflowStage.Team != workflowStage.Team) { return false; }
                     currentWorkflowStage.WorkflowStagePosition = i;
@@ -649,6 +1007,7 @@ namespace ScrumAble.Models
 
                 i++;
             }
+
 
             if (workflowStage.Id == 0)
             {
@@ -667,6 +1026,14 @@ namespace ScrumAble.Models
 
         public void DeleteFromDb(ScrumAbleWorkflowStage workflowStage)
         {
+            var stories = _context.Stories.Where(s => s.WorkflowStage == workflowStage).ToList();
+            var tasks = _context.Tasks.Where(t => t.WorkflowStage == workflowStage).ToList();
+            var defects = _context.Defects.Where(d => d.WorkflowStage == workflowStage).ToList();
+
+            foreach (var task in tasks.ToList()) { DeleteFromDb(task); }
+            foreach (var defect in defects.ToList()) { DeleteFromDb(defect); }
+            foreach (var story in stories.ToList()) { DeleteFromDb(story); }
+
             _context.WorkflowStages.Remove(workflowStage);
             _context.SaveChanges();
         }

@@ -34,6 +34,7 @@ namespace ScrumAble.Models
 
         //The number of points assigned to this Defect
         [Required(AllowEmptyStrings = false), Display(Name = "Sprint Points For This Defect")]
+        [RegularExpression(@"^[0-9]+$", ErrorMessage = "Defect points must be a positive whole number.")]
         public int DefectPoints { get; set; }
 
         //The description of the Defect
