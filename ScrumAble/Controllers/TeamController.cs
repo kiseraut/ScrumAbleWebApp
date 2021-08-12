@@ -143,29 +143,43 @@ namespace ScrumAble.Controllers
 
             _scrumAbleRepo.SaveToDb(team, goodUsers);
 
+            var orderList = new List<int>() {-1};
+
             var openWFStage = new ScrumAbleWorkflowStage
             {
                 WorkflowStageName = "Planned",
                 Team = team,
-                WorkflowStagePosition = 0
+                WorkflowStagePosition = 0,
+                NewWorkflowStageOrder = orderList
             };
+
+            _scrumAbleRepo.SaveToDb(openWFStage, user);
+            orderList.Clear();
+            orderList.Add(openWFStage.Id);
+            orderList.Add(-1);
 
             var inProgressWFStage = new ScrumAbleWorkflowStage
             {
                 WorkflowStageName = "In Progress",
                 Team = team,
-                WorkflowStagePosition = 1
+                WorkflowStagePosition = 1,
+                NewWorkflowStageOrder = orderList
             };
+
+            _scrumAbleRepo.SaveToDb(inProgressWFStage, user);
+            orderList.Clear();
+            orderList.Add(openWFStage.Id);
+            orderList.Add(inProgressWFStage.Id);
+            orderList.Add(-1);
 
             var ClosedWFStage = new ScrumAbleWorkflowStage
             {
                 WorkflowStageName = "Closed",
                 Team = team,
-                WorkflowStagePosition = 2
+                WorkflowStagePosition = 2,
+                NewWorkflowStageOrder = orderList
             };
 
-            _scrumAbleRepo.SaveToDb(openWFStage, user);
-            _scrumAbleRepo.SaveToDb(inProgressWFStage, user);
             _scrumAbleRepo.SaveToDb(ClosedWFStage, user);
 
             return RedirectToAction("Details", "Team", new { id = team.Id });
